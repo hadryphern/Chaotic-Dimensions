@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11612.153 insiders
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chaotic", "chaotic.csproj", "{B6369987-B3B4-A052-660D-0AD5B2CF8581}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6369987-B3B4-A052-660D-0AD5B2CF8581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6369987-B3B4-A052-660D-0AD5B2CF8581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6369987-B3B4-A052-660D-0AD5B2CF8581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6369987-B3B4-A052-660D-0AD5B2CF8581}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9969C005-838F-4A5F-8610-965E9CB06790}
+	EndGlobalSection
+EndGlobal
