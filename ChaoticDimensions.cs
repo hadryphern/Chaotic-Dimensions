@@ -1,15 +1,31 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChaoticDimensions.Common.Graphics;
+using Terraria;
+using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 using Terraria.ModLoader;
 
 namespace ChaoticDimensions
 {
-	// Please read https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Modding-Guide#mod-skeleton-contents for more information about the various files in a mod.
 	public class ChaoticDimensions : Mod
 	{
+		internal const string CrystalineDevourerSkyKey = "ChaoticDimensions:CrystalineDevourerSky";
 
+		public override void Load() {
+			if (Main.dedServ) {
+				return;
+			}
+
+			Filters.Scene[CrystalineDevourerSkyKey] = new Filter(new ScreenShaderData("FilterMiniTower").UseColor(0.45f, 0.1f, 0.55f), EffectPriority.VeryHigh);
+			SkyManager.Instance[CrystalineDevourerSkyKey] = new CrystalineDevourerSky();
+		}
+
+		public override void Unload() {
+			if (Main.dedServ) {
+				return;
+			}
+
+			Filters.Scene[CrystalineDevourerSkyKey] = null;
+			SkyManager.Instance[CrystalineDevourerSkyKey] = null;
+		}
 	}
 }
