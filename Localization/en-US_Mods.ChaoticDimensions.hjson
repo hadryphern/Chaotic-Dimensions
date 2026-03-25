@@ -59,6 +59,7 @@ Projectiles: {
 	CrystalineStarMinion.DisplayName: Crystaline Star Minion
 	CrystalineStarShot.DisplayName: Crystaline Star Shot
 	CrystalineDevourerSkyBeam.DisplayName: Crystaline Devourer Sky Beam
+	CrystalineDevourerArenaWall.DisplayName: Crystaline Devourer Arena Wall
 }
 
 Buffs: {

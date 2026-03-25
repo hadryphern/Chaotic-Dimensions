@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ChaoticDimensions.Content.Bosses.CrystalineDevourer;
+using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.Graphics.Effects;
@@ -13,6 +14,8 @@ namespace ChaoticDimensions.Common.Graphics
 {
 	public sealed class CrystalineDevourerSky : CustomSky
 	{
+		private static readonly Asset<Texture2D> BackdropTexture = ModContent.Request<Texture2D>("ChaoticDimensions/Assets/UI/CrystalineCosmosBackground");
+
 		private struct SkyStar
 		{
 			public Vector2 Position;
@@ -58,32 +61,38 @@ namespace ChaoticDimensions.Common.Graphics
 			}
 
 			Texture2D pixel = TextureAssets.MagicPixel.Value;
+			Texture2D backdrop = BackdropTexture.Value;
 			Rectangle screen = new(0, 0, Main.screenWidth, Main.screenHeight);
 
-			Color top = Color.Lerp(Color.Black, new Color(34, 6, 54), intensity);
-			Color mid = Color.Lerp(Color.Black, new Color(70, 16, 97), intensity);
-			Color bottom = Color.Lerp(Color.Black, new Color(18, 5, 32), intensity);
+			float driftX = (Main.screenPosition.X * 0.0125f) % 150f;
+			float driftY = (Main.screenPosition.Y * 0.0085f) % 90f;
+			Rectangle backgroundDestination = new(-120 - (int)driftX, -90 - (int)driftY, screen.Width + 240, screen.Height + 180);
+			spriteBatch.Draw(backdrop, backgroundDestination, Color.White * (0.78f * intensity));
 
-			spriteBatch.Draw(pixel, new Rectangle(0, 0, screen.Width, screen.Height / 2), top);
-			spriteBatch.Draw(pixel, new Rectangle(0, screen.Height / 3, screen.Width, screen.Height / 2), mid * 0.92f);
-			spriteBatch.Draw(pixel, new Rectangle(0, screen.Height / 2, screen.Width, screen.Height / 2), bottom * 0.95f);
+			Color top = Color.Lerp(Color.Black, new Color(24, 4, 40), intensity);
+			Color mid = Color.Lerp(Color.Black, new Color(58, 12, 83), intensity);
+			Color bottom = Color.Lerp(Color.Black, new Color(16, 4, 28), intensity);
 
-			DrawWaveLayer(spriteBatch, pixel, 0.75f, 32f, 0.75f, new Color(117, 24, 158) * (0.18f * intensity));
-			DrawWaveLayer(spriteBatch, pixel, 0.55f, 54f, -0.55f, new Color(89, 14, 122) * (0.22f * intensity));
-			DrawWaveLayer(spriteBatch, pixel, 0.35f, 78f, 0.35f, new Color(161, 64, 199) * (0.14f * intensity));
+			spriteBatch.Draw(pixel, new Rectangle(0, 0, screen.Width, screen.Height / 2), top * 0.64f);
+			spriteBatch.Draw(pixel, new Rectangle(0, screen.Height / 3, screen.Width, screen.Height / 2), mid * 0.58f);
+			spriteBatch.Draw(pixel, new Rectangle(0, screen.Height / 2, screen.Width, screen.Height / 2), bottom * 0.78f);
+
+			DrawWaveLayer(spriteBatch, pixel, 0.75f, 32f, 0.75f, new Color(117, 24, 158) * (0.1f * intensity));
+			DrawWaveLayer(spriteBatch, pixel, 0.55f, 54f, -0.55f, new Color(89, 14, 122) * (0.14f * intensity));
+			DrawWaveLayer(spriteBatch, pixel, 0.35f, 78f, 0.35f, new Color(161, 64, 199) * (0.08f * intensity));
 
 			foreach (SkyStar star in stars) {
 				float twinkle = 0.55f + 0.45f * (float)Math.Sin(Main.GlobalTimeWrappedHourly * 2.4f + star.TwinkleOffset);
 				Vector2 position = ApplyParallax(star.Position, star.Depth);
 				float size = star.Scale * (0.6f + intensity * 0.8f);
 				Rectangle starRect = new((int)position.X, (int)position.Y, Math.Max(1, (int)size), Math.Max(1, (int)size));
-				spriteBatch.Draw(pixel, starRect, Color.Lerp(new Color(182, 90, 216), Color.White, 0.45f) * (twinkle * intensity));
+				spriteBatch.Draw(pixel, starRect, Color.Lerp(new Color(182, 90, 216), Color.White, 0.45f) * (twinkle * intensity * 0.75f));
 			}
 
 			foreach (ConstellationLine line in constellations) {
 				Vector2 start = ApplyParallax(line.Start, line.Depth);
 				Vector2 end = ApplyParallax(line.End, line.Depth);
-				DrawLine(spriteBatch, pixel, start, end, new Color(190, 120, 232) * (0.18f * intensity), 2f);
+				DrawLine(spriteBatch, pixel, start, end, new Color(190, 120, 232) * (0.1f * intensity), 2f);
 			}
 		}
 

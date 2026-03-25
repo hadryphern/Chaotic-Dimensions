@@ -16,6 +16,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
+using ChaoticDimensions.Common.Systems;
 
 namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 {
@@ -31,8 +32,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 	{
 		public const int SharedLifeMax = 5000000;
 		public const int IndividualLifeMax = SharedLifeMax / 2;
-		private const int MinSegments = 66;
-		private const int MaxSegments = 74;
+		private const int MinSegments = 80;
+		private const int MaxSegments = 92;
 		private const float SpawnBodySpacing = 48f;
 		private const float SpawnHeadSpacing = 66f;
 		private const float SpawnTailSpacing = 58f;
@@ -40,9 +41,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		private const int OrbitDuration = 180;
 		private const int DashDuration = 38;
 		private const int DashCooldown = 30;
-		private const int SupremeSkyBeamTelegraph = 60;
-		private const int SupremeSkyBeamDuration = 300;
-		private const int SupremeSkyBeamCooldown = 300;
+		private const int SupremeSkyBeamTelegraph = 45;
+		private const int SupremeSkyBeamDuration = 150;
 
 		private bool initialized;
 		private int wormIndex;
@@ -123,6 +123,10 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			}
 
 			if (ControlsState) {
+				CrystalineDevourerArenaSystem.EnsureArena(NPC, target);
+			}
+
+			if (ControlsState) {
 				RunLeaderState(target);
 				UpdateProjectilePressure(target);
 			}
@@ -147,6 +151,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 
 			shardBurstTimer = wormIndex * 6;
 			pressureRetargetTimer = wormIndex * 14;
+			skyBeamTimer = 120 + (wormIndex * 20);
 		}
 
 		private void SpawnSegmentsIfNeeded() {
@@ -279,10 +284,11 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 				return;
 			}
 
-			skyBeamTimer++;
-			int supremeCycle = SupremeSkyBeamTelegraph + SupremeSkyBeamDuration + SupremeSkyBeamCooldown;
-			if (skyBeamTimer % supremeCycle == 1) {
+			skyBeamTimer--;
+			if (skyBeamTimer <= 0) {
 				SpawnSkyBeam(target);
+				skyBeamTimer = GetNextSkyBeamDelay();
+				NPC.netUpdate = true;
 			}
 			attackState = CrystalineAttackState.SupremeLaser;
 		}
@@ -484,25 +490,28 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			}
 
 			float ratio = SharedLifeRatio;
-			int beamCount = ratio <= 0.10f ? 6 : ratio <= 0.15f ? 4 : 1;
-			float spread = ratio <= 0.10f ? 900f : ratio <= 0.15f ? 700f : 520f;
+			int beamCount = ratio <= 0.10f ? 6 : ratio <= 0.18f ? 5 : 4;
+			Vector2 arenaCenter = CrystalineDevourerArenaSystem.IsActive ? CrystalineDevourerArenaSystem.Center : target.Center;
+			float horizontalSpread = CrystalineDevourerArenaSystem.IsActive ? CrystalineDevourerArenaSystem.HalfWidth - 320f : 1100f;
+			float verticalSpread = CrystalineDevourerArenaSystem.IsActive ? CrystalineDevourerArenaSystem.HalfHeight - 260f : 420f;
 
 			for (int i = 0; i < beamCount; i++) {
-				float offsetX;
-				if (beamCount == 1) {
-					offsetX = Main.rand.NextFloat(-spread, spread);
-				}
-				else {
-					float slotProgress = beamCount == 1 ? 0.5f : i / (float)(beamCount - 1);
-					float baseOffset = MathHelper.Lerp(-spread, spread, slotProgress);
-					offsetX = baseOffset + Main.rand.NextFloat(-90f, 90f);
-				}
-
-				Vector2 beamCenter = new(target.Center.X + offsetX, target.Center.Y);
-				Projectile.NewProjectile(NPC.GetSource_FromAI(), beamCenter, Vector2.Zero, ModContent.ProjectileType<CrystalineDevourerSkyBeam>(), 580, 0f, Main.myPlayer, SupremeSkyBeamTelegraph, SupremeSkyBeamDuration);
+				Vector2 beamCenter = arenaCenter + new Vector2(
+					Main.rand.NextFloat(-horizontalSpread, horizontalSpread),
+					Main.rand.NextFloat(-verticalSpread, verticalSpread));
+				Vector2 beamDirection = Vector2.UnitY.RotatedBy(MathHelper.ToRadians(Main.rand.NextFloat(-72f, 72f)));
+				Projectile.NewProjectile(NPC.GetSource_FromAI(), beamCenter, beamDirection, ModContent.ProjectileType<CrystalineDevourerSkyBeam>(), 580, 0f, Main.myPlayer, SupremeSkyBeamTelegraph, SupremeSkyBeamDuration);
 			}
 
 			SoundEngine.PlaySound(SoundID.Item122 with { Pitch = -0.2f, Volume = 1.2f }, target.Center);
+		}
+
+		private int GetNextSkyBeamDelay() {
+			return SharedLifeRatio switch {
+				<= 0.10f => Main.rand.Next(55, 90),
+				<= 0.18f => Main.rand.Next(75, 110),
+				_ => Main.rand.Next(95, 135)
+			};
 		}
 
 		private void UpdateProjectilePressure(Player target) {
@@ -637,7 +646,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			Vector2 drawPosition = NPC.Center - screenPos + forward * (HeadDrawForwardOffset + 2f);
 			Vector2 origin = texture.Size() * 0.5f;
 			float speedStretch = MathHelper.Clamp(NPC.velocity.Length() / 90f, 0f, 0.08f);
-			Vector2 drawScale = new(0.985f, 1f + speedStretch);
+			Vector2 drawScale = new(1.04f, 1.04f + speedStretch);
 			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), drawRotation, origin, drawScale, SpriteEffects.None, 0f);
 			return false;
 		}

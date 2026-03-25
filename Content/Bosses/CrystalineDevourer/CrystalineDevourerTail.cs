@@ -10,7 +10,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 	public sealed class CrystalineDevourerTail : ModNPC
 	{
 		private const float SegmentFollowDistance = 58f;
-		private const float TailDrawBackwardOffset = 14f;
+		private const float TailDrawBackwardOffset = 24f;
 		private static readonly Vector2 TailScale = new(0.94f, 1.04f);
 
 		public override void SetStaticDefaults() {
@@ -67,11 +67,11 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			Texture2D texture = TextureAssets.Npc[Type].Value;
 			Vector2 origin = texture.Size() * 0.5f;
 			Vector2 axis = CrystalineDevourerSegmentVisuals.GetSegmentAxis(NPC, out float curvature);
-			Vector2 drawPosition = CrystalineDevourerSegmentVisuals.GetSegmentDrawCenter(NPC, 0.16f) - screenPos - axis * TailDrawBackwardOffset;
+			Vector2 drawPosition = NPC.Center - screenPos - axis * TailDrawBackwardOffset;
 			float drawRotation = axis.ToRotation() + MathHelper.PiOver2;
 			Vector2 drawScale = new(
-				MathHelper.Lerp(TailScale.X * 0.96f, TailScale.X * 0.9f, curvature),
-				MathHelper.Lerp(TailScale.Y * 1.08f, TailScale.Y * 1.14f, curvature));
+				MathHelper.Lerp(TailScale.X * 1.08f, TailScale.X * 1.02f, curvature),
+				MathHelper.Lerp(TailScale.Y * 1.18f, TailScale.Y * 1.28f, curvature));
 			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), drawRotation, origin, drawScale, SpriteEffects.None, 0f);
 			return false;
 		}
