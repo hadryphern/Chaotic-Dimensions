@@ -1,4 +1,5 @@
 using ChaoticDimensions.Content.Bosses.CrystalineDevourer;
+using ChaoticDimensions.Common.Systems;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
@@ -12,7 +13,7 @@ namespace ChaoticDimensions.Content.Scenes
 		public override int Music => MusicLoader.GetMusicSlot(Mod, "Sounds/Music/CrystalineWorm");
 
 		public override bool IsSceneEffectActive(Player player) {
-			return NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>());
+			return CrystalineDevourerIntroSystem.IsActive || NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>());
 		}
 
 		public override void SpecialVisuals(Player player, bool isActive) {

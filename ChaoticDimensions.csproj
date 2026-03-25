@@ -9,8 +9,12 @@
 	</PropertyGroup>
 
 	<!-- References -->
+
 	<ItemGroup>
-		
+		<Compile Remove=".analysis\**\*" />
+		<Content Remove=".analysis\**\*" />
+		<EmbeddedResource Remove=".analysis\**\*" />
+		<None Remove=".analysis\**\*" />
 	</ItemGroup>
 
 </Project>

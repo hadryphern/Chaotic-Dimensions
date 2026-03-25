@@ -1,9 +1,17 @@
 using System;
 using System.IO;
 using Microsoft.Xna.Framework;
+using ChaoticDimensions.Content.BossBars;
+using ChaoticDimensions.Content.Items.Accessories;
+using ChaoticDimensions.Content.Items.Consumables;
+using ChaoticDimensions.Content.Items.Materials;
+using ChaoticDimensions.Content.Items.Weapons.Magic;
+using ChaoticDimensions.Content.Items.Weapons.Melee;
+using ChaoticDimensions.Content.Items.Weapons.Ranged;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -13,24 +21,22 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 	{
 		Orbit,
 		Dash,
-		SupremeLaser,
-		SupremePortals
+		SupremeLaser
 	}
 
+	[AutoloadBossHead]
 	public sealed class CrystalineDevourerHead : ModNPC
 	{
-		public override string Texture => "Terraria/Images/NPC_134";
-
-		public const int SharedLifeMax = 987000;
-		private const int MinSegments = 48;
-		private const int MaxSegments = 54;
+		public const int SharedLifeMax = 5000000;
+		public const int IndividualLifeMax = SharedLifeMax / 2;
+		private const int MinSegments = 60;
+		private const int MaxSegments = 68;
 		private const int OrbitDuration = 180;
-		private const int DashDuration = 34;
-		private const int DashCooldown = 40;
-		private const int SupremeLaserTelegraph = 60;
-		private const int SupremeLaserDuration = 300;
-		private const int SupremePortalDuration = 120;
-		private const float OrbitSeparation = 210f;
+		private const int DashDuration = 38;
+		private const int DashCooldown = 30;
+		private const int SupremeSkyBeamTelegraph = 60;
+		private const int SupremeSkyBeamDuration = 300;
+		private const int SupremeSkyBeamCooldown = 300;
 
 		private bool initialized;
 		private int wormIndex;
@@ -46,25 +52,30 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		private Vector2 lastTargetPosition;
 		private Vector2 cachedBeamDirection = Vector2.UnitX;
 		private int shardBurstTimer;
+		private int pressureBurstTimer;
+		private int pressureRetargetTimer;
+		private Vector2 pressureTargetPosition;
+		private int skyBeamTimer;
 
 		private bool IsLeader => wormIndex == 0;
+		private bool ControlsState => IsLeader || !TwinIsAlive;
 		private bool TwinIsAlive => twinHeadIndex >= 0 && twinHeadIndex < Main.maxNPCs && Main.npc[twinHeadIndex].active && Main.npc[twinHeadIndex].type == Type;
 		private NPC TwinNPC => TwinIsAlive ? Main.npc[twinHeadIndex] : null;
 		private CrystalineDevourerHead Leader => IsLeader ? this : (TwinIsAlive ? TwinNPC.ModNPC as CrystalineDevourerHead : this);
-		private float SharedLifeRatio => NPC.life / (float)Math.Max(1, NPC.lifeMax);
+		private float SharedLifeRatio => GetCombinedLife() / (float)Math.Max(1, GetCombinedLifeMax());
 
 		private int CurrentPhase {
 			get {
-				float ratio = Leader.NPC.life / (float)Math.Max(1, Leader.NPC.lifeMax);
+				float ratio = SharedLifeRatio;
 				if (ratio > 0.85f)
 					return 1;
 				if (ratio > 0.75f)
 					return 2;
-				if (ratio > 0.65f)
+				if (ratio > 0.7f)
 					return 3;
-				if (ratio > 0.5f)
+				if (ratio > 0.65f)
 					return 4;
-				if (ratio > 0.35f)
+				if (ratio > 0.6f)
 					return 5;
 				return 6;
 			}
@@ -76,11 +87,11 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		public override void SetDefaults() {
-			NPC.width = 112;
-			NPC.height = 112;
-			NPC.damage = 175;
+			NPC.width = 96;
+			NPC.height = 96;
+			NPC.damage = 260;
 			NPC.defense = 5;
-			NPC.lifeMax = SharedLifeMax;
+			NPC.lifeMax = IndividualLifeMax;
 			NPC.knockBackResist = 0f;
 			NPC.value = Item.buyPrice(platinum: 1, gold: 50);
 			NPC.npcSlots = 12f;
@@ -89,7 +100,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			NPC.noGravity = true;
 			NPC.noTileCollide = true;
 			NPC.netAlways = true;
-			NPC.BossBar = Main.BigBossProgressBar.NeverValid;
+			NPC.BossBar = ModContent.GetInstance<CrystalineDevourerBossBar>();
 			Music = MusicID.Boss3;
 		}
 
@@ -105,11 +116,13 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 				return false;
 			}
 
-			if (IsLeader) {
+			if (ControlsState) {
 				RunLeaderState(target);
+				UpdateProjectilePressure(target);
 			}
 
 			UpdateMovement(target);
+			UpdateCombatStats();
 			UpdateRotation();
 			UpdateOpacity();
 			return false;
@@ -125,6 +138,9 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			if (NPC.ai[2] >= 0f) {
 				wormIndex = (int)NPC.ai[2];
 			}
+
+			shardBurstTimer = wormIndex * 6;
+			pressureRetargetTimer = wormIndex * 14;
 		}
 
 		private void SpawnSegmentsIfNeeded() {
@@ -163,6 +179,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			int twin = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y - 120, Type, NPC.whoAmI);
 			NPC twinNpc = Main.npc[twin];
 			twinNpc.ai[2] = 1f;
+			twinNpc.boss = false;
 			twinNpc.netUpdate = true;
 
 			var twinHead = (CrystalineDevourerHead)twinNpc.ModNPC;
@@ -176,26 +193,32 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		private void SyncSharedLife() {
-			if (!TwinIsAlive) {
-				return;
-			}
-
-			NPC twin = TwinNPC;
-			if (IsLeader) {
-				int sharedLife = Math.Min(NPC.life, twin.life);
-				NPC.life = sharedLife;
-				twin.life = sharedLife;
-				if (sharedLife <= 0) {
-					NPC.active = false;
-					twin.active = false;
-				}
-			}
-			else if (Leader != null && Leader != this) {
-				NPC.life = Leader.NPC.life;
-			}
+			// Phase thresholds and boss bar use combined life, but each worm now keeps its own health pool.
 		}
 
 		private void TargetOrDespawn() {
+			bool anyLivingPlayer = false;
+			for (int i = 0; i < Main.maxPlayers; i++) {
+				Player player = Main.player[i];
+				if (player.active && !player.dead) {
+					anyLivingPlayer = true;
+					break;
+				}
+			}
+
+			if (!anyLivingPlayer) {
+				NPC.velocity.Y -= 0.45f;
+				NPC.velocity *= 0.985f;
+				NPC.EncourageDespawn(10);
+				if (TwinIsAlive) {
+					TwinNPC.velocity.Y -= 0.45f;
+					TwinNPC.velocity *= 0.985f;
+					TwinNPC.EncourageDespawn(10);
+				}
+
+				return;
+			}
+
 			NPC.TargetClosest(false);
 			if (NPC.target < 0 || NPC.target == 255 || Main.player[NPC.target].dead) {
 				NPC.velocity.Y += 0.8f;
@@ -224,29 +247,12 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 				return;
 			}
 
-			int supremeCycle = SupremeLaserTelegraph + SupremeLaserDuration + SupremePortalDuration;
-			int supremeTimer = phaseTimer % supremeCycle;
-			if (supremeTimer == 0) {
-				laserActorIndex = 1 - laserActorIndex;
-				sideSign *= -1;
+			skyBeamTimer++;
+			int supremeCycle = SupremeSkyBeamTelegraph + SupremeSkyBeamDuration + SupremeSkyBeamCooldown;
+			if (skyBeamTimer % supremeCycle == 1) {
+				SpawnSkyBeam(target);
 			}
-
-			if (supremeTimer < SupremeLaserTelegraph + SupremeLaserDuration) {
-				attackState = CrystalineAttackState.SupremeLaser;
-				if (supremeTimer == 10) {
-					SpawnBeam(target);
-				}
-			}
-			else {
-				if (attackState != CrystalineAttackState.SupremePortals) {
-					PrepareDash(target);
-				}
-
-				attackState = CrystalineAttackState.SupremePortals;
-				if (supremeTimer % 40 == 0) {
-					SpawnPortalPair(target, supremeTimer);
-				}
-			}
+			attackState = CrystalineAttackState.SupremeLaser;
 		}
 
 		private void PrepareDash(Player target) {
@@ -256,6 +262,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			}
 
 			dashVelocity = aim.SafeNormalize(Vector2.UnitY) * GetDashSpeed();
+			lastTargetPosition = target.Center;
 			dashTimer = DashDuration;
 			cachedBeamDirection = dashVelocity.SafeNormalize(Vector2.UnitX);
 		}
@@ -264,8 +271,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			var leader = Leader ?? this;
 			CrystalineAttackState state = leader.attackState;
 			if (!IsLeader && leader != this && !leader.NPC.active) {
-				NPC.active = false;
-				return;
+				leader = this;
+				state = attackState;
 			}
 
 			if (state == CrystalineAttackState.Dash && leader.dashTimer > 0) {
@@ -275,11 +282,6 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 
 			if (state == CrystalineAttackState.SupremeLaser) {
 				DoSupremeLaserMovement(target, leader);
-				return;
-			}
-
-			if (state == CrystalineAttackState.SupremePortals) {
-				DoSupremePortalMovement(target, leader);
 				return;
 			}
 
@@ -294,60 +296,50 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			float angle = leader.orbitAngle;
 			Vector2 orbitDirection = Vector2.UnitX.RotatedBy(angle);
 			Vector2 tangent = orbitDirection.RotatedBy(MathHelper.PiOver2);
-			float radius = MathHelper.Lerp(520f, 330f, 1f - leader.SharedLifeRatio);
-			float signedOffset = wormIndex == 0 ? OrbitSeparation : -OrbitSeparation;
-			Vector2 targetPosition = target.Center + orbitDirection * radius + tangent * signedOffset;
+			float radius = MathHelper.Lerp(1180f, 860f, 1f - leader.SharedLifeRatio);
+			float signedRadiusOffset = wormIndex == 0 ? 180f : -180f;
+			float signedLateralOffset = wormIndex == 0 ? GetOrbitSeparation() : -GetOrbitSeparation();
+			Vector2 targetPosition = target.Center + orbitDirection * (radius + signedRadiusOffset) + tangent * signedLateralOffset;
 			lastTargetPosition = targetPosition;
 			SteerTowards(targetPosition, GetMoveSpeed(), GetTurnRate());
 		}
 
 		private void DoDashMovement(CrystalineDevourerHead leader) {
-			NPC.velocity = leader.dashVelocity;
+			Vector2 dashDirection = leader.dashVelocity.SafeNormalize(Vector2.UnitY);
+			Vector2 lateral = dashDirection.RotatedBy(MathHelper.PiOver2) * (wormIndex == 0 ? GetDashSpread() : -GetDashSpread());
+			Vector2 dashTarget = leader.lastTargetPosition + lateral;
+			SteerTowards(dashTarget, leader.GetDashSpeed(), 0.45f);
 			if (leader.IsLeader) {
 				leader.dashTimer--;
 			}
 		}
 
 		private void DoSupremeLaserMovement(Player target, CrystalineDevourerHead leader) {
-			int timer = leader.phaseTimer % (SupremeLaserTelegraph + SupremeLaserDuration + SupremePortalDuration);
-			bool isLaserActor = wormIndex == leader.laserActorIndex;
-			if (isLaserActor) {
-				Vector2 lockPosition = target.Center + new Vector2(leader.sideSign * 580f, -140f);
-				lastTargetPosition = lockPosition;
-				SteerTowards(lockPosition, 17f, 0.18f);
-				if (timer >= SupremeLaserTelegraph) {
-					NPC.velocity *= 0.9f;
-				}
-			}
-			else {
-				Vector2 orbitDirection = Vector2.UnitX.RotatedBy(leader.orbitAngle + MathHelper.PiOver2);
-				Vector2 strikePoint = target.Center + orbitDirection * 280f;
-				SteerTowards(strikePoint, 23f, 0.22f);
-				if (Main.netMode != NetmodeID.MultiplayerClient) {
-					shardBurstTimer++;
-					if (shardBurstTimer >= 24) {
-						SpawnShardBurst(target);
-						shardBurstTimer = 0;
-					}
-				}
-			}
-		}
-
-		private void DoSupremePortalMovement(Player target, CrystalineDevourerHead leader) {
-			int timer = leader.phaseTimer % (SupremeLaserTelegraph + SupremeLaserDuration + SupremePortalDuration);
-			int localTimer = timer - (SupremeLaserTelegraph + SupremeLaserDuration);
-			if (localTimer < 0) {
-				localTimer = 0;
+			pressureRetargetTimer--;
+			if (pressureRetargetTimer <= 0 || Vector2.Distance(NPC.Center, pressureTargetPosition) < 170f) {
+				float phaseOffset = wormIndex == 0 ? 0f : MathHelper.Pi;
+				float angle = leader.phaseTimer * 0.07f + phaseOffset + Main.rand.NextFloat(-0.95f, 0.95f);
+				float radius = Main.rand.NextFloat(860f, 1460f);
+				pressureTargetPosition = target.Center + Vector2.UnitX.RotatedBy(angle) * radius;
+				dashVelocity = (target.Center - pressureTargetPosition).SafeNormalize(Vector2.UnitY) * (GetDashSpeed() + 12f);
+				pressureRetargetTimer = Main.rand.Next(24, 40);
+				NPC.netUpdate = true;
 			}
 
-			float angleOffset = wormIndex == 0 ? 0f : MathHelper.Pi;
-			Vector2 portalPoint = target.Center + Vector2.UnitX.RotatedBy(Main.GlobalTimeWrappedHourly * 2f + angleOffset) * 700f;
-			if (localTimer < 30) {
-				SteerTowards(portalPoint, 24f, 0.3f);
+			if (pressureRetargetTimer > 10) {
+				SteerTowards(pressureTargetPosition, 62f, 0.36f);
 			}
 			else {
-				Vector2 dashDirection = (target.Center - NPC.Center).SafeNormalize(Vector2.UnitY);
-				NPC.velocity = dashDirection * (GetDashSpeed() + 6f);
+				NPC.velocity = Vector2.Lerp(NPC.velocity, dashVelocity, 0.24f);
+			}
+
+			if (Main.netMode != NetmodeID.MultiplayerClient) {
+				shardBurstTimer++;
+				int interval = wormIndex == 0 ? 10 : 13;
+				if (shardBurstTimer >= interval) {
+					SpawnShardBurst(target, 7, 6, 18.5f, 21.5f, 260f);
+					shardBurstTimer = 0;
+				}
 			}
 		}
 
@@ -360,50 +352,94 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			}
 		}
 
+		private void UpdateCombatStats() {
+			NPC.defense = CurrentPhase >= 6 ? 10 : 5;
+			NPC.damage = CurrentPhase switch {
+				1 => 280,
+				2 => 300,
+				3 => 325,
+				4 => 350,
+				5 => 385,
+				_ => 430
+			};
+		}
+
 		private float GetMoveSpeed() {
 			return CurrentPhase switch {
-				1 => 8f,
-				2 => 10.5f,
-				3 => 13f,
-				4 => 16f,
-				5 => 18.5f,
-				_ => 21.5f
+				1 => 10f,
+				2 => 14f,
+				3 => 18f,
+				4 => 24f,
+				5 => 30f,
+				_ => 66f
 			};
 		}
 
 		private float GetDashSpeed() {
 			return CurrentPhase switch {
-				4 => 24f,
-				5 => 29f,
-				_ => 34f
+				4 => 34f,
+				5 => 42f,
+				_ => 82f
 			};
 		}
 
 		private float GetTurnRate() {
 			return CurrentPhase switch {
-				1 => 0.07f,
-				2 => 0.085f,
-				3 => 0.105f,
-				4 => 0.13f,
-				5 => 0.155f,
-				_ => 0.18f
+				1 => 0.085f,
+				2 => 0.11f,
+				3 => 0.14f,
+				4 => 0.18f,
+				5 => 0.23f,
+				_ => 0.34f
 			};
 		}
 
 		private float GetOrbitAngularSpeed() {
 			return CurrentPhase switch {
-				1 => 0.018f,
-				2 => 0.023f,
-				3 => 0.028f,
-				4 => 0.032f,
-				5 => 0.037f,
-				_ => 0.045f
+				1 => 0.02f,
+				2 => 0.028f,
+				3 => 0.036f,
+				4 => 0.045f,
+				5 => 0.058f,
+				_ => 0.09f
+			};
+		}
+
+		private float GetOrbitSeparation() {
+			return CurrentPhase switch {
+				1 => 820f,
+				2 => 900f,
+				3 => 980f,
+				4 => 1040f,
+				5 => 1100f,
+				_ => 1200f
+			};
+		}
+
+		private float GetDashSpread() {
+			return CurrentPhase switch {
+				4 => 520f,
+				5 => 620f,
+				_ => 780f
 			};
 		}
 
 		private void UpdateRotation() {
+			if (NPC.ai[0] > 0f && NPC.ai[0] < Main.maxNPCs) {
+				NPC nextSegment = Main.npc[(int)NPC.ai[0]];
+				if (nextSegment.active) {
+					Vector2 bodyDirection = nextSegment.Center - NPC.Center;
+					if (bodyDirection.LengthSquared() > 0.1f) {
+						float desiredRotation = bodyDirection.ToRotation() - MathHelper.PiOver2;
+						NPC.rotation = NPC.rotation.AngleLerp(desiredRotation, 0.22f);
+						return;
+					}
+				}
+			}
+
 			if (NPC.velocity.LengthSquared() > 0.1f) {
-				NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
+				float desiredRotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
+				NPC.rotation = NPC.rotation.AngleLerp(desiredRotation, 0.15f);
 			}
 		}
 
@@ -411,45 +447,112 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			NPC.Opacity = 1f;
 		}
 
-		private void SpawnBeam(Player target) {
-			if (Main.netMode == NetmodeID.MultiplayerClient || !TwinIsAlive) {
+		private void SpawnSkyBeam(Player target) {
+			if (Main.netMode == NetmodeID.MultiplayerClient) {
 				return;
 			}
 
-			NPC actor = laserActorIndex == wormIndex ? NPC : TwinNPC;
-			Vector2 beamDirection = (target.Center - actor.Center).SafeNormalize(new Vector2(-sideSign, 0f));
-			cachedBeamDirection = beamDirection;
-			Projectile.NewProjectile(NPC.GetSource_FromAI(), actor.Center, beamDirection, ModContent.ProjectileType<CrystalineDevourerBeam>(), 210, 0f, Main.myPlayer, actor.whoAmI, SupremeLaserTelegraph, SupremeLaserDuration);
-			SoundEngine.PlaySound(SoundID.Item122, actor.Center);
+			float ratio = SharedLifeRatio;
+			int beamCount = ratio <= 0.10f ? 6 : ratio <= 0.15f ? 4 : 1;
+			float spread = ratio <= 0.10f ? 900f : ratio <= 0.15f ? 700f : 520f;
+
+			for (int i = 0; i < beamCount; i++) {
+				float offsetX;
+				if (beamCount == 1) {
+					offsetX = Main.rand.NextFloat(-spread, spread);
+				}
+				else {
+					float slotProgress = beamCount == 1 ? 0.5f : i / (float)(beamCount - 1);
+					float baseOffset = MathHelper.Lerp(-spread, spread, slotProgress);
+					offsetX = baseOffset + Main.rand.NextFloat(-90f, 90f);
+				}
+
+				Vector2 beamCenter = new(target.Center.X + offsetX, target.Center.Y);
+				Projectile.NewProjectile(NPC.GetSource_FromAI(), beamCenter, Vector2.Zero, ModContent.ProjectileType<CrystalineDevourerSkyBeam>(), 580, 0f, Main.myPlayer, SupremeSkyBeamTelegraph, SupremeSkyBeamDuration);
+			}
+
+			SoundEngine.PlaySound(SoundID.Item122 with { Pitch = -0.2f, Volume = 1.2f }, target.Center);
 		}
 
-		private void SpawnPortalPair(Player target, int timer) {
-			if (Main.netMode == NetmodeID.MultiplayerClient || !TwinIsAlive) {
+		private void UpdateProjectilePressure(Player target) {
+			if (Main.netMode == NetmodeID.MultiplayerClient || CurrentPhase <= 1 || CurrentPhase >= 6) {
 				return;
 			}
 
-			Vector2 offsetA = new Vector2(560f * sideSign, -200f).RotatedBy(timer * 0.02f);
-			Vector2 offsetB = new Vector2(-560f * sideSign, 200f).RotatedBy(-timer * 0.02f);
-			Projectile.NewProjectile(NPC.GetSource_FromAI(), target.Center + offsetA, Vector2.Zero, ModContent.ProjectileType<CrystalineDevourerPortal>(), 0, 0f, Main.myPlayer, 0f, 0f);
-			Projectile.NewProjectile(NPC.GetSource_FromAI(), target.Center + offsetB, Vector2.Zero, ModContent.ProjectileType<CrystalineDevourerPortal>(), 0, 0f, Main.myPlayer, 1f, 0f);
-			SoundEngine.PlaySound(SoundID.Item8, target.Center);
+			pressureBurstTimer++;
+			int interval = CurrentPhase switch {
+				2 => 78,
+				3 => 60,
+				4 => 42,
+				_ => 30
+			};
+
+			if (pressureBurstTimer < interval) {
+				return;
+			}
+
+			pressureBurstTimer = 0;
+			switch (CurrentPhase) {
+				case 2:
+					SpawnShardBurst(target, 3, 0, 12f, 0f, 180f);
+					break;
+				case 3:
+					SpawnShardBurst(target, 4, 2, 13.5f, 15f, 185f);
+					break;
+				case 4:
+					SpawnShardBurst(target, 5, 3, 15f, 16.5f, 195f);
+					break;
+				case 5:
+					SpawnShardBurst(target, 6, 4, 16.5f, 18f, 210f);
+					break;
+			}
 		}
 
-		private void SpawnShardBurst(Player target) {
+		private void SpawnShardBurst(Player target, int primaryCount = 7, int secondaryCount = 5, float primarySpeed = 13.5f, float secondarySpeed = 15.5f, float lifetime = 210f) {
 			if (Main.netMode == NetmodeID.MultiplayerClient) {
 				return;
 			}
 
 			Vector2 offset = target.Center - NPC.Center;
 			Vector2 direction = offset == Vector2.Zero ? Vector2.UnitY : Vector2.Normalize(offset);
-			for (int i = -2; i <= 2; i++) {
-				Vector2 velocity = direction.RotatedBy(MathHelper.ToRadians(10f * i)) * 10f;
+			float stagger = (phaseTimer / 12 % 2 == 0) ? 5f : -5f;
+			int primaryHalf = primaryCount / 2;
+			for (int i = -primaryHalf; i <= primaryHalf; i++) {
+				Vector2 velocity = direction.RotatedBy(MathHelper.ToRadians(11f * i + stagger)) * (primarySpeed + Math.Abs(i) * 0.6f);
 				int shard = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<CrystalineShard>(), Target: 0);
 				Main.npc[shard].velocity = velocity;
 				Main.npc[shard].ai[0] = target.whoAmI;
-				Main.npc[shard].ai[1] = 210f;
+				Main.npc[shard].ai[1] = lifetime;
 				Main.npc[shard].netUpdate = true;
 			}
+
+			int secondaryHalf = secondaryCount / 2;
+			for (int i = -secondaryHalf; i <= secondaryHalf && secondaryCount > 0; i++) {
+				Vector2 velocity = direction.RotatedBy(MathHelper.ToRadians((11f * i) + 5.5f - stagger)) * (secondarySpeed + Math.Abs(i) * 0.75f);
+				int shard = NPC.NewNPC(NPC.GetSource_FromAI(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<CrystalineShard>(), Target: 0);
+				Main.npc[shard].velocity = velocity;
+				Main.npc[shard].ai[0] = target.whoAmI;
+				Main.npc[shard].ai[1] = Math.Max(30f, lifetime - 15f);
+				Main.npc[shard].netUpdate = true;
+			}
+		}
+
+		private int GetCombinedLife() {
+			int total = NPC.active ? Math.Max(0, NPC.life) : 0;
+			if (TwinIsAlive) {
+				total += Math.Max(0, TwinNPC.life);
+			}
+
+			return total;
+		}
+
+		private int GetCombinedLifeMax() {
+			return SharedLifeMax;
+		}
+
+		public override void ModifyNPCLoot(NPCLoot npcLoot) {
+			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrystalineTear>(), 1, 250, 250));
+			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrystalineSword>(), 200, 1, 1));
 		}
 
 		public override void SendExtraAI(BinaryWriter writer) {
@@ -466,6 +569,10 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			writer.WriteVector2(dashVelocity);
 			writer.WriteVector2(cachedBeamDirection);
 			writer.Write(shardBurstTimer);
+			writer.Write(pressureBurstTimer);
+			writer.Write(pressureRetargetTimer);
+			writer.WriteVector2(pressureTargetPosition);
+			writer.Write(skyBeamTimer);
 		}
 
 		public override void ReceiveExtraAI(BinaryReader reader) {
@@ -482,10 +589,14 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			dashVelocity = reader.ReadVector2();
 			cachedBeamDirection = reader.ReadVector2();
 			shardBurstTimer = reader.ReadInt32();
+			pressureBurstTimer = reader.ReadInt32();
+			pressureRetargetTimer = reader.ReadInt32();
+			pressureTargetPosition = reader.ReadVector2();
+			skyBeamTimer = reader.ReadInt32();
 		}
 
 		public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
-			return IsLeader ? null : false;
+			return ControlsState ? null : false;
 		}
 
 		public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
@@ -502,14 +613,12 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		public override void HitEffect(NPC.HitInfo hit) {
-			if (NPC.life <= 0 && TwinIsAlive) {
-				TwinNPC.active = false;
-			}
+			SoundEngine.PlaySound(SoundID.NPCHit53 with { Volume = 1.15f, Pitch = -0.45f, PitchVariance = 0.08f }, NPC.Center);
 		}
 
 		public override void OnKill() {
 			if (TwinIsAlive) {
-				TwinNPC.active = false;
+				TwinNPC.boss = true;
 			}
 		}
 

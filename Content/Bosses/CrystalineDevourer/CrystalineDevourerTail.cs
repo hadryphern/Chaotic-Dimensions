@@ -7,7 +7,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 {
 	public sealed class CrystalineDevourerTail : ModNPC
 	{
-		public override string Texture => "Terraria/Images/NPC_136";
+		private const float SegmentFollowDistance = 84f;
 
 		public override void SetStaticDefaults() {
 			NPCID.Sets.MustAlwaysDraw[Type] = true;
@@ -15,8 +15,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		public override void SetDefaults() {
-			NPC.width = 80;
-			NPC.height = 80;
+			NPC.width = 56;
+			NPC.height = 56;
 			NPC.damage = 175;
 			NPC.defense = 5;
 			NPC.lifeMax = CrystalineDevourerHead.SharedLifeMax;
@@ -45,11 +45,13 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			NPC.rotation = direction.ToRotation() + MathHelper.PiOver2;
 			float length = direction.Length();
 			if (length > 0f) {
-				NPC.Center = ahead.Center - direction / length * NPC.width;
+				Vector2 desiredCenter = ahead.Center - direction / length * SegmentFollowDistance;
+				NPC.Center = Vector2.Lerp(NPC.Center, desiredCenter, 0.94f);
 			}
 
 			NPC.velocity = Vector2.Zero;
 			NPC.damage = head.damage;
+			NPC.defense = head.defense;
 			NPC.life = head.life;
 			return false;
 		}

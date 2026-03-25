@@ -10,17 +10,18 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		public override string Texture => "Terraria/Images/Projectile_936";
 
 		public override void SetDefaults() {
-			NPC.width = 28;
-			NPC.height = 28;
-			NPC.damage = 90;
+			NPC.width = 40;
+			NPC.height = 40;
+			NPC.damage = 125;
 			NPC.defense = 0;
-			NPC.lifeMax = 35;
+			NPC.lifeMax = 55;
 			NPC.knockBackResist = 0.15f;
 			NPC.aiStyle = -1;
 			NPC.noGravity = true;
 			NPC.noTileCollide = true;
 			NPC.dontCountMe = true;
 			NPC.value = 0f;
+			NPC.scale = 1.15f;
 		}
 
 		public override bool CheckActive() => false;
@@ -35,8 +36,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			if (targetIndex >= 0 && targetIndex < Main.maxPlayers && Main.player[targetIndex].active && !Main.player[targetIndex].dead) {
 				Player target = Main.player[targetIndex];
 				Vector2 offset = target.Center - NPC.Center;
-				Vector2 desiredVelocity = (offset == Vector2.Zero ? Vector2.UnitY : Vector2.Normalize(offset)) * 12f;
-				NPC.velocity = Vector2.Lerp(NPC.velocity, desiredVelocity, 0.035f);
+				Vector2 desiredVelocity = (offset == Vector2.Zero ? Vector2.UnitY : Vector2.Normalize(offset)) * 15.5f;
+				NPC.velocity = Vector2.Lerp(NPC.velocity, desiredVelocity, 0.05f);
 			}
 
 			NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;

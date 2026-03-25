@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ChaoticDimensions.Content.Bosses.CrystalineDevourer;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.Graphics.Effects;
+using Terraria.ModLoader;
 using Terraria.Utilities;
 
 namespace ChaoticDimensions.Common.Graphics
@@ -35,6 +37,10 @@ namespace ChaoticDimensions.Common.Graphics
 		public override void Update(GameTime gameTime) {
 			if (!initialized) {
 				InitializeSky();
+			}
+
+			if (isActive && !NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>())) {
+				isActive = false;
 			}
 
 			float step = Main.gamePaused ? 0f : 0.03f;

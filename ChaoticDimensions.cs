@@ -24,8 +24,17 @@ namespace ChaoticDimensions
 				return;
 			}
 
-			Filters.Scene[CrystalineDevourerSkyKey] = null;
-			SkyManager.Instance[CrystalineDevourerSkyKey] = null;
+			try {
+				Filters.Scene?[CrystalineDevourerSkyKey]?.Deactivate();
+			}
+			catch {
+			}
+
+			try {
+				SkyManager.Instance?.Deactivate(CrystalineDevourerSkyKey);
+			}
+			catch {
+			}
 		}
 	}
 }

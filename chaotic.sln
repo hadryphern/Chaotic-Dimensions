@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.5.11612.153 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chaotic", "chaotic.csproj", "{B6369987-B3B4-A052-660D-0AD5B2CF8581}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChaoticDimensions", "ChaoticDimensions.csproj", "{B6369987-B3B4-A052-660D-0AD5B2CF8581}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

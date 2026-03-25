@@ -1,13 +1,17 @@
 using ChaoticDimensions.Content.Bosses.CrystalineDevourer;
+using ChaoticDimensions.Common.Systems;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using ChaoticDimensions.Content.Items.Materials;
 
 namespace ChaoticDimensions.Content.Items.Summons
 {
 	public sealed class CrystalineSigil : ModItem
 	{
-		public override string Texture => "Terraria/Images/Item_520";
+		public override void SetStaticDefaults() {
+			ItemID.Sets.SortingPriorityBossSpawns[Type] = 13;
+		}
 
 		public override void SetDefaults() {
 			Item.width = 32;
@@ -16,21 +20,37 @@ namespace ChaoticDimensions.Content.Items.Summons
 			Item.useAnimation = 45;
 			Item.useTime = 45;
 			Item.UseSound = SoundID.Roar;
-			Item.rare = ItemRarityID.Red;
+			Item.rare = ItemRarityID.Purple;
 			Item.maxStack = 20;
 			Item.consumable = false;
 		}
 
 		public override bool CanUseItem(Player player) {
-			return !NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>());
+			return NPC.downedMoonlord && !CrystalineDevourerIntroSystem.IsActive && !NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>());
 		}
 
 		public override bool? UseItem(Player player) {
 			if (Main.myPlayer == player.whoAmI) {
-				NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<CrystalineDevourerHead>());
+				CrystalineDevourerIntroSystem.StartIntro(player);
 			}
 
 			return true;
+		}
+
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient(ItemID.CrystalShard, 250)
+				.AddIngredient(ItemID.LunarBar, 250)
+				.AddIngredient(ItemID.WormFood)
+				.AddTile(TileID.LunarCraftingStation)
+				.Register();
+
+			CreateRecipe()
+				.AddIngredient(ItemID.CrystalShard, 250)
+				.AddIngredient(ItemID.LunarBar, 250)
+				.AddIngredient(ItemID.BloodySpine)
+				.AddTile(TileID.LunarCraftingStation)
+				.Register();
 		}
 	}
 }

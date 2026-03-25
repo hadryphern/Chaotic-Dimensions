@@ -1,0 +1,84 @@
+Items: {
+	CrystalineSigil: {
+		DisplayName: Crystaline Sigil
+		Tooltip: ""
+	}
+
+	CrystalineEye: {
+		DisplayName: Crystaline Eye
+		Tooltip: ""
+	}
+
+	CrystalinePotion: {
+		DisplayName: Crystaline Potion
+		Tooltip: ""
+	}
+
+	CrystalineTear: {
+		DisplayName: Crystaline Tear
+		Tooltip: ""
+	}
+
+	CrystalineStaff: {
+		DisplayName: Crystaline Staff
+		Tooltip: ""
+	}
+
+	CrystalineSword: {
+		DisplayName: Absolute Crystal
+		Tooltip: ""
+	}
+
+	CrystalineGun: {
+		DisplayName: Crystaline Gun
+		Tooltip: ""
+	}
+
+	CrystalineEnvoured: {
+		DisplayName: Crystaline Envoured
+		Tooltip: ""
+	}
+}
+
+NPCs: {
+	CrystalineDevourerBody.DisplayName: Crystaline Devourer Body
+	CrystalineDevourerHead.DisplayName: Crystaline Devourer Head
+	CrystalineDevourerTail.DisplayName: Crystaline Devourer Tail
+	CrystalineShard.DisplayName: Crystaline Shard
+}
+
+Projectiles: {
+	CrystalineDevourerBeam.DisplayName: Crystaline Devourer Beam
+	CrystalineDevourerPortal.DisplayName: Crystaline Devourer Portal
+	CrystalineBoltProjectile.DisplayName: Crystaline Bolt Projectile
+	CrystalineSwordProjectile.DisplayName: Crystaline Sword Projectile
+	CrystalineEnvouredMinion.DisplayName: Crystaline Envoured Minion
+	CrystalineEnvouredBody.DisplayName: Crystaline Envoured Body
+	CrystalineEnvouredTail.DisplayName: Crystaline Envoured Tail
+	CrystalineGunLaser.DisplayName: Crystaline Gun Laser
+	CrystalineStarMinion.DisplayName: Crystaline Star Minion
+	CrystalineStarShot.DisplayName: Crystaline Star Shot
+	CrystalineDevourerSkyBeam.DisplayName: Crystaline Devourer Sky Beam
+}
+
+Buffs: {
+	CrystalinePotionFortitudeBuff: {
+		DisplayName: Crystaline Potion Fortitude Buff
+		Description: Mods.ChaoticDimensions.Buffs.CrystalinePotionFortitudeBuff.Description
+	}
+
+	CrystalinePotionRegenerationBuff: {
+		DisplayName: Crystaline Potion Regeneration Buff
+		Description: Mods.ChaoticDimensions.Buffs.CrystalinePotionRegenerationBuff.Description
+	}
+
+	CrystalineRushBuff: {
+		DisplayName: Crystaline Rush Buff
+		Description: Mods.ChaoticDimensions.Buffs.CrystalineRushBuff.Description
+	}
+
+	CrystalineEnvouredBuff: {
+		DisplayName: Crystaline Envoured Buff
+		Description: Mods.ChaoticDimensions.Buffs.CrystalineEnvouredBuff.Description
+	}
+}
