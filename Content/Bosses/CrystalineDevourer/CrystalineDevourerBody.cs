@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
@@ -13,10 +12,6 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		private const float SegmentFollowDistance = 46f;
 		private const float HeadFollowDistance = 66f;
 		private static readonly Vector2 SegmentScale = new(0.9f, 1.02f);
-		private static readonly Asset<Texture2D> TailCapTexture = ModContent.Request<Texture2D>("ChaoticDimensions/Content/Bosses/CrystalineDevourer/CrystalineDevourerTailCap");
-		private static readonly Vector2 TailVisualScale = new(0.94f, 1.18f);
-		private static readonly Vector2 TailOrigin = new(64f, 64f);
-		private const float TailVisualOffset = 6f;
 
 		public override void SetStaticDefaults() {
 			NPCID.Sets.MustAlwaysDraw[Type] = true;
@@ -78,16 +73,6 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			Vector2 drawScale = new(
 				MathHelper.Lerp(SegmentScale.X * 1.02f, SegmentScale.X * 0.95f, curvature),
 				MathHelper.Lerp(SegmentScale.Y * 1.15f, SegmentScale.Y * 1.24f, curvature));
-
-			if (NPC.ai[3] == 1f || CrystalineDevourerSegmentVisuals.IsTailFollower(NPC, out _)) {
-				Texture2D tailTexture = TailCapTexture.Value;
-				Vector2 tailDrawPosition = drawPosition - axis * TailVisualOffset;
-				Vector2 tailScale = new(
-					MathHelper.Lerp(TailVisualScale.X * 0.98f, TailVisualScale.X * 1.02f, curvature),
-					MathHelper.Lerp(TailVisualScale.Y * 0.98f, TailVisualScale.Y * 1.06f, curvature));
-				spriteBatch.Draw(tailTexture, tailDrawPosition, null, NPC.GetAlpha(drawColor), drawRotation, TailOrigin, tailScale, SpriteEffects.None, 0f);
-				return false;
-			}
 
 			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), drawRotation, origin, drawScale, SpriteEffects.None, 0f);
 			return false;

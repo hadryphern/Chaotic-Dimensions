@@ -10,6 +10,9 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 	public sealed class CrystalineDevourerTail : ModNPC
 	{
 		private const float SegmentFollowDistance = 108f;
+		private static readonly Vector2 TailScale = new(0.95f, 1.12f);
+		private const float TailDrawBlend = 0.1f;
+		private const float TailDrawForwardOffset = 2f;
 
 		public override void SetStaticDefaults() {
 			NPCID.Sets.MustAlwaysDraw[Type] = true;
@@ -62,6 +65,15 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
 
 		public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+			Texture2D texture = TextureAssets.Npc[Type].Value;
+			Vector2 origin = texture.Size() * 0.5f;
+			Vector2 axis = CrystalineDevourerSegmentVisuals.GetSegmentAxis(NPC, out float curvature);
+			Vector2 drawPosition = CrystalineDevourerSegmentVisuals.GetSegmentDrawCenter(NPC, TailDrawBlend) - screenPos + axis * TailDrawForwardOffset;
+			float drawRotation = axis.ToRotation() + MathHelper.PiOver2;
+			Vector2 drawScale = new(
+				MathHelper.Lerp(TailScale.X * 0.98f, TailScale.X * 1.03f, curvature),
+				MathHelper.Lerp(TailScale.Y * 1.02f, TailScale.Y * 1.1f, curvature));
+			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), drawRotation, origin, drawScale, SpriteEffects.None, 0f);
 			return false;
 		}
 

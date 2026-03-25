@@ -15,7 +15,8 @@ namespace ChaoticDimensions.Common.Systems
 	{
 		private const int ArenaHalfWidthTiles = 164;
 		private const int ArenaHalfHeightTiles = 104;
-		private const int BorderThicknessTiles = 4;
+		private const int BorderThicknessTiles = 1;
+		private const int OrphanCleanupMarginTiles = 24;
 		private const float PlayerKillPadding = (BorderThicknessTiles * 16f) - 8f;
 
 		public const float ArenaHalfWidth = ArenaHalfWidthTiles * 16f;
@@ -80,9 +81,17 @@ namespace ChaoticDimensions.Common.Systems
 
 		public override void OnWorldLoad() {
 			ClearState();
+			if (Main.netMode != NetmodeID.MultiplayerClient) {
+				RemoveAllOrphanBarrierTiles();
+			}
 		}
 
 		public override void OnWorldUnload() {
+			if (Main.netMode != NetmodeID.MultiplayerClient && storedTiles.Count > 0) {
+				ResetArena(restoreTiles: true);
+				return;
+			}
+
 			ClearState();
 		}
 
@@ -165,6 +174,12 @@ namespace ChaoticDimensions.Common.Systems
 			int minTileY = Math.Max(10, centerTileY - ArenaHalfHeightTiles);
 			int maxTileY = Math.Min(Main.maxTilesY - 10, centerTileY + ArenaHalfHeightTiles);
 
+			RemoveOrphanBarrierTiles(
+				minTileX - OrphanCleanupMarginTiles,
+				minTileY - OrphanCleanupMarginTiles,
+				maxTileX + OrphanCleanupMarginTiles,
+				maxTileY + OrphanCleanupMarginTiles);
+
 			for (int offset = 0; offset < BorderThicknessTiles; offset++) {
 				int topY = minTileY + offset;
 				int bottomY = maxTileY - offset;
@@ -180,6 +195,41 @@ namespace ChaoticDimensions.Common.Systems
 				for (int y = minTileY + BorderThicknessTiles; y <= maxTileY - BorderThicknessTiles; y++) {
 					PlaceBarrierTile(leftX, y);
 					PlaceBarrierTile(rightX, y);
+				}
+			}
+		}
+
+		private static void RemoveAllOrphanBarrierTiles() {
+			RemoveOrphanBarrierTiles(0, 0, Main.maxTilesX - 1, Main.maxTilesY - 1);
+		}
+
+		private static void RemoveOrphanBarrierTiles(int minTileX, int minTileY, int maxTileX, int maxTileY) {
+			int barrierType = ModContent.TileType<CrystalineBarrierBlock>();
+			minTileX = Utils.Clamp(minTileX, 0, Main.maxTilesX - 1);
+			maxTileX = Utils.Clamp(maxTileX, 0, Main.maxTilesX - 1);
+			minTileY = Utils.Clamp(minTileY, 0, Main.maxTilesY - 1);
+			maxTileY = Utils.Clamp(maxTileY, 0, Main.maxTilesY - 1);
+
+			for (int x = minTileX; x <= maxTileX; x++) {
+				for (int y = minTileY; y <= maxTileY; y++) {
+					Tile tile = Framing.GetTileSafely(x, y);
+					if (!tile.HasTile || tile.TileType != barrierType) {
+						continue;
+					}
+
+					if (barrierTiles.Contains(new Point(x, y))) {
+						continue;
+					}
+
+					tile.ClearTile();
+					tile.ClearBlockPaintAndCoating();
+					tile.LiquidAmount = 0;
+					tile.LiquidType = LiquidID.Water;
+					WorldGen.SquareTileFrame(x, y, true);
+
+					if (Main.netMode == NetmodeID.Server) {
+						NetMessage.SendTileSquare(-1, x, y);
+					}
 				}
 			}
 		}
