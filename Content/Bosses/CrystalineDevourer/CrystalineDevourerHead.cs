@@ -632,10 +632,13 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 
 		public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
 			Texture2D texture = TextureAssets.Npc[Type].Value;
-			Vector2 forward = (NPC.rotation - MathHelper.PiOver2).ToRotationVector2();
-			Vector2 drawPosition = NPC.Center - screenPos + forward * HeadDrawForwardOffset;
+			Vector2 forward = CrystalineDevourerSegmentVisuals.GetHeadForward(NPC);
+			float drawRotation = forward.ToRotation() + MathHelper.PiOver2;
+			Vector2 drawPosition = NPC.Center - screenPos + forward * (HeadDrawForwardOffset + 2f);
 			Vector2 origin = texture.Size() * 0.5f;
-			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), NPC.rotation, origin, Vector2.One, SpriteEffects.None, 0f);
+			float speedStretch = MathHelper.Clamp(NPC.velocity.Length() / 90f, 0f, 0.08f);
+			Vector2 drawScale = new(0.985f, 1f + speedStretch);
+			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), drawRotation, origin, drawScale, SpriteEffects.None, 0f);
 			return false;
 		}
 
