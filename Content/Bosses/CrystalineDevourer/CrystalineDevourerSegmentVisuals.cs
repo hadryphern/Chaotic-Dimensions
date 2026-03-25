@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ModLoader;
 
 namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 {
@@ -79,6 +80,26 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			}
 
 			return center;
+		}
+
+		public static bool IsTailFollower(NPC npc, out NPC tail) {
+			tail = null;
+			int index = (int)npc.ai[0];
+			if (index < 0 || index >= Main.maxNPCs) {
+				return false;
+			}
+
+			NPC candidate = Main.npc[index];
+			if (candidate.type != ModContent.NPCType<CrystalineDevourerTail>()) {
+				return false;
+			}
+
+			if (npc.realLife >= 0 && candidate.realLife != npc.realLife) {
+				return false;
+			}
+
+			tail = candidate;
+			return true;
 		}
 
 		public static Vector2 GetHeadForward(NPC npc) {

@@ -36,7 +36,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		private const int MaxSegments = 92;
 		private const float SpawnBodySpacing = 48f;
 		private const float SpawnHeadSpacing = 66f;
-		private const float SpawnTailSpacing = 58f;
+		private const float SpawnTailSpacing = 72f;
 		private const float HeadDrawForwardOffset = 12f;
 		private const int OrbitDuration = 180;
 		private const int DashDuration = 38;
@@ -172,6 +172,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 				segmentNpc.realLife = NPC.whoAmI;
 				segmentNpc.ai[1] = latest;
 				segmentNpc.ai[2] = NPC.whoAmI;
+				segmentNpc.ai[3] = 0f;
 				PositionSpawnedSegment(Main.npc[latest], segmentNpc, spawnDirection, latest == NPC.whoAmI ? SpawnHeadSpacing : SpawnBodySpacing);
 				Main.npc[latest].ai[0] = segment;
 				latest = segment;
@@ -180,8 +181,10 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			int tail = NPC.NewNPC(source, (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<CrystalineDevourerTail>(), NPC.whoAmI);
 			NPC tailNpc = Main.npc[tail];
 			tailNpc.realLife = NPC.whoAmI;
+			tailNpc.ai[0] = -1f;
 			tailNpc.ai[1] = latest;
 			tailNpc.ai[2] = NPC.whoAmI;
+			Main.npc[latest].ai[3] = 1f;
 			PositionSpawnedSegment(Main.npc[latest], tailNpc, spawnDirection, SpawnTailSpacing);
 			Main.npc[latest].ai[0] = tail;
 			NPC.netUpdate = true;

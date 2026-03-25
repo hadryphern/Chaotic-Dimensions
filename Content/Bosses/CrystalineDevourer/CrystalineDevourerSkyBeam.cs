@@ -11,7 +11,11 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 {
 	public sealed class CrystalineDevourerSkyBeam : ModProjectile
 	{
-		private const float BeamHalfLength = 1500f;
+		private const float BeamHalfLength = 2600f;
+		private const float TelegraphHitThickness = 0.01f;
+		private const float FireHitThickness = 0.05f;
+		private const float TelegraphDrawThickness = 0.12f;
+		private const float FireDrawThickness = 0.18f;
 
 		private int TelegraphTime => (int)Projectile.ai[0];
 		private int FireTime => (int)Projectile.ai[1];
@@ -20,8 +24,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		public override string Texture => "Terraria/Images/Projectile_466";
 
 		public override void SetDefaults() {
-			Projectile.width = 30;
-			Projectile.height = 30;
+			Projectile.width = 1;
+			Projectile.height = 1;
 			Projectile.hostile = true;
 			Projectile.tileCollide = false;
 			Projectile.ignoreWater = true;
@@ -54,30 +58,23 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			Vector2 axis = Projectile.velocity.SafeNormalize(Vector2.UnitY);
 			Vector2 start = Projectile.Center - axis * BeamHalfLength;
 			Vector2 end = Projectile.Center + axis * BeamHalfLength;
-			float thickness = IsFiring ? 26f : 6f;
+			float thickness = IsFiring ? FireHitThickness : TelegraphHitThickness;
 			return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, thickness, ref collisionPoint);
 		}
 
 		public override bool PreDraw(ref Color lightColor) {
 			Texture2D pixel = TextureAssets.MagicPixel.Value;
 			Vector2 axis = Projectile.velocity.SafeNormalize(Vector2.UnitY);
-			Vector2 perpendicular = axis.RotatedBy(MathHelper.PiOver2);
 			Vector2 start = Projectile.Center - axis * BeamHalfLength - Main.screenPosition;
 			Vector2 end = Projectile.Center + axis * BeamHalfLength - Main.screenPosition;
-			float pulse = 0.94f + (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 20f + Projectile.identity) * 0.08f;
+			float pulse = 0.96f + (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 20f + Projectile.identity) * 0.04f;
 
 			if (!IsFiring) {
-				DrawBeam(Main.spriteBatch, pixel, start, end, new Color(255, 255, 255, 220), 4f);
-				DrawBeam(Main.spriteBatch, pixel, start + perpendicular * 6f, end + perpendicular * 6f, new Color(232, 128, 255, 140), 2f);
-				DrawBeam(Main.spriteBatch, pixel, start - perpendicular * 6f, end - perpendicular * 6f, new Color(232, 128, 255, 140), 2f);
+				DrawBeam(Main.spriteBatch, pixel, start, end, new Color(255, 255, 255, 210), TelegraphDrawThickness);
 				return false;
 			}
 
-			DrawBeam(Main.spriteBatch, pixel, start, end, new Color(255, 245, 255) * 0.95f, 26f * pulse);
-			DrawBeam(Main.spriteBatch, pixel, start + perpendicular * 18f, end + perpendicular * 18f, new Color(239, 143, 255) * 0.82f, 8f);
-			DrawBeam(Main.spriteBatch, pixel, start - perpendicular * 18f, end - perpendicular * 18f, new Color(239, 143, 255) * 0.82f, 8f);
-			DrawBeam(Main.spriteBatch, pixel, start + perpendicular * 34f, end + perpendicular * 34f, new Color(180, 66, 219) * 0.68f, 4f);
-			DrawBeam(Main.spriteBatch, pixel, start - perpendicular * 34f, end - perpendicular * 34f, new Color(180, 66, 219) * 0.68f, 4f);
+			DrawBeam(Main.spriteBatch, pixel, start, end, new Color(255, 245, 255) * 0.95f, FireDrawThickness * pulse);
 			return false;
 		}
 
