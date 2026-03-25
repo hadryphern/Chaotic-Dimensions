@@ -16,20 +16,19 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		public static void FollowSegment(NPC segment, NPC ahead, float followDistance, float curvatureBias, float rotationSmoothing) {
-			Vector2 previousCenter = segment.Center;
-			Vector2 fallbackDirection = GetForwardDirection(segment, Vector2.UnitY);
-			Vector2 aheadForward = GetForwardDirection(ahead, fallbackDirection);
-			Vector2 liveDirection = ahead.Center - segment.Center;
-			if (liveDirection.LengthSquared() <= 0.01f) {
-				liveDirection = aheadForward;
+			Vector2 aheadForward = GetForwardDirection(ahead, Vector2.UnitY);
+			Vector2 followDirection = ahead.Center - segment.Center;
+			if (followDirection.LengthSquared() <= 0.01f) {
+				followDirection = aheadForward;
 			}
 
-			Vector2 followDirection = Vector2.Lerp(liveDirection.SafeNormalize(aheadForward), aheadForward, curvatureBias).SafeNormalize(aheadForward);
+			followDirection = followDirection.SafeNormalize(aheadForward);
 			segment.Center = ahead.Center - followDirection * followDistance;
 
-			float desiredRotation = followDirection.ToRotation() + MathHelper.PiOver2;
+			Vector2 visualDirection = Vector2.Lerp(followDirection, aheadForward, curvatureBias).SafeNormalize(followDirection);
+			float desiredRotation = visualDirection.ToRotation() + MathHelper.PiOver2;
 			segment.rotation = SmoothAngle(segment.rotation, desiredRotation, rotationSmoothing);
-			segment.velocity = segment.Center - previousCenter;
+			segment.velocity = Vector2.Zero;
 		}
 
 		public static float SmoothAngle(float currentAngle, float targetAngle, float amount) {
