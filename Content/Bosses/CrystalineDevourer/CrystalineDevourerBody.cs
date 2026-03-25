@@ -1,5 +1,7 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -7,8 +9,9 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 {
 	public sealed class CrystalineDevourerBody : ModNPC
 	{
-		private const float SegmentFollowDistance = 48f;
-		private const float HeadFollowDistance = 76f;
+		private const float SegmentFollowDistance = 46f;
+		private const float HeadFollowDistance = 66f;
+		private static readonly Vector2 SegmentScale = new(0.9f, 1.02f);
 
 		public override void SetStaticDefaults() {
 			NPCID.Sets.MustAlwaysDraw[Type] = true;
@@ -43,13 +46,14 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			}
 
 			Vector2 direction = ahead.Center - NPC.Center;
-			NPC.rotation = direction.ToRotation() + MathHelper.PiOver2;
-			float length = direction.Length();
-			if (length > 0f) {
-				float followDistance = ahead.type == ModContent.NPCType<CrystalineDevourerHead>() ? HeadFollowDistance : SegmentFollowDistance;
-				Vector2 desiredCenter = ahead.Center - direction / length * followDistance;
-				NPC.Center = Vector2.Lerp(NPC.Center, desiredCenter, 0.92f);
+			if (direction.LengthSquared() <= 0.01f) {
+				direction = (ahead.rotation - MathHelper.PiOver2).ToRotationVector2();
 			}
+
+			direction = direction.SafeNormalize(Vector2.UnitY);
+			float followDistance = ahead.type == ModContent.NPCType<CrystalineDevourerHead>() ? HeadFollowDistance : SegmentFollowDistance;
+			NPC.rotation = direction.ToRotation() + MathHelper.PiOver2;
+			NPC.Center = ahead.Center - direction * followDistance;
 
 			NPC.velocity = Vector2.Zero;
 			NPC.damage = head.damage;
@@ -59,6 +63,14 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) => false;
+
+		public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+			Texture2D texture = TextureAssets.Npc[Type].Value;
+			Vector2 origin = texture.Size() * 0.5f;
+			Vector2 drawPosition = NPC.Center - screenPos;
+			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), NPC.rotation, origin, SegmentScale, SpriteEffects.None, 0f);
+			return false;
+		}
 
 		public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
 			cooldownSlot = ImmunityCooldownID.Bosses;

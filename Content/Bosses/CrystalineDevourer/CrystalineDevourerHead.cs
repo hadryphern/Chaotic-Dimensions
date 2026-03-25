@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using ChaoticDimensions.Content.BossBars;
 using ChaoticDimensions.Content.Items.Accessories;
 using ChaoticDimensions.Content.Items.Consumables;
@@ -11,6 +12,7 @@ using ChaoticDimensions.Content.Items.Weapons.Ranged;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -29,8 +31,12 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 	{
 		public const int SharedLifeMax = 5000000;
 		public const int IndividualLifeMax = SharedLifeMax / 2;
-		private const int MinSegments = 60;
-		private const int MaxSegments = 68;
+		private const int MinSegments = 66;
+		private const int MaxSegments = 74;
+		private const float SpawnBodySpacing = 48f;
+		private const float SpawnHeadSpacing = 66f;
+		private const float SpawnTailSpacing = 58f;
+		private const float HeadDrawForwardOffset = 12f;
 		private const int OrbitDuration = 180;
 		private const int DashDuration = 38;
 		private const int DashCooldown = 30;
@@ -153,22 +159,48 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			int totalSegments = Main.rand.Next(MinSegments, MaxSegments + 1);
 			int bodySegments = totalSegments - 2;
 			IEntitySource source = NPC.GetSource_FromAI();
+			Vector2 spawnDirection = GetSpawnDirection();
 
 			for (int i = 0; i < bodySegments; i++) {
 				int segment = NPC.NewNPC(source, (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<CrystalineDevourerBody>(), NPC.whoAmI);
-				Main.npc[segment].realLife = NPC.whoAmI;
-				Main.npc[segment].ai[1] = latest;
-				Main.npc[segment].ai[2] = NPC.whoAmI;
+				NPC segmentNpc = Main.npc[segment];
+				segmentNpc.realLife = NPC.whoAmI;
+				segmentNpc.ai[1] = latest;
+				segmentNpc.ai[2] = NPC.whoAmI;
+				PositionSpawnedSegment(Main.npc[latest], segmentNpc, spawnDirection, latest == NPC.whoAmI ? SpawnHeadSpacing : SpawnBodySpacing);
 				Main.npc[latest].ai[0] = segment;
 				latest = segment;
 			}
 
 			int tail = NPC.NewNPC(source, (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<CrystalineDevourerTail>(), NPC.whoAmI);
-			Main.npc[tail].realLife = NPC.whoAmI;
-			Main.npc[tail].ai[1] = latest;
-			Main.npc[tail].ai[2] = NPC.whoAmI;
+			NPC tailNpc = Main.npc[tail];
+			tailNpc.realLife = NPC.whoAmI;
+			tailNpc.ai[1] = latest;
+			tailNpc.ai[2] = NPC.whoAmI;
+			PositionSpawnedSegment(Main.npc[latest], tailNpc, spawnDirection, SpawnTailSpacing);
 			Main.npc[latest].ai[0] = tail;
 			NPC.netUpdate = true;
+		}
+
+		private Vector2 GetSpawnDirection() {
+			if (NPC.velocity.LengthSquared() > 0.01f) {
+				return NPC.velocity.SafeNormalize(Vector2.UnitY);
+			}
+
+			if (NPC.HasValidTarget) {
+				Vector2 targetDirection = Main.player[NPC.target].Center - NPC.Center;
+				if (targetDirection.LengthSquared() > 0.01f) {
+					return targetDirection.SafeNormalize(Vector2.UnitY);
+				}
+			}
+
+			return Vector2.UnitY;
+		}
+
+		private static void PositionSpawnedSegment(NPC ahead, NPC segment, Vector2 spawnDirection, float spacing) {
+			Vector2 direction = spawnDirection.LengthSquared() > 0.01f ? spawnDirection.SafeNormalize(Vector2.UnitY) : Vector2.UnitY;
+			segment.Center = ahead.Center - direction * spacing;
+			segment.rotation = direction.ToRotation() + MathHelper.PiOver2;
 		}
 
 		private void SpawnTwinIfNeeded() {
@@ -431,15 +463,14 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 					Vector2 bodyDirection = nextSegment.Center - NPC.Center;
 					if (bodyDirection.LengthSquared() > 0.1f) {
 						float desiredRotation = bodyDirection.ToRotation() - MathHelper.PiOver2;
-						NPC.rotation = NPC.rotation.AngleLerp(desiredRotation, 0.22f);
+						NPC.rotation = desiredRotation;
 						return;
 					}
 				}
 			}
 
 			if (NPC.velocity.LengthSquared() > 0.1f) {
-				float desiredRotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
-				NPC.rotation = NPC.rotation.AngleLerp(desiredRotation, 0.15f);
+				NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
 			}
 		}
 
@@ -597,6 +628,15 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 
 		public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position) {
 			return ControlsState ? null : false;
+		}
+
+		public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
+			Texture2D texture = TextureAssets.Npc[Type].Value;
+			Vector2 forward = (NPC.rotation - MathHelper.PiOver2).ToRotationVector2();
+			Vector2 drawPosition = NPC.Center - screenPos + forward * HeadDrawForwardOffset;
+			Vector2 origin = texture.Size() * 0.5f;
+			spriteBatch.Draw(texture, drawPosition, NPC.frame, NPC.GetAlpha(drawColor), NPC.rotation, origin, Vector2.One, SpriteEffects.None, 0f);
+			return false;
 		}
 
 		public override bool CanHitPlayer(Player target, ref int cooldownSlot) {
