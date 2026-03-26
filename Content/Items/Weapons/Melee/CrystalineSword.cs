@@ -34,11 +34,17 @@ namespace ChaoticDimensions.Content.Items.Weapons.Melee
 
 		public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback) {
 			Vector2 baseDirection = velocity.SafeNormalize(Vector2.UnitX);
-			for (int i = -1; i <= 1; i++) {
-				Vector2 spawnOffset = baseDirection.RotatedBy(MathHelper.PiOver2) * (90f * i);
-				Vector2 spawnPosition = player.MountedCenter - baseDirection * 80f + spawnOffset;
-				Vector2 swordVelocity = baseDirection.RotatedBy(MathHelper.ToRadians(8f * i)) * Item.shootSpeed;
-				Projectile.NewProjectile(source, spawnPosition, swordVelocity, type, damage, knockback, player.whoAmI);
+			Vector2 normal = baseDirection.RotatedBy(MathHelper.PiOver2);
+			Vector2 centerSpawnPosition = player.MountedCenter + (baseDirection * 34f);
+			Vector2 swordVelocity = baseDirection * Item.shootSpeed;
+
+			int centerProjectileIndex = Projectile.NewProjectile(source, centerSpawnPosition, swordVelocity, type, damage, knockback, player.whoAmI);
+			if (centerProjectileIndex >= 0 && centerProjectileIndex < Main.maxProjectiles) {
+				Projectile centerProjectile = Main.projectile[centerProjectileIndex];
+				float centerIdentity = centerProjectile.identity;
+
+				Projectile.NewProjectile(source, centerSpawnPosition + (normal * CrystalineSwordProjectile.OrbitRadius), swordVelocity, type, damage, knockback, player.whoAmI, centerIdentity, 1f);
+				Projectile.NewProjectile(source, centerSpawnPosition - (normal * CrystalineSwordProjectile.OrbitRadius), swordVelocity, type, damage, knockback, player.whoAmI, centerIdentity, -1f);
 			}
 
 			return false;
