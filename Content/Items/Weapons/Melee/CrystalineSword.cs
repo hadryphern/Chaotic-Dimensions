@@ -44,14 +44,5 @@ namespace ChaoticDimensions.Content.Items.Weapons.Melee
 			return false;
 		}
 
-		public override void AddRecipes() {
-			CreateRecipe()
-				.AddIngredient<CrystalineTear>(50)
-				.AddIngredient(ItemID.StarWrath)
-				.AddIngredient(ItemID.Meowmere)
-				.AddIngredient(ItemID.LunarBar, 20)
-				.AddTile(TileID.LunarCraftingStation)
-				.Register();
-		}
 	}
 }

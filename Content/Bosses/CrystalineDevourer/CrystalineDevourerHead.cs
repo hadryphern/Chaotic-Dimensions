@@ -116,6 +116,9 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			SpawnTwinIfNeeded();
 			SyncSharedLife();
 			TargetOrDespawn();
+			if (!NPC.active) {
+				return false;
+			}
 
 			Player target = Main.player[NPC.target];
 			if (!target.active || target.dead) {
@@ -237,25 +240,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		private void TargetOrDespawn() {
-			bool anyLivingPlayer = false;
-			for (int i = 0; i < Main.maxPlayers; i++) {
-				Player player = Main.player[i];
-				if (player.active && !player.dead) {
-					anyLivingPlayer = true;
-					break;
-				}
-			}
-
-			if (!anyLivingPlayer) {
-				NPC.velocity.Y -= 0.45f;
-				NPC.velocity *= 0.985f;
-				NPC.EncourageDespawn(10);
-				if (TwinIsAlive) {
-					TwinNPC.velocity.Y -= 0.45f;
-					TwinNPC.velocity *= 0.985f;
-					TwinNPC.EncourageDespawn(10);
-				}
-
+			if (!CrystalineDevourerArenaSystem.HasAnyLivingPlayers()) {
+				EndEncounterImmediately();
 				return;
 			}
 
@@ -390,6 +376,59 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			NPC.velocity = Vector2.Lerp(NPC.velocity, desiredVelocity, turnRate);
 			if (NPC.velocity.Length() > moveSpeed) {
 				NPC.velocity = NPC.velocity.SafeNormalize(Vector2.Zero) * moveSpeed;
+			}
+		}
+
+		private void EndEncounterImmediately() {
+			if (Main.netMode == NetmodeID.MultiplayerClient) {
+				return;
+			}
+
+			CrystalineDevourerArenaSystem.ShutdownEncounter();
+			DeactivateEncounterNPCs();
+			DeactivateEncounterProjectiles();
+		}
+
+		private static void DeactivateEncounterNPCs() {
+			int headType = ModContent.NPCType<CrystalineDevourerHead>();
+			int bodyType = ModContent.NPCType<CrystalineDevourerBody>();
+			int tailType = ModContent.NPCType<CrystalineDevourerTail>();
+			int shardType = ModContent.NPCType<CrystalineShard>();
+
+			for (int i = 0; i < Main.maxNPCs; i++) {
+				NPC npc = Main.npc[i];
+				if (!npc.active) {
+					continue;
+				}
+
+				if (npc.type != headType && npc.type != bodyType && npc.type != tailType && npc.type != shardType) {
+					continue;
+				}
+
+				npc.active = false;
+				npc.netUpdate = true;
+				if (Main.netMode == NetmodeID.Server) {
+					NetMessage.SendData(MessageID.SyncNPC, number: i);
+				}
+			}
+		}
+
+		private static void DeactivateEncounterProjectiles() {
+			int beamType = ModContent.ProjectileType<CrystalineDevourerBeam>();
+			int skyBeamType = ModContent.ProjectileType<CrystalineDevourerSkyBeam>();
+			int portalType = ModContent.ProjectileType<CrystalineDevourerPortal>();
+
+			for (int i = 0; i < Main.maxProjectiles; i++) {
+				Projectile projectile = Main.projectile[i];
+				if (!projectile.active) {
+					continue;
+				}
+
+				if (projectile.type != beamType && projectile.type != skyBeamType && projectile.type != portalType) {
+					continue;
+				}
+
+				projectile.Kill();
 			}
 		}
 
@@ -595,7 +634,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 
 		public override void ModifyNPCLoot(NPCLoot npcLoot) {
 			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrystalineTear>(), 1, 250, 250));
-			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrystalineSword>(), 200, 1, 1));
+			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrystalineSword>(), 40, 1, 1));
+			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<global::ChaoticDimensions.Content.Items.Accessories.CrystalineEye>(), 20, 1, 1));
 		}
 
 		public override void SendExtraAI(BinaryWriter writer) {

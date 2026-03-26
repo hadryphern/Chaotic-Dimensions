@@ -13,7 +13,12 @@ namespace ChaoticDimensions.Content.Scenes
 		public override int Music => MusicLoader.GetMusicSlot(Mod, "Sounds/Music/CrystalineWorm");
 
 		public override bool IsSceneEffectActive(Player player) {
-			return CrystalineDevourerIntroSystem.IsActive || NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>());
+			if (!player.active || player.dead) {
+				return false;
+			}
+
+			return CrystalineDevourerIntroSystem.IsActive ||
+				(CrystalineDevourerArenaSystem.HasAnyLivingPlayers() && NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>()));
 		}
 
 		public override void SpecialVisuals(Player player, bool isActive) {

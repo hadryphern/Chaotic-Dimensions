@@ -38,6 +38,36 @@ Items: {
 		DisplayName: Crystaline Envoured
 		Tooltip: ""
 	}
+
+	CrystalineDevourBreastplate: {
+		DisplayName: Crystaline Devour Breastplate
+		Tooltip: ""
+	}
+
+	CrystalineDevourGreaves: {
+		DisplayName: Crystaline Devour Greaves
+		Tooltip: ""
+	}
+
+	CrystalineDevourMagicHelm: {
+		DisplayName: Crystaline Devour Magic Helm
+		Tooltip: ""
+	}
+
+	CrystalineDevourMeleeHelm: {
+		DisplayName: Crystaline Devour Melee Helm
+		Tooltip: ""
+	}
+
+	CrystalineDevourRangedHelm: {
+		DisplayName: Crystaline Devour Ranged Helm
+		Tooltip: ""
+	}
+
+	CrystalineDevourSummonerHelm: {
+		DisplayName: Crystaline Devour Summoner Helm
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -81,5 +111,10 @@ Buffs: {
 	CrystalineEnvouredBuff: {
 		DisplayName: Crystaline Envoured Buff
 		Description: Mods.ChaoticDimensions.Buffs.CrystalineEnvouredBuff.Description
+	}
+
+	CrystalineDevourAegisBuff: {
+		DisplayName: Crystaline Devour Aegis Buff
+		Description: Mods.ChaoticDimensions.Buffs.CrystalineDevourAegisBuff.Description
 	}
 }

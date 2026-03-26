@@ -11,13 +11,16 @@ namespace ChaoticDimensions.Content.Items.Accessories
 			Item.width = 28;
 			Item.height = 28;
 			Item.accessory = true;
-			Item.rare = ItemRarityID.Purple;
-			Item.value = Item.buyPrice(platinum: 1);
+			Item.defense = 25;
+			Item.rare = ItemRarityID.Red;
+			Item.value = Item.buyPrice(platinum: 3);
 		}
 
 		public override void UpdateAccessory(Player player, bool hideVisual) {
 			player.GetModPlayer<CrystalinePlayer>().crystalineEyeEquipped = true;
-			player.lifeRegen += 4;
+			player.moveSpeed += 0.22f;
+			player.maxRunSpeed += 0.8f;
+			player.runAcceleration *= 1.15f;
 		}
 	}
 }

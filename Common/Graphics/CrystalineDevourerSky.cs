@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ChaoticDimensions.Content.Bosses.CrystalineDevourer;
+using ChaoticDimensions.Common.Systems;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
@@ -42,7 +43,7 @@ namespace ChaoticDimensions.Common.Graphics
 				InitializeSky();
 			}
 
-			if (isActive && !NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>())) {
+			if (isActive && (!NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>()) || !CrystalineDevourerArenaSystem.HasAnyLivingPlayers())) {
 				isActive = false;
 			}
 

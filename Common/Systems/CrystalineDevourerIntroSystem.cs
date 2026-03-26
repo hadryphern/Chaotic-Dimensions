@@ -33,9 +33,13 @@ namespace ChaoticDimensions.Common.Systems
 			return true;
 		}
 
-		public override void Unload() {
+		public static void CancelIntro() {
 			introTimer = 0;
 			introPlayer = -1;
+		}
+
+		public override void Unload() {
+			CancelIntro();
 		}
 
 		public override void PostUpdateEverything() {
@@ -43,16 +47,15 @@ namespace ChaoticDimensions.Common.Systems
 				return;
 			}
 
-			if (introPlayer < 0 || introPlayer >= Main.maxPlayers || !Main.player[introPlayer].active) {
-				introTimer = 0;
-				introPlayer = -1;
+			if (introPlayer < 0 || introPlayer >= Main.maxPlayers || !Main.player[introPlayer].active || Main.player[introPlayer].dead) {
+				CancelIntro();
 				return;
 			}
 
 			introTimer--;
 			if (introTimer <= 0) {
 				Player player = Main.player[introPlayer];
-				introPlayer = -1;
+				CancelIntro();
 				if (Main.myPlayer == player.whoAmI && !NPC.AnyNPCs(ModContent.NPCType<CrystalineDevourerHead>())) {
 					NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<CrystalineDevourerHead>());
 				}

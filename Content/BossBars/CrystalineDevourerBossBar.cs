@@ -6,6 +6,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.BigProgressBar;
 using Terraria.ModLoader;
 using ChaoticDimensions.Content.Bosses.CrystalineDevourer;
+using ChaoticDimensions.Common.Systems;
 
 namespace ChaoticDimensions.Content.BossBars
 {
@@ -22,6 +23,10 @@ namespace ChaoticDimensions.Content.BossBars
 		}
 
 		public override bool? ModifyInfo(ref BigProgressBarInfo info, ref float life, ref float lifeMax, ref float shield, ref float shieldMax) {
+			if (!CrystalineDevourerArenaSystem.HasAnyLivingPlayers() || !Main.LocalPlayer.active || Main.LocalPlayer.dead) {
+				return false;
+			}
+
 			if (info.npcIndexToAimAt < 0 || info.npcIndexToAimAt >= Main.maxNPCs) {
 				return false;
 			}

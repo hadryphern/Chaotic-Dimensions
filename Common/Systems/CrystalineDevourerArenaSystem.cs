@@ -79,6 +79,17 @@ namespace ChaoticDimensions.Common.Systems
 		public static float HalfWidth => ArenaHalfWidth;
 		public static float HalfHeight => ArenaHalfHeight;
 
+		public static bool HasAnyLivingPlayers() {
+			for (int i = 0; i < Main.maxPlayers; i++) {
+				Player player = Main.player[i];
+				if (player.active && !player.dead) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		public override void OnWorldLoad() {
 			ClearState();
 			if (Main.netMode != NetmodeID.MultiplayerClient) {
@@ -128,6 +139,10 @@ namespace ChaoticDimensions.Common.Systems
 			if (Main.netMode != NetmodeID.MultiplayerClient) {
 				KillPlayersOutsideArena();
 			}
+		}
+
+		public static void ShutdownEncounter() {
+			ResetArena(restoreTiles: true);
 		}
 
 		public static bool Contains(Vector2 worldPosition, float padding = 0f) {
