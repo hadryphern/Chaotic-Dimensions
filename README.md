@@ -3,151 +3,76 @@
 </div>
 
 <p align="center">
-  <strong>Chaotic Dimensions</strong> e um mod autoral para <strong>Terraria / tModLoader</strong>, criado como projeto de TCC em Portugal e focado em atmosfera cosmica, cristais, encontros cinematograficos e conteudo pos-Moon Lord.
+  <strong>Chaotic Dimensions</strong> e um mod autoral para <strong>Terraria / tModLoader</strong>, criado como projeto de TCC em Portugal e pensado para crescer como um universo proprio, com varios bosses, progressoes, biomas, dimensoes e encounters com identidade forte.
   <br />
-  <em>Chaotic Dimensions is an original Terraria / tModLoader mod project focused on crystal-cosmic atmosphere, cinematic encounters and handcrafted post-Moon Lord content.</em>
+  <em>Chaotic Dimensions is an original Terraria / tModLoader project designed to grow into its own universe, with multiple bosses, handcrafted progression, new biomes, dimensions and high-identity encounters.</em>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/tModLoader-Mod-7c3aed?style=for-the-badge" alt="tModLoader Mod" />
-  <img src="https://img.shields.io/badge/Terraria-Post--Moon%20Lord-a855f7?style=for-the-badge" alt="Post Moon Lord" />
-  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-c084fc?style=for-the-badge" alt="Status Em Desenvolvimento" />
-  <img src="https://img.shields.io/badge/Idioma-PT%20%2F%20EN-9333ea?style=for-the-badge" alt="Idioma PT EN" />
+  <img src="https://img.shields.io/badge/Terraria-Original%20Content-a855f7?style=for-the-badge" alt="Original Content" />
+  <img src="https://img.shields.io/badge/Vision-Multi--Boss-c084fc?style=for-the-badge" alt="Multi Boss Vision" />
+  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-9333ea?style=for-the-badge" alt="Status Em Desenvolvimento" />
+  <img src="https://img.shields.io/badge/Idioma-PT%20%2F%20EN-7e22ce?style=for-the-badge" alt="Idioma PT EN" />
 </p>
 
-## Visao Geral
+## Sobre o Projeto
 
-Chaotic Dimensions nasceu com a proposta de construir uma identidade visual e mecanica propria dentro do universo de Terraria. A ideia central do projeto e misturar fantasia cristalina, atmosfera cosmica, apresentacao estilizada e um boss principal que pareca memoravel tanto no combate quanto no impacto visual.
+Chaotic Dimensions nasceu para ser mais do que um unico boss ou um unico arco de conteudo. A ideia do projeto e construir uma linha propria dentro do universo de Terraria: direcao visual forte, atmosfera cosmica e cristalina, bosses marcantes, progressao autoral e uma sensacao de expansao continua.
 
-Atualmente o mod ja conta com boss customizado, arena tematica, ceu proprio, musica dedicada, barra de vida personalizada, itens exclusivos, armas para multiplas classes, acessorio utilitario, consumiveis e uma armadura modular inspirada no `Crystaline Devour`.
+O `Crystaline Devour` e apenas o primeiro boss oficial dessa fundacao. Ele representa o inicio da identidade do mod, nao o unico foco dela.
 
-## Showcase Atual
+## Visao
 
-![Current Crystaline Showcase](.github/readme/showcase.png)
+- Criar varios bosses com apresentacao, mecanicas e ambientacao proprias.
+- Expandir o mod com itens, armas, armaduras, acessorios e sistemas originais.
+- Construir encounters com intro, musica, boss bar, sky e arena personalizados.
+- Misturar fantasia cristalina, escala cosmica e estilo autoral em uma progressao pos-Moon Lord.
 
-## Conteudo Atual
+## Fundacoes Ja Implementadas
 
-### Boss Principal
+Atualmente o projeto ja possui a primeira base jogavel do universo `Chaotic Dimensions`:
 
-**Crystaline Devour / Crystaline Devourer**
-
-- Intro/cutscene de invocacao com title card.
-- Musica propria da luta.
-- Sky e coloracao tematica durante o encounter.
+- Primeiro boss oficial: `Crystaline Devour / Crystaline Devourer`.
+- Intro/cutscene para invocacao do encounter.
 - Boss bar customizada.
-- Arena cristalina para fechar o combate em uma area controlada.
-- Padroes de ataque com pressao de projeteis, mobilidade de worm e `Sky Blaster`.
-- Encontro encerrado automaticamente quando todos os jogadores morrem, limpando arena e efeitos visuais.
+- Musica propria da luta.
+- Sky e coloracao tematica durante o combate.
+- Arena cristalina para controlar o encontro.
+- Arsenal cristalino inicial com armas para classes diferentes.
+- Acessorios e consumiveis exclusivos.
+- Armadura modular `Crystaline Devour Armor`.
+- Sistemas de buffs e efeitos especiais ligados a equipamentos.
 
-### Arsenal e Itens
+## Primeiro Marco Oficial
 
-| Item | Categoria | Estado atual | Destaque |
-| --- | --- | --- | --- |
-| `Crystaline Sigil` | Summon | Implementado | Invoca o boss e dispara a intro do encounter. |
-| `Crystaline Tear` | Material | Implementado | Material principal da progressao cristalina. |
-| `Crystaline Potion` | Consumivel | Implementado | Cura `250` de vida, melhora regeneracao e reduz o potion sickness. |
-| `Crystaline Eye` | Acessorio | Implementado | `25` de defesa, bonus de mobilidade e teleporte no clique direito com impulso direcional. |
-| `Crystaline Sword` | Melee | Implementado | Arma rara do boss com lamina central, espadas orbitais e sustain via cura ao acertar. |
-| `Crystaline Staff` | Magic | Implementado | Disparo magico multiplo com spread cristalino. |
-| `Crystaline Gun` | Ranged | Implementado | Arma extremamente rapida baseada em pressao continua de tiros. |
+O `Crystaline Devour` e o primeiro boss oficial do projeto e funciona como a primeira grande demonstracao da direcao que o mod quer seguir:
 
-### Armadura Crystaline Devour
-
-O set foi desenhado como uma armadura modular: peitoral e grevas sao compartilhados, enquanto o capacete define a classe e muda completamente o perfil do conjunto.
-
-| Peca / Variante | Classe | Defesa total do set | Destaque |
-| --- | --- | --- | --- |
-| `Crystaline Devour Melee Helm` | Melee | `250` | Dano melee massivo, velocidade melee e mobilidade elevada. |
-| `Crystaline Devour Magic Helm` | Magic | `150` | Dano magico extremo e custo de mana quase nulo. |
-| `Crystaline Devour Ranged Helm` | Ranged | `210` | Altissima cadencia, dano ranged elevado e economia pesada de municao. |
-| `Crystaline Devour Summoner Helm` | Summoner | `99` | Dano summoner absurdo, `+10` minions e bonus de mobilidade. |
-| `Crystaline Devour Breastplate` | Universal | Compartilhado | Nucleo visual e defensivo da armadura. |
-| `Crystaline Devour Greaves` | Universal | Compartilhado | Base do set e mobilidade complementar. |
-
-**Bonus especial do set**
-
-- Todos os sets ativam uma protecao de `10 segundos` de imortalidade ao receber dano.
-- A protecao entra em cooldown de `3 minutos` antes de poder ativar novamente.
-
-### Buffs e Sistemas de Suporte
-
-| Sistema / Buff | Funcao |
-| --- | --- |
-| `Crystaline Potion Regeneration` | Regeneracao adicional elevada. |
-| `Crystaline Potion Fortitude` | Defesa extra ao consumir a pocao. |
-| `Crystaline Rush` | Velocidade e regeneracao apos o teleporte do `Crystaline Eye`. |
-| `Crystaline Devour Aegis` | Estado de invulnerabilidade temporaria ligado ao set da armadura. |
+- Presenca visual forte.
+- Encounter estilizado.
+- Ambiente proprio.
+- Progressao baseada em drops e equipamentos exclusivos.
+- Base tecnica para os proximos bosses, dimensoes e sistemas do mod.
 
 ## Direcao Visual
 
-O projeto ja possui uma linha estetica propria sendo construida:
+Chaotic Dimensions esta sendo construido com foco em identidade. Isso inclui:
 
-- Fundo cosmico-cristalino para o encounter do boss.
-- Titulo customizado para o menu do mod.
-- Preview visual da armadura `Crystaline Devour`.
-- Title card exclusiva para a apresentacao do boss.
+- Menu proprio.
+- Backgrounds e skies personalizados.
+- Title cards para encounters importantes.
+- Armaduras e itens com linha visual dedicada.
+- Apresentacao pensada para parecer parte de um universo maior.
 
-## Espaco para Screenshots, GIFs e Videos
-
-Esta parte do README ja esta preparada para voce plugar sua midia propria conforme o projeto for evoluindo.
-
-### Placeholder de midia
-
-![Media Placeholder](.github/readme/media-placeholder.png)
-
-### Exemplo para screenshot
-
-```md
-![Crystaline Devour boss fight](.github/readme/my-boss-fight.png)
-```
-
-### Exemplo para GIF
-
-```md
-![Crystaline Devour dash showcase](.github/readme/my-dash-showcase.gif)
-```
-
-### Exemplo para video
-
-```md
-[![Assista ao video](.github/readme/media-placeholder.png)](https://www.youtube.com/watch?v=SEU_VIDEO)
-```
-
-### Sugestoes de blocos para galeria
-
-Voce pode usar blocos assim no futuro:
-
-```md
-## Boss Fight Gallery
-
-![Arena do Crystaline Devour](.github/readme/boss-arena-01.png)
-![Sky do encounter](.github/readme/boss-sky-01.png)
-
-## GIF Highlights
-
-![Movimentacao da worm](.github/readme/worm-movement.gif)
-![Sky Blaster showcase](.github/readme/sky-blaster.gif)
-
-## Trailer / Gameplay
-
-[![Trailer do projeto](.github/readme/media-placeholder.png)](https://www.youtube.com/watch?v=SEU_VIDEO)
-```
-
-## Estrutura do Projeto
+## Estrutura do Repositorio
 
 ```text
 ChaoticDimensions/
 |- Content/
 |  |- BossBars/
-|  |- Bosses/CrystalineDevourer/
+|  |- Bosses/
 |  |- Buffs/
 |  |- Items/
-|  |  |- Accessories/
-|  |  |- Armor/CrystalineDevour/
-|  |  |- Consumables/
-|  |  |- Materials/
-|  |  |- Summons/
-|  |  `- Weapons/
 |  |- Players/
 |  |- Projectiles/
 |  `- Scenes/
@@ -156,7 +81,7 @@ ChaoticDimensions/
 |  |- Menus/
 |  |- Systems/
 |  `- Tiles/
-|- Assets/UI/
+|- Assets/
 |- .github/readme/
 `- tools/
 ```
@@ -167,24 +92,16 @@ ChaoticDimensions/
 dotnet build ChaoticDimensions.csproj
 ```
 
-O projeto foi pensado para desenvolvimento em `tModLoader ModSources`, entao a forma mais pratica de testar e compilar e abrir o mod diretamente pelo ambiente do Terraria/tModLoader.
-
-## Status do Projeto
-
-- Boss principal ja jogavel.
-- Arsenal cristalino base ja implementado.
-- Armadura modular `Crystaline Devour` ja integrada.
-- README e assets do repositorio preparados para apresentacao publica.
-- Polimento visual, balanceamento fino e expansao de conteudo ainda em andamento.
+O projeto foi pensado para desenvolvimento dentro de `tModLoader ModSources`, entao o fluxo mais pratico e compilar e abrir o mod diretamente pelo ambiente do Terraria / tModLoader.
 
 ## English Snapshot
 
-Chaotic Dimensions is a crystal-cosmic post-Moon Lord Terraria/tModLoader mod project. Right now the repository already includes a custom boss encounter, themed arena and sky, custom music, weapons for multiple classes, a teleport utility accessory, consumables, buffs and a modular armor line with class-specific helmets.
+Chaotic Dimensions is an original Terraria / tModLoader mod project built to become a much larger custom universe over time. The goal is not to center everything around a single boss, but to create a broader identity with multiple bosses, handcrafted progression, original visuals and memorable encounters.
 
-This README is also prepared to receive your own screenshots, GIFs and video links as the project keeps evolving.
+The `Crystaline Devour` is the first official boss of that vision, not the final centerpiece of the whole mod.
 
 ## Creditos
 
 - **Projeto:** `blueDev`
 - **Plataforma:** `Terraria / tModLoader`
-- **Identidade do README:** assets e apresentacao preparados diretamente dentro do repositorio para facilitar showcase publico do projeto.
+- **README:** organizado para apresentar o projeto de forma mais ampla, sem prender o repositorio a um unico boss ou a uma lista de itens temporaria.
