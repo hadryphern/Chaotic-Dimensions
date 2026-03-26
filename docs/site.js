@@ -62,14 +62,19 @@ const ENTRY_TAGS = {
   cephadrome: "miniboss"
 };
 
-const PROGRESSION_FLOW = [
-  { id: "water-dragon", stage: "early" },
-  { id: "mantis", stage: "early" },
-  { id: "caterkiller", stage: "post_evil" },
-  { id: "emperor-scorpion", stage: "post_evil" },
-  { id: "hercules", stage: "post_evil" },
-  { id: "cephadrome", stage: "hardmode" },
-  { id: "crystaline-devourer", stage: "endgame" }
+const PROGRESSION_GROUPS = [
+  {
+    key: "pre_hardmode",
+    entryIds: ["water-dragon", "mantis", "caterkiller", "emperor-scorpion", "hercules"]
+  },
+  {
+    key: "pre_moonlord",
+    entryIds: ["cephadrome"]
+  },
+  {
+    key: "post_moonlord",
+    entryIds: ["crystaline-devourer"]
+  }
 ];
 
 const staticEntries = [...entries, ...frontierEntries];
@@ -128,12 +133,14 @@ const pageCopy = {
       back: "Voltar para a biblioteca",
       openCrafting: "Ver em Crafting",
       facts: "Fatos rapidos",
+      summon: "Invocacao",
       obtain: "Como obter",
       crafting: "Crafting",
       drops: "Drops",
       pieces: "Pecas",
       notes: "Notas",
       tactics: "Taticas",
+      usedIn: "Usado em",
       related: "Relacionados",
       comments: "Comentarios",
       commentsHint: "Entre pela pagina de Feedback para comentar nesta entrada.",
@@ -151,17 +158,29 @@ const pageCopy = {
       ingredients: "Ingredientes",
       station: "Estacao",
       output: "Resultado",
-      open: "Abrir entrada"
+      open: "Abrir entrada",
+      allTags: "Todas as tags"
     },
     progression: {
       title: "Progressao",
       body: "Uma rota simples para ligar spawn, drops, crafting e checkpoints do mod.",
       open: "Abrir pagina",
-      stages: {
-        early: "Abertura",
-        post_evil: "Pos Evil Boss",
-        hardmode: "Hardmode",
-        endgame: "Pico atual"
+      summon: "Invocacao",
+      crafting: "Como chamar",
+      curiosities: "Curiosidades",
+      groups: {
+        pre_hardmode: {
+          title: "Pre-Hardmode",
+          body: "Criaturas, minibosses e loops iniciais antes da quebra do mundo."
+        },
+        pre_moonlord: {
+          title: "Pre-Moon Lord",
+          body: "Hardmode avancado com encontros que preparam o salto final da progressao."
+        },
+        post_moonlord: {
+          title: "Post-Moon Lord",
+          body: "Conteudo de pico, pensado para encounters e rewards do endgame atual."
+        }
       }
     },
     feedback: {
@@ -287,12 +306,14 @@ const pageCopy = {
       back: "Back to library",
       openCrafting: "View in Crafting",
       facts: "Quick facts",
+      summon: "Summon",
       obtain: "How to obtain",
       crafting: "Crafting",
       drops: "Drops",
       pieces: "Pieces",
       notes: "Notes",
       tactics: "Tactics",
+      usedIn: "Used in",
       related: "Related",
       comments: "Comments",
       commentsHint: "Sign in through the Feedback page to comment on this entry.",
@@ -310,17 +331,29 @@ const pageCopy = {
       ingredients: "Ingredients",
       station: "Station",
       output: "Result",
-      open: "Open entry"
+      open: "Open entry",
+      allTags: "All tags"
     },
     progression: {
       title: "Progression",
       body: "A simple route that links spawns, drops, crafting and progression checkpoints.",
       open: "Open page",
-      stages: {
-        early: "Opening",
-        post_evil: "Post Evil Boss",
-        hardmode: "Hardmode",
-        endgame: "Current peak"
+      summon: "Summon",
+      crafting: "How to call it",
+      curiosities: "Notes",
+      groups: {
+        pre_hardmode: {
+          title: "Pre-Hardmode",
+          body: "Creatures, minibosses and early loops before the world break."
+        },
+        pre_moonlord: {
+          title: "Pre-Moon Lord",
+          body: "Late hardmode encounters that prepare the final jump in progression."
+        },
+        post_moonlord: {
+          title: "Post-Moon Lord",
+          body: "Peak content built around current endgame encounters and rewards."
+        }
       }
     },
     feedback: {
@@ -681,6 +714,9 @@ function renderEntryPage() {
 
   const content = getLocalizedEntry(entry);
   const recipeUrl = hasContentList(entry, "crafting") ? buildPageUrl("crafting", { q: content.title }) : "";
+  const summonEntry = findSummonEntry(entry);
+  const summonContent = getLocalizedEntry(summonEntry);
+  const usedInEntries = getUsedInEntries(entry).slice(0, 12);
   const relatedMarkup = (entry.related ?? []).map((entryId) => {
     const relatedEntry = getEntryById(entryId);
     if (!relatedEntry) {
@@ -688,6 +724,15 @@ function renderEntryPage() {
     }
     const relatedContent = getLocalizedEntry(relatedEntry);
     return `<a class="inline-tag" href="${buildPageUrl("entry", { entry: relatedEntry.id })}">${escapeHtml(relatedContent.title ?? relatedEntry.id)}</a>`;
+  }).join("");
+  const usedInMarkup = usedInEntries.map((usedInEntry) => {
+    const usedInContent = getLocalizedEntry(usedInEntry);
+    return `
+      <a class="entry-inline-row" href="${buildPageUrl("entry", { entry: usedInEntry.id })}">
+        <img class="entry-inline-row__image" src="${escapeHtml(usedInEntry.image)}" alt="${escapeHtml(usedInContent.title ?? usedInEntry.id)}">
+        <span>${escapeHtml(usedInContent.title ?? usedInEntry.id)}</span>
+      </a>
+    `;
   }).join("");
 
   const thread = backendState.commentsByEntry[entry.id];
@@ -710,24 +755,36 @@ function renderEntryPage() {
       <a class="inline-link" href="${buildPageUrl("library")}">${copy.entry.back}</a>
       <div class="entry-hero">
         <div class="entry-main">
+          ${entry.banner ? `
+            <div class="entry-banner-art">
+              <img src="${escapeHtml(entry.banner)}" alt="${escapeHtml(content.title ?? entry.id)}">
+            </div>
+          ` : ""}
           <p class="eyebrow">${getCategoryLabel(entry.category)}</p>
           <h1>${escapeHtml(content.title ?? entry.id)}</h1>
           <p class="entry-subtitle">${escapeHtml(content.subtitle ?? "")}</p>
           <p class="hero-lead">${escapeHtml(content.overview ?? content.summary ?? "")}</p>
-          <div class="entry-actions">
-            ${recipeUrl ? `<a class="header-link header-link--button" href="${recipeUrl}">${copy.entry.openCrafting}</a>` : ""}
-            <a class="header-link header-link--button" href="${buildPageUrl("feedback")}">${copy.entry.comments}</a>
+          <div class="entry-inline-links">
+            ${recipeUrl ? `<a class="inline-link" href="${recipeUrl}">${copy.entry.openCrafting}</a>` : ""}
+            <a class="inline-link" href="${buildPageUrl("feedback")}">${copy.entry.comments}</a>
           </div>
         </div>
         <aside class="entry-aside">
           <div class="aside-card">
-            <img class="entry-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+            <img class="entry-image entry-image--showcase" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
             <div class="meta-stack">
               <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
               <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
             </div>
+            ${summonEntry ? `
+              <div class="content-block content-block--compact">
+                <h3>${copy.entry.summon}</h3>
+                <a class="entry-title-link" href="${buildPageUrl("entry", { entry: summonEntry.id })}">${escapeHtml(summonContent.title ?? summonEntry.id)}</a>
+                ${summonContent.crafting?.length ? `<ul class="content-list">${summonContent.crafting.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+              </div>
+            ` : ""}
             ${(content.facts ?? []).length > 0 ? `
-              <div class="content-block">
+              <div class="content-block content-block--compact">
                 <h3>${copy.entry.facts}</h3>
                 <ul class="content-list">${(content.facts ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
               </div>
@@ -746,6 +803,12 @@ function renderEntryPage() {
         ${renderContentBlock(copy.entry.notes, content.notes)}
         ${renderContentBlock(copy.entry.tactics, content.tactics)}
       </div>
+      ${usedInMarkup ? `
+        <div class="content-block">
+          <h3>${copy.entry.usedIn}</h3>
+          <div class="entry-inline-list">${usedInMarkup}</div>
+        </div>
+      ` : ""}
       ${relatedMarkup ? `
         <div class="content-block">
           <h3>${copy.entry.related}</h3>
@@ -793,6 +856,7 @@ function renderEntryPage() {
 function renderCraftingPage() {
   const copy = getCopy();
   const visibleRecipes = getVisibleRecipes();
+  const recipeCategories = [...new Set(craftableEntries.map((entry) => entry.category))];
 
   elements.main.innerHTML = `
     <section class="page-hero page-hero--compact">
@@ -804,6 +868,16 @@ function renderCraftingPage() {
     <section class="page-section">
       <div class="filter-bar">
         <input class="field-input" id="crafting-search" type="search" value="${escapeHtml(state.search)}" placeholder="${copy.crafting.search}">
+        <select class="field-input" id="crafting-category">
+          <option value="all">${copy.crafting.allTags}</option>
+          ${recipeCategories.map((category) => `
+            <option value="${category}" ${state.category === category ? "selected" : ""}>${getCategoryLabel(category)}</option>
+          `).join("")}
+        </select>
+      </div>
+      <div class="section-head section-head--inline">
+        <h2>${copy.library.results}</h2>
+        <span class="subtle-label">${visibleRecipes.length}</span>
       </div>
       <div class="recipe-list">
         ${visibleRecipes.length > 0 ? visibleRecipes.map((entry) => renderRecipeCard(entry)).join("") : `<div class="empty-card">${copy.crafting.empty}</div>`}
@@ -816,31 +890,34 @@ function renderCraftingPage() {
     renderCraftingPage();
     syncUrl();
   });
+
+  elements.main.querySelector("#crafting-category")?.addEventListener("change", (event) => {
+    state.category = event.target.value;
+    renderCraftingPage();
+    syncUrl();
+  });
 }
 
 function renderProgressionPage() {
   const copy = getCopy();
-  const cards = PROGRESSION_FLOW.map((step) => {
-    const entry = getEntryById(step.id);
-    if (!entry) {
+  const groupMarkup = PROGRESSION_GROUPS.map((group) => {
+    const entriesForGroup = group.entryIds.map((entryId) => getEntryById(entryId)).filter(Boolean);
+    if (entriesForGroup.length === 0) {
       return "";
     }
-    const content = getLocalizedEntry(entry);
+
     return `
-      <article class="progress-card">
-        <div class="progress-head">
-          <span class="inline-tag">${copy.progression.stages[step.stage]}</span>
-          <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
-        </div>
-        <div class="progress-body">
-          <img class="progress-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+      <section class="page-section progression-group">
+        <div class="section-head">
           <div>
-            <h3>${escapeHtml(content.title ?? entry.id)}</h3>
-            <p>${escapeHtml(content.summary ?? "")}</p>
-            <a class="inline-link" href="${buildPageUrl("entry", { entry: entry.id })}">${copy.progression.open}</a>
+            <h2>${copy.progression.groups[group.key].title}</h2>
+            <p>${copy.progression.groups[group.key].body}</p>
           </div>
         </div>
-      </article>
+        <div class="progression-stack progression-stack--grouped">
+          ${entriesForGroup.map((entry) => renderProgressionCard(entry)).join("")}
+        </div>
+      </section>
     `;
   }).join("");
 
@@ -851,9 +928,7 @@ function renderProgressionPage() {
       <p class="hero-lead">${copy.progression.body}</p>
     </section>
 
-    <section class="page-section">
-      <div class="progression-stack">${cards}</div>
-    </section>
+    ${groupMarkup}
   `;
 }
 
@@ -1266,25 +1341,27 @@ function renderFooter() {
 }
 
 function renderEntryCard(entry, includeFacts = false) {
-  const copy = getCopy();
   const content = getLocalizedEntry(entry);
   const facts = includeFacts ? (content.facts ?? []).slice(0, 2) : [];
 
   return `
     <article class="entry-card">
       <div class="entry-card-head">
-        <img class="entry-card-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+        <a class="entry-card-thumb" href="${buildPageUrl("entry", { entry: entry.id })}">
+          <img class="entry-card-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+        </a>
         <div>
           <div class="tag-row">
             <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
             <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
           </div>
-          <h3>${escapeHtml(content.title ?? entry.id)}</h3>
+          <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
+            <h3>${escapeHtml(content.title ?? entry.id)}</h3>
+          </a>
         </div>
       </div>
       <p>${escapeHtml(content.summary ?? "")}</p>
       ${facts.length > 0 ? `<ul class="content-list">${facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}</ul>` : ""}
-      <a class="inline-link" href="${buildPageUrl("entry", { entry: entry.id })}">${copy.common.openPage}</a>
     </article>
   `;
 }
@@ -1297,10 +1374,17 @@ function renderRecipeCard(entry) {
   return `
     <article class="recipe-card">
       <div class="entry-card-head">
-        <img class="entry-card-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+        <a class="entry-card-thumb" href="${buildPageUrl("entry", { entry: entry.id })}">
+          <img class="entry-card-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+        </a>
         <div>
-          <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
-          <h3>${escapeHtml(content.title ?? entry.id)}</h3>
+          <div class="tag-row">
+            <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
+            <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
+          </div>
+          <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
+            <h3>${escapeHtml(content.title ?? entry.id)}</h3>
+          </a>
         </div>
       </div>
       <div class="recipe-meta">
@@ -1315,7 +1399,51 @@ function renderRecipeCard(entry) {
           </div>
         ` : ""}
       </div>
-      <a class="inline-link" href="${buildPageUrl("entry", { entry: entry.id })}">${copy.crafting.open}</a>
+    </article>
+  `;
+}
+
+function renderProgressionCard(entry) {
+  const copy = getCopy();
+  const content = getLocalizedEntry(entry);
+  const summonEntry = findSummonEntry(entry);
+  const summonContent = getLocalizedEntry(summonEntry);
+  const summonLines = summonContent.crafting?.length ? summonContent.crafting.slice(0, 4) : (summonContent.obtain ?? []).slice(0, 3);
+  const noteLines = (content.notes ?? []).slice(0, 3);
+
+  return `
+    <article class="progress-card progress-card--detailed">
+      <img class="progress-image progress-image--large" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+      <div class="progress-copy">
+        <div class="tag-row">
+          <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
+          <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
+        </div>
+        <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
+          <h3>${escapeHtml(content.title ?? entry.id)}</h3>
+        </a>
+        <p>${escapeHtml(content.summary ?? content.overview ?? "")}</p>
+        <div class="progress-detail-grid">
+          ${summonEntry ? `
+            <div class="progress-detail-block">
+              <strong>${copy.progression.summon}</strong>
+              <a class="inline-link" href="${buildPageUrl("entry", { entry: summonEntry.id })}">${escapeHtml(summonContent.title ?? summonEntry.id)}</a>
+            </div>
+          ` : ""}
+          ${summonLines.length > 0 ? `
+            <div class="progress-detail-block">
+              <strong>${copy.progression.crafting}</strong>
+              <ul class="content-list">${summonLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+            </div>
+          ` : ""}
+          ${noteLines.length > 0 ? `
+            <div class="progress-detail-block">
+              <strong>${copy.progression.curiosities}</strong>
+              <ul class="content-list">${noteLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+            </div>
+          ` : ""}
+        </div>
+      </div>
     </article>
   `;
 }
@@ -1416,7 +1544,7 @@ function syncUrl() {
     }
   }
 
-  if (pageId === "library" && state.category !== "all") {
+  if ((pageId === "library" || pageId === "crafting") && state.category !== "all") {
     params.set("category", state.category);
   }
 
@@ -1496,6 +1624,10 @@ function getVisibleRecipes() {
   const term = normalize(state.search);
 
   return craftableEntries.filter((entry) => {
+    if (state.category !== "all" && entry.category !== state.category) {
+      return false;
+    }
+
     if (!term) {
       return true;
     }
@@ -1520,6 +1652,38 @@ function getEntriesByCategory(category) {
 
 function getEntryById(entryId) {
   return allEntries.find((entry) => entry.id === entryId);
+}
+
+function getUsedInEntries(entry) {
+  const content = getLocalizedEntry(entry);
+  const needles = [entry.id, content.title]
+    .filter(Boolean)
+    .map((value) => normalize(value));
+
+  return allEntries.filter((candidate) => {
+    if (candidate.id === entry.id) {
+      return false;
+    }
+
+    return Object.values(candidate.content ?? {}).some((candidateContent) => {
+      return (candidateContent?.crafting ?? []).some((line) => {
+        const normalizedLine = normalize(line);
+        return needles.some((needle) => needle && normalizedLine.includes(needle));
+      });
+    });
+  }).sort(compareEntries);
+}
+
+function findSummonEntry(entry) {
+  const directMatch = (entry.related ?? [])
+    .map((entryId) => getEntryById(entryId))
+    .find((relatedEntry) => relatedEntry?.category === "summons");
+
+  if (directMatch) {
+    return directMatch;
+  }
+
+  return allEntries.find((candidate) => candidate.category === "summons" && (candidate.related ?? []).includes(entry.id));
 }
 
 function getLocalizedEntry(entry) {
@@ -1590,6 +1754,7 @@ function mergeEntries(baseEntries, publishedEntries) {
       id: entry.id,
       category: entry.category ?? existing?.category ?? "materials",
       image: entry.image ?? existing?.image ?? "./assets/images/favicon.png",
+      banner: entry.banner ?? existing?.banner ?? "",
       related: Array.isArray(entry.related) ? [...entry.related] : [...(existing?.related ?? [])],
       sortOrder: Number(entry.sortOrder ?? existing?.sortOrder ?? 0),
       isPublished: entry.isPublished ?? existing?.isPublished ?? true,
@@ -1605,6 +1770,7 @@ function cloneEntry(entry) {
     id: entry.id,
     category: entry.category,
     image: entry.image,
+    banner: entry.banner ?? "",
     related: [...(entry.related ?? [])],
     sortOrder: Number(entry.sortOrder ?? 0),
     isPublished: entry.isPublished ?? true,

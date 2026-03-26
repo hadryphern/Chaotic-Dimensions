@@ -1,22 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600&display=swap");
 
 :root {
-  --bg: #0b0d10;
-  --surface: #111419;
-  --surface-soft: #151920;
-  --surface-muted: #0f1217;
-  --line: #222831;
-  --line-strong: #2d3642;
-  --text: #f5f7fb;
-  --text-soft: #c8d0dc;
-  --text-dim: #8c95a3;
-  --accent: #90a9ff;
-  --accent-soft: rgba(144, 169, 255, 0.12);
+  --bg: #090a0f;
+  --surface: #101219;
+  --surface-soft: #131722;
+  --surface-muted: #0c0f16;
+  --line: #1e2331;
+  --line-strong: #2a3143;
+  --text: #f4f6fb;
+  --text-soft: #c6cee1;
+  --text-dim: #858da0;
+  --accent: #a68cff;
+  --accent-soft: rgba(166, 140, 255, 0.12);
   --danger: #ff7a8f;
   --success: #89d4a1;
-  --radius: 18px;
-  --radius-small: 12px;
-  --content-width: 1200px;
+  --radius: 10px;
+  --radius-small: 8px;
+  --content-width: 1240px;
 }
 
 * {
@@ -30,7 +30,9 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at top center, rgba(166, 140, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, #07080c, #090a0f 26%, #090b11 100%);
   color: var(--text);
   font-family: "Plus Jakarta Sans", sans-serif;
 }
@@ -138,7 +140,7 @@ h2 {
 .action-button,
 .account-chip,
 .inline-tag {
-  border-radius: 999px;
+  border-radius: var(--radius-small);
 }
 
 .header-link,
@@ -157,6 +159,15 @@ h2 {
 .header-link:hover,
 .header-link.is-active {
   color: var(--text);
+}
+
+.main-nav .header-link {
+  border-bottom: 1px solid transparent;
+}
+
+.main-nav .header-link:hover,
+.main-nav .header-link.is-active {
+  border-bottom-color: var(--accent);
 }
 
 .header-link--button,
@@ -207,7 +218,7 @@ h2 {
 }
 
 .page-hero {
-  max-width: 860px;
+  max-width: 980px;
   padding: 10px 0 6px;
 }
 
@@ -277,7 +288,6 @@ h3 {
 
 .feature-grid,
 .summary-grid,
-.entry-grid,
 .feedback-grid,
 .field-grid,
 .content-grid,
@@ -288,11 +298,16 @@ h3 {
 
 .feature-grid,
 .summary-grid,
-.entry-grid,
 .feedback-grid,
 .content-grid,
 .admin-subgrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.entry-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .field-grid--double {
@@ -348,6 +363,19 @@ h3 {
   gap: 14px;
 }
 
+.entry-card,
+.recipe-card,
+.progress-card {
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.entry-card:hover,
+.recipe-card:hover,
+.progress-card:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-soft);
+}
+
 .panel-card--nested {
   padding: 18px;
   background: var(--surface-muted);
@@ -386,9 +414,72 @@ h3 {
   margin-bottom: 10px;
 }
 
+.entry-image--showcase {
+  width: 132px;
+  height: 132px;
+}
+
 .entry-image--large {
   width: 132px;
   height: 132px;
+}
+
+.entry-card-thumb {
+  display: block;
+}
+
+.entry-title-link {
+  color: var(--text);
+}
+
+.entry-title-link:hover {
+  color: var(--accent);
+}
+
+.entry-inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.entry-inline-list {
+  display: grid;
+  gap: 10px;
+}
+
+.entry-inline-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: var(--surface-muted);
+}
+
+.entry-inline-row:hover {
+  border-color: var(--line-strong);
+}
+
+.entry-inline-row__image {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.entry-banner-art {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(166, 140, 255, 0.08), transparent);
+  overflow: hidden;
+}
+
+.entry-banner-art img {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
 }
 
 .inline-link {
@@ -447,6 +538,10 @@ h3 {
   gap: 14px;
 }
 
+.recipe-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .form-section {
   display: grid;
   gap: 16px;
@@ -460,13 +555,18 @@ h3 {
 }
 
 .entry-hero {
-  grid-template-columns: minmax(0, 1.4fr) 320px;
+  grid-template-columns: minmax(0, 1.45fr) 340px;
   align-items: start;
 }
 
 .entry-subtitle {
   margin: 8px 0 0;
   color: var(--text-dim);
+}
+
+.entry-main {
+  display: grid;
+  gap: 18px;
 }
 
 .admin-layout {
@@ -490,6 +590,53 @@ h3 {
 
 .admin-subgrid--single {
   grid-template-columns: 1fr;
+}
+
+.content-block--compact {
+  padding: 16px;
+}
+
+.recipe-meta,
+.progress-detail-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.recipe-meta {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.progression-stack--grouped {
+  gap: 18px;
+}
+
+.progress-card--detailed {
+  grid-template-columns: 164px minmax(0, 1fr);
+  align-items: start;
+}
+
+.progress-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.progress-image--large {
+  width: 164px;
+  height: 164px;
+  padding: 18px;
+}
+
+.progress-detail-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.progress-detail-block {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: var(--surface-muted);
 }
 
 .admin-entry-list {
@@ -597,6 +744,9 @@ h3 {
   .feature-grid,
   .summary-grid,
   .entry-grid,
+  .recipe-list,
+  .recipe-meta,
+  .progress-detail-grid,
   .feedback-grid,
   .content-grid,
   .admin-subgrid,
@@ -618,7 +768,9 @@ h3 {
 
   .entry-card-head,
   .progress-body,
-  .comment-head {
+  .comment-head,
+  .progress-card--detailed,
+  .entry-inline-row {
     grid-template-columns: 1fr;
   }
 
