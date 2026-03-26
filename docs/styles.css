@@ -49,8 +49,13 @@ img {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
+}
+
+textarea {
+  resize: vertical;
 }
 
 .wiki-app {
@@ -143,7 +148,8 @@ textarea {
 
 .search-box input,
 .stub-form input,
-.stub-form textarea {
+.stub-form textarea,
+.stub-form select {
   width: 100%;
   padding: 13px 14px;
   color: var(--text);
@@ -540,6 +546,106 @@ textarea {
   font-size: 0.92rem;
 }
 
+.button-row,
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.form-grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+}
+
+.field-group span {
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-soft);
+}
+
+.checkbox-row input {
+  width: 18px;
+  height: 18px;
+}
+
+.message-bar {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #0f1520;
+  color: var(--text-soft);
+}
+
+.message-bar--error {
+  border-color: rgba(236, 98, 118, 0.32);
+  background: rgba(120, 27, 44, 0.22);
+  color: #ffd4db;
+}
+
+.message-bar--success {
+  border-color: rgba(118, 191, 148, 0.32);
+  background: var(--success-soft);
+}
+
+.detail-section--comments {
+  padding-top: 8px;
+}
+
+.comment-stack {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.comment-card {
+  padding: 14px;
+  background: #0f1520;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.comment-card.is-hidden {
+  border-style: dashed;
+  opacity: 0.88;
+}
+
+.comment-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+}
+
+.comment-card__body {
+  margin: 10px 0 0;
+  line-height: 1.75;
+  color: var(--text-soft);
+}
+
 .site-footer {
   margin-top: 18px;
   padding: 0 4px;
@@ -573,7 +679,8 @@ textarea {
 @media (max-width: 1320px) {
   .overview-grid,
   .browser-layout,
-  .placeholder-grid--two {
+  .placeholder-grid--two,
+  .form-grid--three {
     grid-template-columns: 1fr;
   }
 
@@ -628,7 +735,9 @@ textarea {
   .mini-grid,
   .taxonomy-grid,
   .timeline-grid,
-  .placeholder-grid--two {
+  .placeholder-grid--two,
+  .form-grid--two,
+  .form-grid--three {
     grid-template-columns: 1fr;
   }
 
@@ -636,7 +745,8 @@ textarea {
   .footer-inner,
   .detail-card__head,
   .timeline-card__body,
-  .entry-row {
+  .entry-row,
+  .comment-card__head {
     grid-template-columns: 1fr;
   }
 
@@ -644,5 +754,10 @@ textarea {
   .footer-inner {
     display: grid;
     justify-items: start;
+  }
+
+  .button-row,
+  .meta-row {
+    align-items: start;
   }
 }

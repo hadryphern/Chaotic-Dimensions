@@ -798,6 +798,8 @@ function renderCommunity() {
   }
 
   if (backendState.user) {
+    const currentEntry = getEntryById(state.selectedEntryId);
+    const currentTitle = escapeHtml(currentEntry ? (getLocalizedEntry(currentEntry)?.title ?? state.selectedEntryId) : state.selectedEntryId);
     elements.community.innerHTML = `
       <div class="section-heading">
         <p class="section-kicker">${copy.community.eyebrow}</p>
@@ -828,7 +830,7 @@ function renderCommunity() {
         <article class="panel panel--muted">
           <h3>${backendState.isAdmin ? copy.admin.title : copy.community.cardTitle}</h3>
           <p>${backendState.isAdmin ? runtime.adminSignedInBody : runtime.memberSignedInBody}</p>
-          <p class="helper-text">${runtime.commentHint.replace("{title}", escapeHtml(getLocalizedEntry(getEntryById(state.selectedEntryId))?.title ?? state.selectedEntryId))}</p>
+          <p class="helper-text">${runtime.commentHint.replace("{title}", currentTitle)}</p>
         </article>
       </div>
     `;
@@ -904,7 +906,68 @@ function renderCommunity() {
 
 function renderAdmin() {
   const copy = getPageCopy();
+  const runtime = getRuntimeCopy();
   const toolList = copy.admin.uploadItems.map((item) => `<li>${item}</li>`).join("");
+  const draft = ensureAdminDraft();
+  const selectedEntry = getEntryById(state.selectedEntryId);
+  const selectedTitle = escapeHtml(selectedEntry ? (getLocalizedEntry(selectedEntry)?.title ?? state.selectedEntryId) : state.selectedEntryId);
+
+  if (!backendState.enabled) {
+    elements.admin.innerHTML = `
+      <div class="section-heading">
+        <p class="section-kicker">${copy.admin.eyebrow}</p>
+        <h2>${copy.admin.title}</h2>
+        <p>${copy.admin.intro}</p>
+      </div>
+
+      <div class="placeholder-grid placeholder-grid--two">
+        <article class="panel">
+          <h3>${copy.admin.requirementTitle}</h3>
+          <p>${copy.admin.requirementBody}</p>
+          <div class="button-row">
+            <a class="link-button" href="${getRepositoryFileUrl("docs/SUPABASE_SETUP.md")}" target="_blank" rel="noreferrer">${runtime.setupLinkLabel}</a>
+            <a class="link-button" href="${getRepositoryFileUrl("supabase/wiki_schema.sql")}" target="_blank" rel="noreferrer">${runtime.sqlLinkLabel}</a>
+          </div>
+          ${backendState.error ? `<p class="message-bar message-bar--error">${escapeHtml(backendState.error)}</p>` : ""}
+        </article>
+
+        <article class="panel panel--muted">
+          <h3>${copy.admin.uploadTitle}</h3>
+          <ul>${toolList}</ul>
+          <p class="helper-text">${copy.admin.backendMissing}</p>
+        </article>
+      </div>
+    `;
+    return;
+  }
+
+  if (!backendState.isAdmin) {
+    elements.admin.innerHTML = `
+      <div class="section-heading">
+        <p class="section-kicker">${copy.admin.eyebrow}</p>
+        <h2>${copy.admin.title}</h2>
+        <p>${copy.admin.intro}</p>
+      </div>
+
+      <div class="placeholder-grid placeholder-grid--two">
+        <article class="panel">
+          <h3>${copy.admin.accessDenied}</h3>
+          <p>${runtime.editorCandidateNote}</p>
+          <div class="button-row">
+            <a class="link-button" href="#community">${copy.nav.community}</a>
+            <a class="link-button" href="${getRepositoryFileUrl("docs/SUPABASE_SETUP.md")}" target="_blank" rel="noreferrer">${runtime.setupLinkLabel}</a>
+          </div>
+        </article>
+
+        <article class="panel panel--muted">
+          <h3>${runtime.promotionTitle}</h3>
+          <p>${runtime.promotionBody}</p>
+          <a class="link-button" href="${getRepositoryFileUrl("supabase/wiki_schema.sql")}" target="_blank" rel="noreferrer">${runtime.sqlLinkLabel}</a>
+        </article>
+      </div>
+    `;
+    return;
+  }
 
   elements.admin.innerHTML = `
     <div class="section-heading">
@@ -917,14 +980,241 @@ function renderAdmin() {
       <article class="panel">
         <h3>${copy.admin.uploadTitle}</h3>
         <ul>${toolList}</ul>
+        <form class="stub-form" id="asset-upload-form">
+          <div class="form-grid form-grid--two">
+            <label class="field-group">
+              <span>${copy.admin.imagePath}</span>
+              <input type="text" name="pathPrefix" value="${escapeHtml(draft.imagePath)}" placeholder="entries">
+            </label>
+
+            <label class="field-group">
+              <span>${copy.admin.imageFile}</span>
+              <input type="file" name="imageFile" accept="image/*" required>
+            </label>
+          </div>
+          <button class="button button--primary" type="submit">${copy.admin.uploadButton}</button>
+        </form>
+        ${(backendState.uploadMessage || backendState.uploadError) ? `
+          <p class="message-bar ${backendState.uploadError ? "message-bar--error" : "message-bar--success"}">
+            ${escapeHtml(backendState.uploadError || backendState.uploadMessage)}
+          </p>
+        ` : ""}
       </article>
 
       <article class="panel panel--muted">
-        <h3>${copy.admin.requirementTitle}</h3>
-        <p>${copy.admin.requirementBody}</p>
+        <h3>${runtime.editorContextTitle}</h3>
+        <p>${runtime.currentSelectionLabel.replace("{title}", selectedTitle)}</p>
+        <div class="button-row">
+          <button class="link-button" type="button" id="admin-load-selected">${runtime.loadSelectedButton}</button>
+          <button class="link-button" type="button" id="admin-new-entry">${runtime.newEntryButton}</button>
+        </div>
+        <p class="helper-text">${runtime.saveHelp}</p>
       </article>
     </div>
+
+    <article class="panel">
+      <h3>${copy.admin.editorTitle}</h3>
+      <form class="stub-form" id="admin-entry-form">
+        <div class="form-grid form-grid--three">
+          <label class="field-group">
+            <span>${copy.admin.entryId}</span>
+            <input type="text" name="entryId" value="${escapeHtml(draft.id)}" required>
+          </label>
+
+          <label class="field-group">
+            <span>${copy.admin.category}</span>
+            <input type="text" name="category" value="${escapeHtml(draft.category)}" required>
+          </label>
+
+          <label class="field-group">
+            <span>${runtime.sortOrderLabel}</span>
+            <input type="number" name="sortOrder" value="${escapeHtml(draft.sortOrder)}">
+          </label>
+        </div>
+
+        <div class="form-grid form-grid--two">
+          <label class="field-group">
+            <span>${copy.admin.imageUrl}</span>
+            <input type="url" id="entry-image-url" name="imageUrl" value="${escapeHtml(draft.imageUrl)}">
+          </label>
+
+          <label class="field-group">
+            <span>${copy.admin.related}</span>
+            <input type="text" name="related" value="${escapeHtml(draft.related)}">
+          </label>
+        </div>
+
+        <div class="form-grid form-grid--two">
+          <label class="field-group">
+            <span>${copy.admin.titleLabel}</span>
+            <input type="text" name="title" value="${escapeHtml(draft.title)}" required>
+          </label>
+
+          <label class="field-group">
+            <span>${copy.admin.subtitleLabel}</span>
+            <input type="text" name="subtitle" value="${escapeHtml(draft.subtitle)}">
+          </label>
+        </div>
+
+        <label class="field-group">
+          <span>${copy.admin.summaryLabel}</span>
+          <textarea name="summary" rows="3">${escapeHtml(draft.summary)}</textarea>
+        </label>
+
+        <label class="field-group">
+          <span>${copy.admin.overviewLabel}</span>
+          <textarea name="overview" rows="5">${escapeHtml(draft.overview)}</textarea>
+        </label>
+
+        <div class="form-grid form-grid--two">
+          <label class="field-group">
+            <span>${copy.admin.factsLabel}</span>
+            <textarea name="facts" rows="6">${escapeHtml(draft.facts)}</textarea>
+          </label>
+
+          <label class="field-group">
+            <span>${copy.admin.obtainLabel}</span>
+            <textarea name="obtain" rows="6">${escapeHtml(draft.obtain)}</textarea>
+          </label>
+        </div>
+
+        <div class="form-grid form-grid--two">
+          <label class="field-group">
+            <span>${copy.admin.craftingLabel}</span>
+            <textarea name="crafting" rows="6">${escapeHtml(draft.crafting)}</textarea>
+          </label>
+
+          <label class="field-group">
+            <span>${copy.admin.dropsLabel}</span>
+            <textarea name="drops" rows="6">${escapeHtml(draft.drops)}</textarea>
+          </label>
+        </div>
+
+        <div class="form-grid form-grid--two">
+          <label class="field-group">
+            <span>${copy.catalog.pieces}</span>
+            <textarea name="pieces" rows="5">${escapeHtml(draft.pieces)}</textarea>
+          </label>
+
+          <label class="field-group">
+            <span>${copy.admin.notesLabel}</span>
+            <textarea name="notes" rows="5">${escapeHtml(draft.notes)}</textarea>
+          </label>
+        </div>
+
+        <label class="field-group">
+          <span>${copy.admin.tacticsLabel}</span>
+          <textarea name="tactics" rows="5">${escapeHtml(draft.tactics)}</textarea>
+        </label>
+
+        <label class="checkbox-row">
+          <input type="checkbox" name="published" ${draft.published ? "checked" : ""}>
+          <span>${copy.admin.publishedLabel}</span>
+        </label>
+
+        <div class="button-row">
+          <button class="button button--primary" type="submit">${copy.admin.saveButton}</button>
+        </div>
+      </form>
+      ${(backendState.entryMessage || backendState.entryError) ? `
+        <p class="message-bar ${backendState.entryError ? "message-bar--error" : "message-bar--success"}">
+          ${escapeHtml(backendState.entryError || backendState.entryMessage)}
+        </p>
+      ` : ""}
+    </article>
+
+    <article class="panel">
+      <h3>${copy.admin.moderationTitle}</h3>
+      ${backendState.adminComments.length > 0 ? `
+        <div class="comment-stack">
+          ${backendState.adminComments.map((comment) => `
+            <article class="comment-card ${comment.is_hidden ? "is-hidden" : ""}">
+              <div class="comment-card__head">
+                <strong>${escapeHtml(comment.display_name)}</strong>
+                <div class="meta-row">
+                  <span class="tag tag--subtle">${escapeHtml(comment.entry_id)}</span>
+                  <span class="tag ${comment.is_hidden ? "tag--subtle" : ""}">${comment.is_hidden ? runtime.hiddenLabel : runtime.visibleLabel}</span>
+                </div>
+              </div>
+              <p class="comment-card__body">${formatMultilineText(comment.body)}</p>
+              <div class="button-row">
+                <span class="helper-text">${formatDateTime(comment.created_at)}</span>
+                <button class="link-button" type="button" data-toggle-comment="${comment.id}" data-comment-hidden="${comment.is_hidden}">
+                  ${comment.is_hidden ? runtime.showCommentButton : runtime.hideCommentButton}
+                </button>
+              </div>
+            </article>
+          `).join("")}
+        </div>
+      ` : `<div class="empty-state">${runtime.moderationEmpty}</div>`}
+    </article>
   `;
+
+  elements.admin.querySelector("#admin-load-selected")?.addEventListener("click", () => {
+    loadSelectedEntryIntoAdminDraft();
+    renderAdmin();
+  });
+
+  elements.admin.querySelector("#admin-new-entry")?.addEventListener("click", () => {
+    clearAdminDraft();
+    renderAdmin();
+  });
+
+  elements.admin.querySelector("#asset-upload-form")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const url = await uploadWikiAsset(formData.get("imageFile"), formData.get("pathPrefix"));
+    if (url) {
+      ensureAdminDraft();
+      state.adminDraft.imageUrl = url;
+      renderAdmin();
+    }
+  });
+
+  const adminEntryForm = elements.admin.querySelector("#admin-entry-form");
+  adminEntryForm?.addEventListener("input", () => {
+    updateAdminDraftFromForm(adminEntryForm);
+  });
+  adminEntryForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const draftState = updateAdminDraftFromForm(event.currentTarget);
+    if (!draftState.id || !draftState.category || !draftState.title) {
+      backendState.entryError = runtime.requiredEntryFields;
+      backendState.entryMessage = "";
+      renderAdmin();
+      return;
+    }
+
+    const baseEntry = getEntryById(draftState.id);
+    const payload = {
+      id: draftState.id,
+      category: draftState.category,
+      image_url: draftState.imageUrl || baseEntry?.image || "./assets/images/favicon.png",
+      related_ids: parseCsvList(draftState.related),
+      sort_order: Number(draftState.sortOrder || 0),
+      is_published: draftState.published,
+      content_json: buildLocalizedContentPayload(baseEntry, draftState)
+    };
+
+    const ok = await saveWikiEntry(payload);
+    if (ok) {
+      state.selectedEntryId = draftState.id;
+      state.category = draftState.category || "all";
+      refreshEntryCache();
+      await ensureSelectedEntryComments(true);
+      render();
+    }
+  });
+
+  elements.admin.querySelectorAll("[data-toggle-comment]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const commentId = button.dataset.toggleComment;
+      const isHidden = button.dataset.commentHidden === "true";
+      await setCommentHidden(commentId, !isHidden);
+      await ensureSelectedEntryComments(true);
+      render();
+    });
+  });
 }
 
 function renderFooter() {
@@ -939,17 +1229,19 @@ function renderFooter() {
 
 function renderCatalogRow(entry) {
   const content = getLocalizedEntry(entry);
-  const preview = (content.facts ?? []).slice(0, 2).map((fact) => `<li>${fact}</li>`).join("");
+  const preview = (content.facts ?? []).slice(0, 2).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("");
+  const title = escapeHtml(content.title ?? entry.id);
+  const summary = escapeHtml(content.summary ?? "");
 
   return `
     <button class="entry-row ${state.selectedEntryId === entry.id ? "is-active" : ""}" type="button" data-entry-id="${entry.id}">
-      <img class="icon" src="${entry.image}" alt="${content.title}">
+      <img class="icon" src="${escapeHtml(entry.image)}" alt="${title}">
       <div class="entry-row__body">
         <div class="entry-row__head">
-          <strong>${content.title}</strong>
+          <strong>${title}</strong>
           <span class="tag tag--subtle">${getCategoryLabel(entry.category)}</span>
         </div>
-        <p>${content.summary}</p>
+        <p>${summary}</p>
         <ul class="compact-list">${preview}</ul>
       </div>
     </button>
@@ -962,6 +1254,9 @@ function renderEntryDetail(entry) {
   const sections = ["facts", "obtain", "crafting", "drops", "pieces", "notes", "tactics"]
     .map((key) => renderDetailSection(copy.catalog[key], content[key]))
     .join("");
+  const title = escapeHtml(content.title ?? entry.id);
+  const subtitle = escapeHtml(content.subtitle ?? "");
+  const overview = escapeHtml(content.overview ?? content.summary ?? "");
 
   const related = (entry.related ?? []).map((entryId) => {
     const relatedEntry = getEntryById(entryId);
@@ -970,21 +1265,21 @@ function renderEntryDetail(entry) {
     }
 
     const relatedContent = getLocalizedEntry(relatedEntry);
-    return `<button class="chip" type="button" data-entry-id="${entryId}">${relatedContent.title}</button>`;
+    return `<button class="chip" type="button" data-entry-id="${entryId}">${escapeHtml(relatedContent.title ?? entryId)}</button>`;
   }).join("");
 
   return `
     <article class="detail-card">
       <div class="detail-card__head">
-        <img class="icon icon--detail" src="${entry.image}" alt="${content.title}">
+        <img class="icon icon--detail" src="${escapeHtml(entry.image)}" alt="${title}">
         <div>
           <div class="detail-meta">
             <span class="tag">${getCategoryLabel(entry.category)}</span>
             <span class="tag tag--subtle">${getTagLabel(entry)}</span>
           </div>
-          <h3>${content.title}</h3>
-          <p class="detail-subtitle">${content.subtitle ?? ""}</p>
-          <p>${content.overview ?? content.summary}</p>
+          <h3>${title}</h3>
+          <p class="detail-subtitle">${subtitle}</p>
+          <p>${overview}</p>
         </div>
       </div>
 
@@ -996,6 +1291,8 @@ function renderEntryDetail(entry) {
           <div class="related-row">${related}</div>
         </div>
       ` : ""}
+
+      ${renderCommentsSection(entry)}
     </article>
   `;
 }
@@ -1008,22 +1305,24 @@ function renderDetailSection(label, items) {
   return `
     <div class="detail-section">
       <h4>${label}</h4>
-      <ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>
+      <ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
     </div>
   `;
 }
 
 function renderRecipeRow(entry) {
   const content = getLocalizedEntry(entry);
+  const title = escapeHtml(content.title ?? entry.id);
+  const subtitle = escapeHtml(content.subtitle ?? content.summary ?? "");
   return `
     <button class="entry-row ${state.selectedRecipeId === entry.id ? "is-active" : ""}" type="button" data-recipe-id="${entry.id}">
-      <img class="icon" src="${entry.image}" alt="${content.title}">
+      <img class="icon" src="${escapeHtml(entry.image)}" alt="${title}">
       <div class="entry-row__body">
         <div class="entry-row__head">
-          <strong>${content.title}</strong>
+          <strong>${title}</strong>
           <span class="tag tag--subtle">${getCategoryLabel(entry.category)}</span>
         </div>
-        <p>${content.subtitle ?? content.summary}</p>
+        <p>${subtitle}</p>
       </div>
     </button>
   `;
@@ -1033,34 +1332,36 @@ function renderRecipeDetail(entry) {
   const copy = getPageCopy();
   const content = getLocalizedEntry(entry);
   const recipe = splitRecipeLines(content.crafting ?? []);
+  const title = escapeHtml(content.title ?? entry.id);
+  const summary = escapeHtml(content.summary ?? "");
 
   return `
     <article class="detail-card">
       <div class="detail-card__head">
-        <img class="icon icon--detail" src="${entry.image}" alt="${content.title}">
+        <img class="icon icon--detail" src="${escapeHtml(entry.image)}" alt="${title}">
         <div>
           <span class="tag">${copy.crafting.output}</span>
-          <h3>${content.title}</h3>
-          <p>${content.summary}</p>
+          <h3>${title}</h3>
+          <p>${summary}</p>
         </div>
       </div>
 
       <div class="detail-section">
         <h4>${copy.crafting.ingredients}</h4>
-        <ul>${recipe.ingredients.map((line) => `<li>${line}</li>`).join("")}</ul>
+        <ul>${recipe.ingredients.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
       </div>
 
       ${recipe.stations.length > 0 ? `
         <div class="detail-section">
           <h4>${copy.crafting.station}</h4>
-          <ul>${recipe.stations.map((line) => `<li>${line}</li>`).join("")}</ul>
+          <ul>${recipe.stations.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
         </div>
       ` : ""}
 
       ${(content.notes ?? []).length > 0 ? `
         <div class="detail-section">
           <h4>${copy.crafting.notes}</h4>
-          <ul>${content.notes.map((line) => `<li>${line}</li>`).join("")}</ul>
+          <ul>${content.notes.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
         </div>
       ` : ""}
     </article>
@@ -1140,7 +1441,7 @@ function getEntryById(entryId) {
 function getCategoryLabel(category) {
   const baseCopy = uiCopy[state.language] ?? uiCopy[siteConfig.defaultLanguage];
   const frontierCopy = frontierUiCopy[state.language] ?? frontierUiCopy[siteConfig.defaultLanguage] ?? frontierUiCopy.en;
-  return baseCopy.categories?.[category] ?? frontierCopy.categories?.[category] ?? category;
+  return escapeHtml(baseCopy.categories?.[category] ?? frontierCopy.categories?.[category] ?? humanizeCategory(category));
 }
 
 function getPageCopy() {
@@ -1153,7 +1454,8 @@ function getSiteName() {
 
 function getTagLabel(entry) {
   const copy = getPageCopy();
-  const tagKey = entryTags[entry.id] ?? (entry.category === "bosses" ? "boss" : "mob");
+  const tagKey = entryTags[entry.id]
+    ?? (entry.category === "bosses" || entry.category === "superbosses" ? "boss" : entry.category === "minibosses" ? "miniboss" : "mob");
   return copy.tags[tagKey] ?? tagKey;
 }
 
@@ -1197,6 +1499,413 @@ function splitRecipeLines(lines) {
     ingredients: ingredients.length > 0 ? ingredients : lines,
     stations
   };
+}
+
+function getRuntimeCopy() {
+  if (state.language === "pt-BR") {
+    return {
+      openLabel: "Abrir",
+      accountLabel: "Conta",
+      connectedFallback: "conectado",
+      sidebarSignedIn: "Supabase ativo. Usuario atual: {name}.",
+      sidebarAvailable: "Supabase ativo. Visitantes ja podem criar conta rapida e comentar.",
+      setupTitle: "Backend real via Supabase",
+      setupBody: "A wiki continua no GitHub Pages, mas contas, comentarios, upload e edicao passam a funcionar pelo Supabase.",
+      setupLinkLabel: "Abrir guia do Supabase",
+      sqlLinkLabel: "Abrir SQL",
+      guestAccountHint: "Esse fluxo usa conta anonima do Supabase, entao o visitante comenta so com nome.",
+      createEditorButton: "Criar conta de editor",
+      editorCandidateNote: "A conta criada por email e senha ainda precisa ser promovida para admin no SQL para liberar publicacao e edicao.",
+      memberRoleLabel: "Membro",
+      adminRoleLabel: "Admin",
+      memberSignedInBody: "Sua conta ja pode comentar nas paginas da wiki. Abra qualquer entrada na Biblioteca para deixar feedback.",
+      adminSignedInBody: "Sua conta admin ja pode publicar entradas, subir imagens e moderar comentarios na aba Admin.",
+      commentHint: "Entrada atual para comentar: {title}",
+      promotionTitle: "Promocao para admin",
+      promotionBody: "Depois de criar ou entrar com sua conta de email, rode o SQL de promocao no projeto Supabase para marcar esse usuario como admin.",
+      editorContextTitle: "Contexto do editor",
+      currentSelectionLabel: "Entrada selecionada na Biblioteca: {title}",
+      loadSelectedButton: "Carregar entrada selecionada",
+      newEntryButton: "Nova entrada",
+      saveHelp: "O editor salva o idioma atual e preserva as outras traducoes ja existentes quando houver.",
+      sortOrderLabel: "Ordem",
+      moderationEmpty: "Nenhum comentario recente para moderar.",
+      hideCommentButton: "Ocultar",
+      showCommentButton: "Mostrar",
+      hiddenLabel: "Oculto",
+      visibleLabel: "Visivel",
+      requiredEntryFields: "Preencha pelo menos slug, categoria e titulo antes de salvar.",
+      commentsTitle: "Comentarios",
+      commentsEmpty: "Ainda nao ha comentarios nesta entrada.",
+      commentsLoading: "Carregando comentarios...",
+      commentsSignIn: "Entre pela aba Feedback para comentar nesta entrada.",
+      commentButton: "Publicar comentario",
+      commentSetupBody: "Os comentarios reais ficam disponiveis assim que o Supabase estiver configurado nesta build."
+    };
+  }
+
+  return {
+    openLabel: "Open",
+    accountLabel: "Account",
+    connectedFallback: "connected",
+    sidebarSignedIn: "Supabase is live. Current user: {name}.",
+    sidebarAvailable: "Supabase is live. Visitors can already create quick accounts and comment.",
+    setupTitle: "Real backend with Supabase",
+    setupBody: "The wiki stays on GitHub Pages, while accounts, comments, uploads and editing are powered by Supabase.",
+    setupLinkLabel: "Open Supabase guide",
+    sqlLinkLabel: "Open SQL",
+    guestAccountHint: "This flow uses Supabase anonymous users, so visitors only need a display name to comment.",
+    createEditorButton: "Create editor account",
+    editorCandidateNote: "Email and password users still need the SQL promotion step before they gain admin publishing access.",
+    memberRoleLabel: "Member",
+    adminRoleLabel: "Admin",
+    memberSignedInBody: "Your account can already comment on wiki pages. Open any entry in the Library to leave feedback.",
+    adminSignedInBody: "Your admin account can already publish entries, upload images and moderate comments in the Admin tab.",
+    commentHint: "Current entry to comment on: {title}",
+    promotionTitle: "Admin promotion",
+    promotionBody: "After creating or signing in with your email account, run the promotion SQL in Supabase to mark that user as admin.",
+    editorContextTitle: "Editor context",
+    currentSelectionLabel: "Selected Library entry: {title}",
+    loadSelectedButton: "Load selected entry",
+    newEntryButton: "New entry",
+    saveHelp: "The editor saves the current language and preserves any other translations that already exist.",
+    sortOrderLabel: "Order",
+    moderationEmpty: "No recent comments to moderate.",
+    hideCommentButton: "Hide",
+    showCommentButton: "Show",
+    hiddenLabel: "Hidden",
+    visibleLabel: "Visible",
+    requiredEntryFields: "Fill in at least the slug, category and title before saving.",
+    commentsTitle: "Comments",
+    commentsEmpty: "There are no comments on this entry yet.",
+    commentsLoading: "Loading comments...",
+    commentsSignIn: "Sign in through the Feedback section to comment on this entry.",
+    commentButton: "Publish comment",
+    commentSetupBody: "Real comments become available as soon as Supabase is configured in this build."
+  };
+}
+
+function mergeEntries(baseEntries, publishedEntries) {
+  const merged = new Map();
+
+  baseEntries.forEach((entry) => {
+    merged.set(entry.id, cloneEntry(entry));
+  });
+
+  publishedEntries.forEach((entry) => {
+    const existing = merged.get(entry.id);
+    merged.set(entry.id, {
+      id: entry.id,
+      category: entry.category ?? existing?.category ?? "materials",
+      image: entry.image ?? existing?.image ?? "./assets/images/favicon.png",
+      related: Array.isArray(entry.related) ? [...entry.related] : [...(existing?.related ?? [])],
+      sortOrder: Number(entry.sortOrder ?? existing?.sortOrder ?? 0),
+      isPublished: entry.isPublished ?? existing?.isPublished ?? true,
+      content: mergeContentObjects(existing?.content ?? {}, entry.content ?? {})
+    });
+  });
+
+  return [...merged.values()].sort(compareEntries);
+}
+
+function mergeContentObjects(baseContent, nextContent) {
+  const merged = { ...baseContent };
+  Object.entries(nextContent ?? {}).forEach(([languageCode, content]) => {
+    merged[languageCode] = {
+      ...(baseContent?.[languageCode] ?? {}),
+      ...(content ?? {})
+    };
+  });
+  return merged;
+}
+
+function cloneEntry(entry) {
+  return {
+    id: entry.id,
+    category: entry.category,
+    image: entry.image,
+    related: [...(entry.related ?? [])],
+    sortOrder: Number(entry.sortOrder ?? 0),
+    isPublished: entry.isPublished ?? true,
+    content: mergeContentObjects({}, entry.content ?? {})
+  };
+}
+
+function compareEntries(left, right) {
+  const sortDifference = Number(left.sortOrder ?? 0) - Number(right.sortOrder ?? 0);
+  if (sortDifference !== 0) {
+    return sortDifference;
+  }
+
+  const categoryDifference = normalize(left.category).localeCompare(normalize(right.category));
+  if (categoryDifference !== 0) {
+    return categoryDifference;
+  }
+
+  return normalize(getEntrySortTitle(left)).localeCompare(normalize(getEntrySortTitle(right)));
+}
+
+function buildCategoryList(entryList) {
+  const found = new Set(entryList.map((entry) => entry.category).filter(Boolean));
+  const ordered = defaultCategories.filter((category) => found.has(category));
+  const extras = [...found]
+    .filter((category) => !defaultCategories.includes(category))
+    .sort((left, right) => normalize(humanizeCategory(left)).localeCompare(normalize(humanizeCategory(right))));
+
+  return [...ordered, ...extras];
+}
+
+function refreshEntryCache() {
+  allEntries = mergeEntries(staticEntries, backendState.publishedEntries ?? []);
+  orderedCategories = buildCategoryList(allEntries);
+  craftableEntries = allEntries.filter((entry) => hasContentList(entry, "crafting"));
+
+  if (!allEntries.some((entry) => entry.id === state.selectedEntryId)) {
+    state.selectedEntryId = allEntries[0]?.id ?? siteConfig.defaultEntryId;
+  }
+
+  if (!craftableEntries.some((entry) => entry.id === state.selectedRecipeId)) {
+    state.selectedRecipeId = craftableEntries[0]?.id ?? allEntries[0]?.id ?? siteConfig.defaultEntryId;
+  }
+
+  if (state.category !== "all" && !orderedCategories.includes(state.category)) {
+    state.category = "all";
+  }
+}
+
+async function ensureSelectedEntryComments(force = false) {
+  if (!backendState.enabled || !state.selectedEntryId) {
+    return [];
+  }
+
+  const current = backendState.commentsByEntry[state.selectedEntryId];
+  if (!force && (current?.loading || Array.isArray(current?.items) || current?.error)) {
+    return current?.items ?? [];
+  }
+
+  return loadComments(state.selectedEntryId);
+}
+
+function renderCommentsSection(entry) {
+  const runtime = getRuntimeCopy();
+  const copy = getPageCopy();
+
+  if (!backendState.enabled) {
+    return `
+      <div class="detail-section detail-section--comments">
+        <h4>${runtime.commentsTitle}</h4>
+        <p>${runtime.commentSetupBody}</p>
+      </div>
+    `;
+  }
+
+  const thread = backendState.commentsByEntry[entry.id];
+  const itemsMarkup = thread?.loading
+    ? `<div class="empty-state">${runtime.commentsLoading}</div>`
+    : thread?.error
+      ? `<div class="empty-state">${escapeHtml(thread.error)}</div>`
+      : renderCommentItems(thread?.items ?? []);
+
+  const formMarkup = backendState.user
+    ? `
+      <form class="stub-form" id="entry-comment-form">
+        <textarea name="commentBody" rows="4" placeholder="${copy.community.message}" required></textarea>
+        <button class="button button--primary" type="submit">${runtime.commentButton}</button>
+      </form>
+    `
+    : `<p class="helper-text">${runtime.commentsSignIn}</p>`;
+
+  const messageMarkup = (backendState.commentMessage || backendState.commentError)
+    ? `
+      <p class="message-bar ${backendState.commentError ? "message-bar--error" : "message-bar--success"}">
+        ${escapeHtml(backendState.commentError || backendState.commentMessage)}
+      </p>
+    `
+    : "";
+
+  return `
+    <div class="detail-section detail-section--comments">
+      <h4>${runtime.commentsTitle}</h4>
+      <div class="comment-stack">${itemsMarkup}</div>
+      ${formMarkup}
+      ${messageMarkup}
+    </div>
+  `;
+}
+
+function renderCommentItems(items) {
+  const runtime = getRuntimeCopy();
+
+  if (!items || items.length === 0) {
+    return `<div class="empty-state">${runtime.commentsEmpty}</div>`;
+  }
+
+  return items.map((comment) => `
+    <article class="comment-card ${comment.is_hidden ? "is-hidden" : ""}">
+      <div class="comment-card__head">
+        <strong>${escapeHtml(comment.display_name)}</strong>
+        <div class="meta-row">
+          <span class="tag tag--subtle">${formatDateTime(comment.created_at)}</span>
+          ${comment.is_hidden ? `<span class="tag tag--subtle">${runtime.hiddenLabel}</span>` : ""}
+        </div>
+      </div>
+      <p class="comment-card__body">${formatMultilineText(comment.body)}</p>
+    </article>
+  `).join("");
+}
+
+function formatDateTime(value) {
+  if (!value) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(state.language, {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(new Date(value));
+}
+
+function formatMultilineText(value) {
+  return escapeHtml(value ?? "").replaceAll("\n", "<br>");
+}
+
+function getRepositoryFileUrl(repoPath) {
+  return `${siteConfig.repoUrl}/blob/main/${repoPath}`;
+}
+
+function humanizeCategory(category) {
+  return String(category ?? "")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function getEntrySortTitle(entry) {
+  return entry?.content?.[siteConfig.defaultLanguage]?.title
+    ?? entry?.content?.en?.title
+    ?? Object.values(entry?.content ?? {})[0]?.title
+    ?? entry?.id
+    ?? "";
+}
+
+function parseMultilineList(value) {
+  return String(value ?? "")
+    .split(/\r?\n/g)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function parseCsvList(value) {
+  return String(value ?? "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function joinLines(value) {
+  return Array.isArray(value) ? value.join("\n") : "";
+}
+
+function ensureAdminDraft() {
+  if (!state.adminDraft) {
+    loadSelectedEntryIntoAdminDraft();
+  }
+
+  return state.adminDraft;
+}
+
+function loadSelectedEntryIntoAdminDraft(entryId = state.selectedEntryId) {
+  state.adminDraftSourceId = entryId;
+  state.adminDraft = buildAdminDraft(getEntryById(entryId));
+}
+
+function clearAdminDraft() {
+  state.adminDraftSourceId = "";
+  state.adminDraft = buildAdminDraft(null);
+}
+
+function updateAdminDraftFromForm(form) {
+  const formData = new FormData(form);
+  state.adminDraft = {
+    id: String(formData.get("entryId") ?? "").trim(),
+    category: String(formData.get("category") ?? "").trim(),
+    sortOrder: String(formData.get("sortOrder") ?? "0").trim(),
+    imageUrl: String(formData.get("imageUrl") ?? "").trim(),
+    imagePath: state.adminDraft?.imagePath ?? "entries",
+    related: String(formData.get("related") ?? "").trim(),
+    title: String(formData.get("title") ?? "").trim(),
+    subtitle: String(formData.get("subtitle") ?? "").trim(),
+    summary: String(formData.get("summary") ?? "").trim(),
+    overview: String(formData.get("overview") ?? "").trim(),
+    facts: String(formData.get("facts") ?? "").trim(),
+    obtain: String(formData.get("obtain") ?? "").trim(),
+    crafting: String(formData.get("crafting") ?? "").trim(),
+    drops: String(formData.get("drops") ?? "").trim(),
+    pieces: String(formData.get("pieces") ?? "").trim(),
+    notes: String(formData.get("notes") ?? "").trim(),
+    tactics: String(formData.get("tactics") ?? "").trim(),
+    published: form.querySelector('[name="published"]')?.checked ?? false
+  };
+
+  return state.adminDraft;
+}
+
+function buildAdminDraft(entry) {
+  const content = entry ? getLocalizedEntry(entry) : {};
+
+  return {
+    id: entry?.id ?? "",
+    category: entry?.category ?? (state.category !== "all" ? state.category : "materials"),
+    sortOrder: String(entry?.sortOrder ?? 0),
+    imageUrl: entry?.image ?? "",
+    imagePath: state.adminDraft?.imagePath ?? "entries",
+    related: (entry?.related ?? []).join(", "),
+    title: content?.title ?? "",
+    subtitle: content?.subtitle ?? "",
+    summary: content?.summary ?? "",
+    overview: content?.overview ?? "",
+    facts: joinLines(content?.facts),
+    obtain: joinLines(content?.obtain),
+    crafting: joinLines(content?.crafting),
+    drops: joinLines(content?.drops),
+    pieces: joinLines(content?.pieces),
+    notes: joinLines(content?.notes),
+    tactics: joinLines(content?.tactics),
+    published: Boolean(entry?.isPublished ?? backendState.publishedEntries.some((publishedEntry) => publishedEntry.id === entry?.id))
+  };
+}
+
+function buildLocalizedContentPayload(baseEntry, draft) {
+  const existingContent = mergeContentObjects({}, baseEntry?.content ?? {});
+  const currentLanguageContent = existingContent[state.language] ?? existingContent[siteConfig.defaultLanguage] ?? existingContent.en ?? {};
+  const nextLanguageContent = {
+    ...currentLanguageContent,
+    title: draft.title,
+    subtitle: draft.subtitle,
+    summary: draft.summary,
+    overview: draft.overview,
+    facts: parseMultilineList(draft.facts),
+    obtain: parseMultilineList(draft.obtain),
+    crafting: parseMultilineList(draft.crafting),
+    drops: parseMultilineList(draft.drops),
+    pieces: parseMultilineList(draft.pieces),
+    notes: parseMultilineList(draft.notes),
+    tactics: parseMultilineList(draft.tactics)
+  };
+
+  const nextContent = {
+    ...existingContent,
+    [state.language]: nextLanguageContent
+  };
+
+  languageOptions.forEach((option) => {
+    if (!nextContent[option.code]) {
+      nextContent[option.code] = nextLanguageContent;
+    }
+  });
+
+  return nextContent;
 }
 
 function hasContentList(entry, key) {
