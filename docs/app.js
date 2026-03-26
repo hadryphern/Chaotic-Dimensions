@@ -1,29 +1,251 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
-import { frontierEntries, frontierSection, frontierUiCopy } from "./orespawn-data.js";
+import { frontierEntries, frontierUiCopy } from "./orespawn-data.js";
+
+const allEntries = [...entries, ...frontierEntries];
+const orderedCategories = ["bosses", "mobs", "summons", "weapons", "armor", "accessories", "consumables", "materials", "buffs"];
+const craftableEntries = allEntries.filter((entry) => hasContentList(entry, "crafting"));
+
+const entryTags = {
+  "crystaline-devourer": "boss",
+  "water-dragon": "mob",
+  mantis: "mob",
+  caterkiller: "miniboss",
+  "emperor-scorpion": "miniboss",
+  hercules: "miniboss",
+  cephadrome: "miniboss"
+};
+
+const progressionFlow = [
+  { id: "water-dragon", stage: "early" },
+  { id: "mantis", stage: "early" },
+  { id: "caterkiller", stage: "post_evil" },
+  { id: "emperor-scorpion", stage: "post_evil" },
+  { id: "hercules", stage: "post_evil" },
+  { id: "cephadrome", stage: "hardmode" },
+  { id: "crystaline-devourer", stage: "endgame" }
+];
+
+const pageCopy = {
+  "pt-BR": {
+    nav: {
+      overview: "Inicio",
+      progression: "Progressao",
+      catalog: "Biblioteca",
+      crafting: "Crafting",
+      community: "Feedback",
+      admin: "Admin"
+    },
+    topbar: {
+      search: "Buscar item, boss, mob ou material",
+      menu: "Abrir menu"
+    },
+    overview: {
+      eyebrow: "Wiki Oficial",
+      title: "Uma wiki mais limpa, direta e facil de expandir.",
+      lead: "Base pensada como wiki real: navegacao simples, paginas legiveis, crafting claro e uma progressao que voce pode crescer por update.",
+      body: "Em vez de uma landing page carregada, esta versao prioriza texto, referencia, categorias e leitura. O foco agora e documentar exatamente como pegar itens, onde cada coisa aparece e como a progressao se encaixa.",
+      stats: {
+        entries: "Entradas",
+        recipes: "Receitas",
+        categories: "Categorias",
+        languages: "Idiomas"
+      },
+      sectionsTitle: "Estrutura da wiki",
+      sectionsIntro: "As areas abaixo foram organizadas para funcionar como uma base de documentacao, nao como uma homepage promocional.",
+      quickTitle: "Atalhos",
+      quickCards: [
+        { title: "Itens e equipamentos", body: "Biblioteca central com busca, filtros e pagina detalhada de cada entrada.", target: "#catalog" },
+        { title: "Crafting", body: "Guia separado para receitas, ingredientes, estacoes e itens relacionados.", target: "#crafting" },
+        { title: "Progressao", body: "Linha de bosses, minibosses e encounters para orientar o jogador.", target: "#progression" }
+      ]
+    },
+    sidebar: {
+      title: "Navegacao",
+      categories: "Categorias",
+      links: "Projeto",
+      status: "Status",
+      statusBody: "Layout minimalista entregue. Login, upload e comentarios reais aguardam o backend escolhido."
+    },
+    progression: {
+      eyebrow: "Guia de Progressao",
+      title: "Ordem sugerida de encounters",
+      intro: "Esta linha serve como espinha dorsal da wiki. Ela ajuda a ligar spawn, drops, crafting e upgrades no mesmo fluxo.",
+      stages: {
+        early: "Abertura",
+        post_evil: "Pos Evil Boss",
+        hardmode: "Hardmode",
+        endgame: "Pico atual"
+      }
+    },
+    catalog: {
+      eyebrow: "Biblioteca",
+      title: "Itens, bosses, mobs e sistemas",
+      intro: "Selecione uma categoria, pesquise por nome e abra a ficha completa ao lado.",
+      all: "Tudo",
+      empty: "Nenhuma entrada combinou com o filtro atual.",
+      facts: "Fatos rapidos",
+      obtain: "Como obter",
+      crafting: "Crafting",
+      drops: "Drops",
+      pieces: "Pecas",
+      notes: "Notas",
+      tactics: "Taticas",
+      related: "Relacionados"
+    },
+    crafting: {
+      eyebrow: "Crafting",
+      title: "Receitas e ingredientes",
+      intro: "Area separada para consultar receitas com mais clareza, no estilo de uma wiki de mod focada em progressao.",
+      empty: "Nenhuma receita encontrada para o filtro atual.",
+      ingredients: "Ingredientes",
+      station: "Estacao",
+      output: "Resultado",
+      notes: "Notas"
+    },
+    community: {
+      eyebrow: "Feedback",
+      title: "Comentarios da comunidade",
+      intro: "A estrutura visual ja esta pronta, mas comentarios publicos reais precisam de backend para salvar nome, mensagem e moderacao.",
+      cardTitle: "Base preparada para comentarios",
+      cardBody: "Posso ligar aqui um sistema simples de feedback com nome e comentario, mas isso precisa de um servico para gravar os dados de verdade.",
+      name: "Nome",
+      message: "Comentario",
+      button: "Enviar feedback",
+      note: "No estado atual do GitHub Pages, este formulario e apenas estrutural."
+    },
+    admin: {
+      eyebrow: "Admin",
+      title: "Painel para gestao da wiki",
+      intro: "Tambem da para deixar uma area admin para upload de imagens, escolha de categoria, criacao de receita e organizacao do conteudo.",
+      uploadTitle: "Ferramentas previstas",
+      uploadItems: ["login de admin", "upload de imagens", "cadastro de categorias", "editor de crafting", "moderacao de comentarios"],
+      requirementTitle: "O que falta para ativar",
+      requirementBody: "Para isso funcionar de verdade, precisamos conectar a wiki a um backend. Minha recomendacao e GitHub Pages para o site e Supabase para auth, storage e comentarios."
+    },
+    footer: { text: "Chaotic Dimensions Wiki" },
+    tags: { boss: "Boss", miniboss: "Mini-Boss", mob: "Mob" }
+  },
+  en: {
+    nav: {
+      overview: "Overview",
+      progression: "Progression",
+      catalog: "Library",
+      crafting: "Crafting",
+      community: "Feedback",
+      admin: "Admin"
+    },
+    topbar: {
+      search: "Search item, boss, mob or material",
+      menu: "Open menu"
+    },
+    overview: {
+      eyebrow: "Official Wiki",
+      title: "A cleaner and more expandable wiki foundation.",
+      lead: "Built like a real wiki: simple navigation, readable pages, clear crafting and a progression flow you can keep expanding.",
+      body: "Instead of a crowded landing page, this version focuses on reference, categories and readable documentation.",
+      stats: {
+        entries: "Entries",
+        recipes: "Recipes",
+        categories: "Categories",
+        languages: "Languages"
+      },
+      sectionsTitle: "Wiki structure",
+      sectionsIntro: "The sections below are organized to behave like documentation instead of a promo homepage.",
+      quickTitle: "Shortcuts",
+      quickCards: [
+        { title: "Items and equipment", body: "Central library with search, filters and detailed pages.", target: "#catalog" },
+        { title: "Crafting", body: "Separate guide for recipes, ingredients, stations and related items.", target: "#crafting" },
+        { title: "Progression", body: "Boss and miniboss route to guide players.", target: "#progression" }
+      ]
+    },
+    sidebar: {
+      title: "Navigation",
+      categories: "Categories",
+      links: "Project",
+      status: "Status",
+      statusBody: "Minimal layout is live. Real login, upload and comments still need the backend choice."
+    },
+    progression: {
+      eyebrow: "Progression Guide",
+      title: "Suggested encounter order",
+      intro: "This acts as the backbone of the wiki, connecting spawn rules, drops and upgrades.",
+      stages: {
+        early: "Opening",
+        post_evil: "Post Evil Boss",
+        hardmode: "Hardmode",
+        endgame: "Current peak"
+      }
+    },
+    catalog: {
+      eyebrow: "Library",
+      title: "Items, bosses, mobs and systems",
+      intro: "Pick a category, search by name and open the full sheet on the side.",
+      all: "All",
+      empty: "No entry matches the current filter.",
+      facts: "Quick facts",
+      obtain: "How to obtain",
+      crafting: "Crafting",
+      drops: "Drops",
+      pieces: "Pieces",
+      notes: "Notes",
+      tactics: "Tactics",
+      related: "Related"
+    },
+    crafting: {
+      eyebrow: "Crafting",
+      title: "Recipes and ingredients",
+      intro: "A separate area for recipe lookup with clearer progression references.",
+      empty: "No recipe matched the current filter.",
+      ingredients: "Ingredients",
+      station: "Station",
+      output: "Result",
+      notes: "Notes"
+    },
+    community: {
+      eyebrow: "Feedback",
+      title: "Community comments",
+      intro: "The UI is ready, but real public comments need a backend to store names, messages and moderation.",
+      cardTitle: "Comment area prepared",
+      cardBody: "I can wire a simple name-and-comment system here, but it needs a service that actually stores data.",
+      name: "Name",
+      message: "Comment",
+      button: "Send feedback",
+      note: "Right now on GitHub Pages this form is only structural."
+    },
+    admin: {
+      eyebrow: "Admin",
+      title: "Wiki management panel",
+      intro: "This can become the area for image uploads, category selection, recipe editing and content organization.",
+      uploadTitle: "Planned tools",
+      uploadItems: ["admin login", "image upload", "category editor", "crafting editor", "comment moderation"],
+      requirementTitle: "What still needs to be connected",
+      requirementBody: "To make this real, the wiki needs a backend. My recommendation is GitHub Pages for the site and Supabase for auth, storage and comments."
+    },
+    footer: { text: "Chaotic Dimensions Wiki" },
+    tags: { boss: "Boss", miniboss: "Mini-Boss", mob: "Mob" }
+  }
+};
 
 const elements = {
+  topbar: document.querySelector("#topbar"),
   sidebar: document.querySelector("#sidebar"),
-  hero: document.querySelector("#home"),
-  download: document.querySelector("#download"),
-  wiki: document.querySelector("#wiki"),
-  frontier: document.querySelector("#frontier"),
-  bosses: document.querySelector("#bosses"),
-  roadmap: document.querySelector("#roadmap"),
+  overview: document.querySelector("#overview"),
+  progression: document.querySelector("#progression"),
+  catalog: document.querySelector("#catalog"),
+  crafting: document.querySelector("#crafting"),
+  community: document.querySelector("#community"),
+  admin: document.querySelector("#admin"),
   footer: document.querySelector("#site-footer"),
-  mobileBrand: document.querySelector("#mobile-brand"),
-  mobileNavToggle: document.querySelector("#mobile-nav-toggle"),
-  sidebarOverlay: document.querySelector("#sidebar-overlay"),
+  overlay: document.querySelector("#sidebar-overlay"),
   metaDescription: document.querySelector("#meta-description")
 };
 
-const allEntries = [...entries, ...frontierEntries];
-const allCategories = Array.from(new Set(allEntries.map((entry) => entry.category)));
-
 const state = {
   language: siteConfig.defaultLanguage,
-  category: "all",
   search: "",
+  category: "all",
   selectedEntryId: siteConfig.defaultEntryId,
+  selectedRecipeId: craftableEntries[0]?.id ?? siteConfig.defaultEntryId,
   sidebarOpen: false
 };
 
@@ -38,630 +260,577 @@ function bootstrap() {
 function hydrateStateFromUrl() {
   const url = new URL(window.location.href);
   const language = url.searchParams.get("lang");
+  const search = url.searchParams.get("q");
+  const category = url.searchParams.get("category");
   const entryId = url.searchParams.get("entry");
+  const recipeId = url.searchParams.get("recipe");
 
   if (languageOptions.some((option) => option.code === language)) {
     state.language = language;
   }
 
+  if (search) {
+    state.search = search;
+  }
+
+  if (category === "all" || orderedCategories.includes(category)) {
+    state.category = category;
+  }
+
   if (allEntries.some((entry) => entry.id === entryId)) {
     state.selectedEntryId = entryId;
+  }
+
+  if (craftableEntries.some((entry) => entry.id === recipeId)) {
+    state.selectedRecipeId = recipeId;
   }
 }
 
 function bindGlobalEvents() {
-  elements.mobileNavToggle.addEventListener("click", () => {
-    toggleSidebar(!state.sidebarOpen);
-  });
-
-  elements.sidebarOverlay.addEventListener("click", () => {
-    toggleSidebar(false);
-  });
+  elements.overlay.addEventListener("click", () => toggleSidebar(false));
 
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 980 && state.sidebarOpen) {
+    if (window.innerWidth > 1040 && state.sidebarOpen) {
       toggleSidebar(false);
     }
   });
 }
 
-function toggleSidebar(isOpen) {
-  state.sidebarOpen = isOpen;
-  document.body.classList.toggle("sidebar-open", isOpen);
-  elements.sidebarOverlay.hidden = !isOpen;
-}
-
 function render() {
   syncMetadata();
+  renderTopbar();
   renderSidebar();
-  renderHero();
-  renderDownload();
-  renderWiki();
-  renderFrontier();
-  renderBossSpotlight();
-  renderRoadmap();
+  renderOverview();
+  renderProgression();
+  renderCatalog();
+  renderCrafting();
+  renderCommunity();
+  renderAdmin();
   renderFooter();
   syncUrl();
 }
 
-function syncMetadata() {
-  const copy = getCopy();
-  document.documentElement.lang = state.language;
-  document.title = `${copy.siteName} | ${copy.metaTitle}`;
-  elements.mobileBrand.textContent = copy.siteName;
-  elements.metaDescription.setAttribute("content", copy.metaDescription);
-}
-
-function renderSidebar() {
-  const copy = getCopy();
-  const languageButtons = languageOptions.map((option) => `
-    <button
-      class="language-chip ${option.code === state.language ? "is-active" : ""}"
-      type="button"
-      data-language="${option.code}"
-      aria-pressed="${option.code === state.language}"
-    >
+function renderTopbar() {
+  const copy = getPageCopy();
+  const languageMarkup = languageOptions.map((option) => `
+    <button class="chip ${option.code === state.language ? "is-active" : ""}" type="button" data-language="${option.code}">
       ${option.label}
     </button>
   `).join("");
 
-  const navItems = [
-    { href: "#home", label: copy.nav.overview },
-    { href: "#download", label: copy.nav.download },
-    { href: "#wiki", label: copy.nav.explorer },
-    { href: "#frontier", label: getFrontierCopy().nav.frontier },
-    { href: "#bosses", label: copy.nav.boss },
-    { href: "#roadmap", label: copy.nav.roadmap }
-  ].map((item) => `<a class="sidebar-nav__link" href="${item.href}">${item.label}</a>`).join("");
-
-  elements.sidebar.innerHTML = `
-    <div class="sidebar__brand">
-      <div class="brand-mark">
+  elements.topbar.innerHTML = `
+    <div class="topbar__left">
+      <button class="menu-button" type="button" id="menu-button" aria-label="${copy.topbar.menu}">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <a class="brand" href="#overview">
         <img src="./assets/images/icon.png" alt="Chaotic Dimensions icon">
-      </div>
-      <div>
-        <p class="eyebrow">${copy.sidebar.eyebrow}</p>
-        <h1>${copy.siteName}</h1>
-        <p class="sidebar__summary">${copy.sidebar.summary}</p>
-      </div>
+        <div>
+          <strong>${getSiteName()}</strong>
+          <span>Wiki</span>
+        </div>
+      </a>
     </div>
 
-    <div class="sidebar__group">
-      <p class="sidebar__label">${copy.sidebar.languages}</p>
-      <div class="language-grid">${languageButtons}</div>
+    <label class="search-box">
+      <input id="global-search" type="search" value="${escapeHtml(state.search)}" placeholder="${copy.topbar.search}">
+    </label>
+
+    <div class="topbar__right">
+      <div class="language-row">${languageMarkup}</div>
+      <a class="link-button" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">GitHub</a>
     </div>
-
-    <nav class="sidebar-nav sidebar__group">
-      <p class="sidebar__label">${copy.sidebar.navigation}</p>
-      ${navItems}
-    </nav>
-
-    <div class="sidebar__group sidebar-actions">
-      <a class="button button--ghost" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">${copy.actions.github}</a>
-      <a class="button button--ghost" href="${siteConfig.releasesUrl}" target="_blank" rel="noreferrer">${copy.actions.releases}</a>
-      <a class="button button--ghost" href="${siteConfig.pagesUrl}" target="_blank" rel="noreferrer">${copy.actions.liveSite}</a>
-    </div>
-
-    <p class="sidebar__note">${copy.sidebar.note}</p>
   `;
 
-  elements.sidebar.querySelectorAll("[data-language]").forEach((button) => {
+  elements.topbar.querySelector("#menu-button")?.addEventListener("click", () => toggleSidebar(!state.sidebarOpen));
+  elements.topbar.querySelector("#global-search")?.addEventListener("input", (event) => {
+    state.search = event.target.value;
+    renderCatalog();
+    renderCrafting();
+    syncUrl();
+  });
+
+  elements.topbar.querySelectorAll("[data-language]").forEach((button) => {
     button.addEventListener("click", () => {
       state.language = button.dataset.language;
       render();
     });
   });
+}
 
-  elements.sidebar.querySelectorAll(".sidebar-nav__link").forEach((link) => {
-    link.addEventListener("click", () => {
-      if (window.innerWidth <= 980) {
+function renderSidebar() {
+  const copy = getPageCopy();
+  const navItems = [
+    { href: "#overview", label: copy.nav.overview },
+    { href: "#progression", label: copy.nav.progression },
+    { href: "#catalog", label: copy.nav.catalog },
+    { href: "#crafting", label: copy.nav.crafting },
+    { href: "#community", label: copy.nav.community },
+    { href: "#admin", label: copy.nav.admin }
+  ].map((item) => `<a class="sidebar-link" href="${item.href}">${item.label}</a>`).join("");
+
+  const categoryButtons = orderedCategories.map((category) => `
+    <button class="category-button ${state.category === category ? "is-active" : ""}" type="button" data-category-jump="${category}">
+      <span>${getCategoryLabel(category)}</span>
+      <small>${getEntriesByCategory(category).length}</small>
+    </button>
+  `).join("");
+
+  elements.sidebar.innerHTML = `
+    <div class="sidebar-card">
+      <p class="section-kicker">${copy.sidebar.title}</p>
+      <nav class="sidebar-nav">${navItems}</nav>
+    </div>
+
+    <div class="sidebar-card">
+      <p class="section-kicker">${copy.sidebar.categories}</p>
+      <div class="category-stack">${categoryButtons}</div>
+    </div>
+
+    <div class="sidebar-card">
+      <p class="section-kicker">${copy.sidebar.links}</p>
+      <div class="sidebar-actions">
+        <a class="link-button" href="${siteConfig.pagesUrl}" target="_blank" rel="noreferrer">Pages</a>
+        <a class="link-button" href="${siteConfig.releasesUrl}" target="_blank" rel="noreferrer">Releases</a>
+      </div>
+    </div>
+
+    <div class="sidebar-card sidebar-card--muted">
+      <p class="section-kicker">${copy.sidebar.status}</p>
+      <p>${copy.sidebar.statusBody}</p>
+    </div>
+  `;
+
+  elements.sidebar.querySelectorAll("[data-category-jump]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.category = button.dataset.categoryJump;
+      renderSidebar();
+      renderCatalog();
+      syncUrl();
+      document.querySelector("#catalog")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (window.innerWidth <= 1040) {
         toggleSidebar(false);
       }
     });
   });
 }
 
-function renderHero() {
-  const copy = getCopy();
-  const metricCards = [
-    { value: `${allEntries.length}`, label: copy.hero.metrics.entries },
-    { value: `${allCategories.length}`, label: copy.hero.metrics.categories },
-    { value: `${languageOptions.length}`, label: copy.hero.metrics.languages },
-    { value: "24/7", label: copy.hero.metrics.hosting }
-  ].map((metric) => `
-    <article class="metric-card glass-card">
-      <strong>${metric.value}</strong>
-      <span>${metric.label}</span>
+function renderOverview() {
+  const copy = getPageCopy();
+  const stats = [
+    { value: allEntries.length, label: copy.overview.stats.entries },
+    { value: craftableEntries.length, label: copy.overview.stats.recipes },
+    { value: orderedCategories.length, label: copy.overview.stats.categories },
+    { value: languageOptions.length, label: copy.overview.stats.languages }
+  ].map((item) => `
+    <article class="stat-card">
+      <strong>${item.value}</strong>
+      <span>${item.label}</span>
     </article>
   `).join("");
 
-  elements.hero.innerHTML = `
-    <div class="hero-card glass-card">
-      <div class="hero-copy">
-        <p class="eyebrow">${copy.hero.eyebrow}</p>
-        <h2>${copy.hero.title}</h2>
-        <p class="hero-lead">${copy.hero.lead}</p>
-        <p class="hero-body">${copy.hero.body}</p>
-
-        <div class="hero-actions">
-          <a class="button button--primary" href="#wiki">${copy.actions.browseWiki}</a>
-          <a class="button button--secondary" href="#download">${copy.actions.downloadGuide}</a>
-          <a class="button button--ghost" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">${copy.actions.github}</a>
-        </div>
-
-        <div class="metrics-grid">
-          ${metricCards}
-        </div>
-      </div>
-
-      <div class="hero-media">
-        <div class="hero-banner">
-          <img src="./assets/images/banner.png" alt="${copy.hero.bannerAlt}">
-        </div>
-        <div class="hero-gallery">
-          <div class="hero-gallery__card glass-card">
-            <p class="eyebrow">${copy.hero.galleryLabel}</p>
-            <img src="./assets/images/gallery/crystaline-devour-title.png" alt="${copy.hero.galleryAltOne}">
-          </div>
-          <div class="hero-gallery__stack">
-            <img class="glass-card" src="./assets/images/gallery/crystaline-devour-ring.png" alt="${copy.hero.galleryAltTwo}">
-            <img class="glass-card" src="./assets/images/gallery/crystaline-devour-blaster.png" alt="${copy.hero.galleryAltThree}">
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderDownload() {
-  const copy = getCopy();
-
-  const cards = [
-    {
-      title: copy.download.cards.pages.title,
-      body: copy.download.cards.pages.body,
-      href: siteConfig.pagesUrl,
-      label: copy.download.cards.pages.action
-    },
-    {
-      title: copy.download.cards.releases.title,
-      body: copy.download.cards.releases.body,
-      href: siteConfig.releasesUrl,
-      label: copy.download.cards.releases.action
-    },
-    {
-      title: copy.download.cards.source.title,
-      body: copy.download.cards.source.body,
-      href: siteConfig.repoUrl,
-      label: copy.download.cards.source.action
-    }
-  ].map((card) => `
-    <article class="download-card glass-card">
-      <h3>${card.title}</h3>
-      <p>${card.body}</p>
-      <a class="button button--secondary" href="${card.href}" target="_blank" rel="noreferrer">${card.label}</a>
+  const quickCards = copy.overview.quickCards.map((item) => `
+    <article class="mini-card">
+      <h3>${item.title}</h3>
+      <p>${item.body}</p>
+      <a class="text-link" href="${item.target}">Abrir</a>
     </article>
   `).join("");
 
-  const steps = copy.download.steps.map((step) => `<li>${step}</li>`).join("");
-  const bullets = copy.download.notes.map((note) => `<li>${note}</li>`).join("");
+  const categorySummary = orderedCategories.map((category) => `
+    <article class="taxonomy-card">
+      <h3>${getCategoryLabel(category)}</h3>
+      <p>${getEntriesByCategory(category).length}</p>
+    </article>
+  `).join("");
 
-  elements.download.innerHTML = `
+  elements.overview.innerHTML = `
     <div class="section-heading">
-      <p class="eyebrow">${copy.download.eyebrow}</p>
-      <h2>${copy.download.title}</h2>
-      <p>${copy.download.intro}</p>
+      <p class="section-kicker">${copy.overview.eyebrow}</p>
+      <h1>${copy.overview.title}</h1>
+      <p class="section-lead">${copy.overview.lead}</p>
+      <p class="section-copy">${copy.overview.body}</p>
     </div>
 
-    <div class="download-grid">
-      ${cards}
+    <div class="overview-grid">
+      <div class="panel">
+        <div class="stats-grid">${stats}</div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-kicker">${copy.overview.quickTitle}</p>
+        <div class="mini-grid">${quickCards}</div>
+      </div>
     </div>
 
-    <div class="guide-grid">
-      <article class="glass-card guide-card">
-        <h3>${copy.download.stepsTitle}</h3>
-        <ol class="guide-list">${steps}</ol>
-      </article>
-
-      <article class="glass-card guide-card">
-        <h3>${copy.download.sourceTitle}</h3>
-        <p>${copy.download.sourceIntro}</p>
-        <pre><code>git clone ${siteConfig.repoUrl}.git</code></pre>
-        <pre><code>dotnet build ChaoticDimensions.csproj</code></pre>
-        <ul class="note-list">${bullets}</ul>
-      </article>
+    <div class="section-heading section-heading--compact">
+      <h2>${copy.overview.sectionsTitle}</h2>
+      <p>${copy.overview.sectionsIntro}</p>
     </div>
+
+    <div class="taxonomy-grid">${categorySummary}</div>
   `;
 }
 
-function renderWiki() {
-  const copy = getCopy();
+function renderProgression() {
+  const copy = getPageCopy();
+  const cards = progressionFlow.map((step) => {
+    const entry = getEntryById(step.id);
+    const content = getLocalizedEntry(entry);
+    const preview = (content.facts ?? []).slice(0, 2).map((fact) => `<li>${fact}</li>`).join("");
+
+    return `
+      <article class="timeline-card">
+        <div class="timeline-card__head">
+          <span class="tag">${copy.progression.stages[step.stage]}</span>
+          <span class="tag tag--subtle">${getTagLabel(entry)}</span>
+        </div>
+        <div class="timeline-card__body">
+          <img class="icon icon--large" src="${entry.image}" alt="${content.title}">
+          <div>
+            <h3>${content.title}</h3>
+            <p>${content.summary}</p>
+            <ul class="compact-list">${preview}</ul>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  elements.progression.innerHTML = `
+    <div class="section-heading">
+      <p class="section-kicker">${copy.progression.eyebrow}</p>
+      <h2>${copy.progression.title}</h2>
+      <p>${copy.progression.intro}</p>
+    </div>
+
+    <div class="timeline-grid">${cards}</div>
+  `;
+}
+
+function renderCatalog() {
+  const copy = getPageCopy();
   const visibleEntries = getVisibleEntries();
 
   if (!visibleEntries.some((entry) => entry.id === state.selectedEntryId)) {
     state.selectedEntryId = visibleEntries[0]?.id ?? siteConfig.defaultEntryId;
   }
 
-  const categoryButtons = [
-    {
-      key: "all",
-      label: copy.categories.all,
-      count: allEntries.length
-    },
-    ...allCategories.map((category) => ({
+  const filterButtons = [
+    { key: "all", label: copy.catalog.all, count: allEntries.length },
+    ...orderedCategories.map((category) => ({
       key: category,
       label: getCategoryLabel(category),
-      count: allEntries.filter((entry) => entry.category === category).length
+      count: getEntriesByCategory(category).length
     }))
-  ].map((category) => `
-    <button
-      type="button"
-      class="filter-chip ${category.key === state.category ? "is-active" : ""}"
-      data-category="${category.key}"
-      aria-pressed="${category.key === state.category}"
-    >
-      <span>${category.label}</span>
-      <small>${category.count}</small>
+  ].map((item) => `
+    <button class="chip ${state.category === item.key ? "is-active" : ""}" type="button" data-filter="${item.key}">
+      ${item.label} <small>${item.count}</small>
     </button>
   `).join("");
 
-  const cards = visibleEntries.map((entry) => renderEntryCard(entry)).join("");
-  const selectedEntry = getEntryById(state.selectedEntryId);
-  const detailMarkup = selectedEntry ? renderEntryDetail(selectedEntry) : `<div class="empty-state glass-card">${copy.wiki.empty}</div>`;
+  const rows = visibleEntries.length > 0
+    ? visibleEntries.map((entry) => renderCatalogRow(entry)).join("")
+    : `<div class="empty-state">${copy.catalog.empty}</div>`;
 
-  elements.wiki.innerHTML = `
+  const selectedEntry = getEntryById(state.selectedEntryId);
+  const detailMarkup = selectedEntry ? renderEntryDetail(selectedEntry) : "";
+
+  elements.catalog.innerHTML = `
     <div class="section-heading">
-      <p class="eyebrow">${copy.wiki.eyebrow}</p>
-      <h2>${copy.wiki.title}</h2>
-      <p>${copy.wiki.intro}</p>
+      <p class="section-kicker">${copy.catalog.eyebrow}</p>
+      <h2>${copy.catalog.title}</h2>
+      <p>${copy.catalog.intro}</p>
     </div>
 
-    <div class="wiki-shell">
-      <div class="wiki-browser">
-        <div class="glass-card browser-controls">
-          <label class="search-field">
-            <span>${copy.wiki.searchLabel}</span>
-            <input id="search-input" type="search" value="${escapeHtml(state.search)}" placeholder="${copy.wiki.searchPlaceholder}">
-          </label>
-          <div class="filter-row">
-            ${categoryButtons}
-          </div>
-        </div>
+    <div class="filter-row">${filterButtons}</div>
 
-        <div class="entry-grid">
-          ${cards || `<div class="empty-state glass-card">${copy.wiki.empty}</div>`}
-        </div>
-      </div>
-
-      <aside class="detail-panel">
-        ${detailMarkup}
-      </aside>
+    <div class="browser-layout">
+      <div class="list-panel">${rows}</div>
+      <aside class="detail-panel">${detailMarkup}</aside>
     </div>
   `;
 
-  const searchInput = elements.wiki.querySelector("#search-input");
-  searchInput?.addEventListener("input", (event) => {
-    state.search = event.target.value;
-    renderWiki();
-    syncUrl();
-  });
-
-  elements.wiki.querySelectorAll("[data-category]").forEach((button) => {
+  elements.catalog.querySelectorAll("[data-filter]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.category = button.dataset.category;
-      renderWiki();
+      state.category = button.dataset.filter;
+      renderCatalog();
+      renderSidebar();
       syncUrl();
     });
   });
 
-  elements.wiki.querySelectorAll("[data-entry-id]").forEach((button) => {
+  elements.catalog.querySelectorAll("[data-entry-id]").forEach((button) => {
     button.addEventListener("click", () => {
       state.selectedEntryId = button.dataset.entryId;
-      renderWiki();
+      renderCatalog();
       syncUrl();
     });
   });
 }
 
-function renderFrontier() {
-  const frontierCopy = getFrontierCopy().frontier;
-  const rosterEntries = frontierSection.rosterIds.map((entryId) => getEntryById(entryId)).filter(Boolean);
-  const supportEntries = frontierSection.supportIds.map((entryId) => getEntryById(entryId)).filter(Boolean);
-  const biomeCount = new Set(["beach", "forest-jungle", "desert", "snow"]).size;
-  const gateCount = new Set(
-    rosterEntries.map((entry) => getLocalizedEntry(entry).facts?.[0]).filter(Boolean)
-  ).size;
+function renderCrafting() {
+  const copy = getPageCopy();
+  const visibleRecipes = getVisibleRecipes();
 
-  const metricCards = [
-    { value: `${rosterEntries.length}`, label: frontierCopy.metrics.mobs },
-    { value: `${supportEntries.filter((entry) => entry.category === "summons").length}`, label: frontierCopy.metrics.summons },
-    { value: `${gateCount}`, label: frontierCopy.metrics.gates },
-    { value: `${biomeCount}`, label: frontierCopy.metrics.biomes }
-  ].map((metric) => `
-    <article class="metric-card glass-card">
-      <strong>${metric.value}</strong>
-      <span>${metric.label}</span>
-    </article>
-  `).join("");
+  if (!visibleRecipes.some((entry) => entry.id === state.selectedRecipeId)) {
+    state.selectedRecipeId = visibleRecipes[0]?.id ?? craftableEntries[0]?.id ?? siteConfig.defaultEntryId;
+  }
 
-  const rosterCards = rosterEntries.map((entry) => {
-    const content = getLocalizedEntry(entry);
-    const previewFacts = (content.facts ?? []).slice(0, 3).map((fact) => `<li>${fact}</li>`).join("");
+  const recipeList = visibleRecipes.length > 0
+    ? visibleRecipes.map((entry) => renderRecipeRow(entry)).join("")
+    : `<div class="empty-state">${copy.crafting.empty}</div>`;
 
-    return `
-      <article class="frontier-card glass-card">
-        <div class="frontier-card__media">
-          <img class="sprite-art sprite-art--large" src="${entry.image}" alt="${content.title}">
-        </div>
-        <div class="frontier-card__body">
-          <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
-          <h3>${content.title}</h3>
-          <p>${content.summary}</p>
-          <ul class="fact-preview">${previewFacts}</ul>
-          <button class="button button--secondary" type="button" data-frontier-entry="${entry.id}">${frontierCopy.openEntry}</button>
-        </div>
-      </article>
-    `;
-  }).join("");
+  const selectedRecipe = getEntryById(state.selectedRecipeId);
+  const recipeDetail = selectedRecipe ? renderRecipeDetail(selectedRecipe) : "";
 
-  const supportCards = supportEntries.map((entry) => {
-    const content = getLocalizedEntry(entry);
-    const listSource = content.crafting ?? content.obtain ?? content.facts ?? [];
-    const previewFacts = listSource.slice(0, 3).map((item) => `<li>${item}</li>`).join("");
-
-    return `
-      <article class="support-card glass-card">
-        <div class="support-card__head">
-          <div class="entry-card__media support-card__media">
-            <img class="sprite-art" src="${entry.image}" alt="${content.title}">
-          </div>
-          <div>
-            <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
-            <h3>${content.title}</h3>
-            <p>${content.summary}</p>
-          </div>
-        </div>
-        <ul class="fact-preview">${previewFacts}</ul>
-        <button class="button button--ghost" type="button" data-frontier-entry="${entry.id}">${frontierCopy.openEntry}</button>
-      </article>
-    `;
-  }).join("");
-
-  elements.frontier.innerHTML = `
+  elements.crafting.innerHTML = `
     <div class="section-heading">
-      <p class="eyebrow">${frontierCopy.eyebrow}</p>
-      <h2>${frontierCopy.title}</h2>
-      <p>${frontierCopy.intro}</p>
+      <p class="section-kicker">${copy.crafting.eyebrow}</p>
+      <h2>${copy.crafting.title}</h2>
+      <p>${copy.crafting.intro}</p>
     </div>
 
-    <div class="frontier-metrics">
-      ${metricCards}
-    </div>
-
-    <div class="section-heading frontier-heading">
-      <h3>${frontierCopy.rosterTitle}</h3>
-      <p>${frontierCopy.rosterIntro}</p>
-    </div>
-
-    <div class="frontier-grid">
-      ${rosterCards}
-    </div>
-
-    <div class="section-heading frontier-heading">
-      <h3>${frontierCopy.supportTitle}</h3>
-      <p>${frontierCopy.supportIntro}</p>
-    </div>
-
-    <div class="support-grid">
-      ${supportCards}
+    <div class="browser-layout">
+      <div class="list-panel">${recipeList}</div>
+      <aside class="detail-panel">${recipeDetail}</aside>
     </div>
   `;
 
-  elements.frontier.querySelectorAll("[data-frontier-entry]").forEach((button) => {
+  elements.crafting.querySelectorAll("[data-recipe-id]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.selectedEntryId = button.dataset.frontierEntry;
-      renderWiki();
+      state.selectedRecipeId = button.dataset.recipeId;
+      renderCrafting();
       syncUrl();
-      document.querySelector("#wiki")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 }
 
-function renderBossSpotlight() {
-  const copy = getCopy();
-  const bossEntry = getEntryById("crystaline-devourer");
-  const bossText = getLocalizedEntry(bossEntry);
-
-  const phases = copy.spotlight.phases.map((phase) => `
-    <article class="phase-card glass-card">
-      <h3>${phase.title}</h3>
-      <p>${phase.body}</p>
-    </article>
-  `).join("");
-
-  const facts = bossText.facts.map((fact) => `<li>${fact}</li>`).join("");
-  const drops = bossText.drops.map((drop) => `<li>${drop}</li>`).join("");
-
-  elements.bosses.innerHTML = `
+function renderCommunity() {
+  const copy = getPageCopy();
+  elements.community.innerHTML = `
     <div class="section-heading">
-      <p class="eyebrow">${copy.spotlight.eyebrow}</p>
-      <h2>${copy.spotlight.title}</h2>
-      <p>${copy.spotlight.intro}</p>
+      <p class="section-kicker">${copy.community.eyebrow}</p>
+      <h2>${copy.community.title}</h2>
+      <p>${copy.community.intro}</p>
     </div>
 
-    <div class="spotlight-layout">
-      <article class="glass-card spotlight-gallery">
-        <img class="spotlight-gallery__main" src="./assets/images/gallery/crystaline-devour-ring.png" alt="${copy.spotlight.galleryAltMain}">
-        <div class="spotlight-gallery__thumbs">
-          <img src="./assets/images/gallery/crystaline-devour-title.png" alt="${copy.spotlight.galleryAltOne}">
-          <img src="./assets/images/gallery/crystaline-devour-blaster.png" alt="${copy.spotlight.galleryAltTwo}">
+    <div class="placeholder-grid">
+      <article class="panel">
+        <h3>${copy.community.cardTitle}</h3>
+        <p>${copy.community.cardBody}</p>
+        <div class="stub-form">
+          <input type="text" placeholder="${copy.community.name}" disabled>
+          <textarea rows="5" placeholder="${copy.community.message}" disabled></textarea>
+          <button class="button button--primary" type="button" disabled>${copy.community.button}</button>
         </div>
+        <p class="helper-text">${copy.community.note}</p>
       </article>
-
-      <article class="glass-card spotlight-copy">
-        <p class="eyebrow">${bossText.subtitle}</p>
-        <h3>${bossText.title}</h3>
-        <p>${bossText.overview}</p>
-
-        <div class="detail-columns">
-          <div>
-            <h4>${copy.wiki.sections.facts}</h4>
-            <ul>${facts}</ul>
-          </div>
-          <div>
-            <h4>${copy.wiki.sections.drops}</h4>
-            <ul>${drops}</ul>
-          </div>
-        </div>
-      </article>
-    </div>
-
-    <div class="phase-grid">
-      ${phases}
     </div>
   `;
 }
 
-function renderRoadmap() {
-  const copy = getCopy();
+function renderAdmin() {
+  const copy = getPageCopy();
+  const toolList = copy.admin.uploadItems.map((item) => `<li>${item}</li>`).join("");
 
-  const cards = copy.roadmap.cards.map((card) => `
-    <article class="roadmap-card glass-card">
-      <p class="eyebrow">${card.eyebrow}</p>
-      <h3>${card.title}</h3>
-      <p>${card.body}</p>
-    </article>
-  `).join("");
-
-  elements.roadmap.innerHTML = `
+  elements.admin.innerHTML = `
     <div class="section-heading">
-      <p class="eyebrow">${copy.roadmap.eyebrow}</p>
-      <h2>${copy.roadmap.title}</h2>
-      <p>${copy.roadmap.intro}</p>
+      <p class="section-kicker">${copy.admin.eyebrow}</p>
+      <h2>${copy.admin.title}</h2>
+      <p>${copy.admin.intro}</p>
     </div>
 
-    <div class="roadmap-grid">
-      ${cards}
+    <div class="placeholder-grid placeholder-grid--two">
+      <article class="panel">
+        <h3>${copy.admin.uploadTitle}</h3>
+        <ul>${toolList}</ul>
+      </article>
+
+      <article class="panel panel--muted">
+        <h3>${copy.admin.requirementTitle}</h3>
+        <p>${copy.admin.requirementBody}</p>
+      </article>
     </div>
   `;
 }
 
 function renderFooter() {
-  const copy = getCopy();
+  const copy = getPageCopy();
   elements.footer.innerHTML = `
-    <div>
-      <p class="eyebrow">${copy.footer.eyebrow}</p>
-      <h2>${copy.footer.title}</h2>
-      <p>${copy.footer.body}</p>
-    </div>
-
-    <div class="footer-actions">
-      <a class="button button--secondary" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">${copy.actions.github}</a>
-      <a class="button button--ghost" href="${siteConfig.releasesUrl}" target="_blank" rel="noreferrer">${copy.actions.releases}</a>
-      <a class="button button--ghost" href="#wiki">${copy.actions.browseWiki}</a>
+    <div class="footer-inner">
+      <strong>${copy.footer.text}</strong>
+      <span>${siteConfig.pagesUrl}</span>
     </div>
   `;
 }
 
-function renderEntryCard(entry) {
-  const copy = getCopy();
+function renderCatalogRow(entry) {
   const content = getLocalizedEntry(entry);
-  const previewFacts = content.facts.slice(0, 2).map((fact) => `<li>${fact}</li>`).join("");
+  const preview = (content.facts ?? []).slice(0, 2).map((fact) => `<li>${fact}</li>`).join("");
 
   return `
-    <button
-      type="button"
-      class="entry-card glass-card ${entry.id === state.selectedEntryId ? "is-selected" : ""}"
-      data-entry-id="${entry.id}"
-    >
-      <div class="entry-card__media">
-        <img class="sprite-art" src="${entry.image}" alt="${content.title}">
-      </div>
-      <div class="entry-card__body">
-        <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
-        <h3>${content.title}</h3>
+    <button class="entry-row ${state.selectedEntryId === entry.id ? "is-active" : ""}" type="button" data-entry-id="${entry.id}">
+      <img class="icon" src="${entry.image}" alt="${content.title}">
+      <div class="entry-row__body">
+        <div class="entry-row__head">
+          <strong>${content.title}</strong>
+          <span class="tag tag--subtle">${getCategoryLabel(entry.category)}</span>
+        </div>
         <p>${content.summary}</p>
-        <ul class="fact-preview">${previewFacts}</ul>
+        <ul class="compact-list">${preview}</ul>
       </div>
     </button>
   `;
 }
 
 function renderEntryDetail(entry) {
-  const copy = getCopy();
+  const copy = getPageCopy();
   const content = getLocalizedEntry(entry);
   const sections = ["facts", "obtain", "crafting", "drops", "pieces", "notes", "tactics"]
-    .map((key) => renderListSection(copy.wiki.sections[key], content[key]))
+    .map((key) => renderDetailSection(copy.catalog[key], content[key]))
     .join("");
 
-  const relatedMarkup = (entry.related?.length ?? 0) > 0
-    ? `
-      <div class="detail-section">
-        <h4>${copy.wiki.sections.related}</h4>
-        <div class="related-chips">
-          ${entry.related.map((relatedId) => {
-            const relatedEntry = getEntryById(relatedId);
-            const relatedContent = getLocalizedEntry(relatedEntry);
-            return `<button type="button" class="related-chip" data-entry-id="${relatedId}">${relatedContent.title}</button>`;
-          }).join("")}
-        </div>
-      </div>
-    `
-    : "";
+  const related = (entry.related ?? []).map((entryId) => {
+    const relatedEntry = getEntryById(entryId);
+    if (!relatedEntry) {
+      return "";
+    }
 
-  const galleryMarkup = entry.gallery?.length
-    ? `
-      <div class="gallery-strip">
-        ${entry.gallery.map((image) => {
-          const alt = image.alt?.[state.language] ?? image.alt?.[siteConfig.defaultLanguage] ?? content.title;
-          return `<img src="${image.src}" alt="${alt}">`;
-        }).join("")}
-      </div>
-    `
-    : "";
-
-  const bannerMedia = entry.banner
-    ? `<img class="detail-banner" src="${entry.banner}" alt="${content.title}">`
-    : `<img class="sprite-art sprite-art--large" src="${entry.image}" alt="${content.title}">`;
+    const relatedContent = getLocalizedEntry(relatedEntry);
+    return `<button class="chip" type="button" data-entry-id="${entryId}">${relatedContent.title}</button>`;
+  }).join("");
 
   return `
-    <article class="glass-card detail-card">
-      <div class="detail-hero">
-        <div class="detail-copy">
-          <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
+    <article class="detail-card">
+      <div class="detail-card__head">
+        <img class="icon icon--detail" src="${entry.image}" alt="${content.title}">
+        <div>
+          <div class="detail-meta">
+            <span class="tag">${getCategoryLabel(entry.category)}</span>
+            <span class="tag tag--subtle">${getTagLabel(entry)}</span>
+          </div>
           <h3>${content.title}</h3>
-          <p class="detail-subtitle">${content.subtitle}</p>
-          <p>${content.overview}</p>
-        </div>
-        <div class="detail-media">
-          ${bannerMedia}
+          <p class="detail-subtitle">${content.subtitle ?? ""}</p>
+          <p>${content.overview ?? content.summary}</p>
         </div>
       </div>
 
-      ${galleryMarkup}
       ${sections}
-      ${relatedMarkup}
+
+      ${related ? `
+        <div class="detail-section">
+          <h4>${copy.catalog.related}</h4>
+          <div class="related-row">${related}</div>
+        </div>
+      ` : ""}
     </article>
   `;
 }
 
-function renderListSection(label, items) {
-  if (!items || items.length === 0) {
+function renderDetailSection(label, items) {
+  if (!label || !items || items.length === 0) {
     return "";
   }
 
-  const list = items.map((item) => `<li>${item}</li>`).join("");
   return `
     <div class="detail-section">
       <h4>${label}</h4>
-      <ul>${list}</ul>
+      <ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>
     </div>
   `;
 }
 
-function getVisibleEntries() {
-  const term = state.search.trim().toLowerCase();
+function renderRecipeRow(entry) {
+  const content = getLocalizedEntry(entry);
+  return `
+    <button class="entry-row ${state.selectedRecipeId === entry.id ? "is-active" : ""}" type="button" data-recipe-id="${entry.id}">
+      <img class="icon" src="${entry.image}" alt="${content.title}">
+      <div class="entry-row__body">
+        <div class="entry-row__head">
+          <strong>${content.title}</strong>
+          <span class="tag tag--subtle">${getCategoryLabel(entry.category)}</span>
+        </div>
+        <p>${content.subtitle ?? content.summary}</p>
+      </div>
+    </button>
+  `;
+}
 
+function renderRecipeDetail(entry) {
+  const copy = getPageCopy();
+  const content = getLocalizedEntry(entry);
+  const recipe = splitRecipeLines(content.crafting ?? []);
+
+  return `
+    <article class="detail-card">
+      <div class="detail-card__head">
+        <img class="icon icon--detail" src="${entry.image}" alt="${content.title}">
+        <div>
+          <span class="tag">${copy.crafting.output}</span>
+          <h3>${content.title}</h3>
+          <p>${content.summary}</p>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h4>${copy.crafting.ingredients}</h4>
+        <ul>${recipe.ingredients.map((line) => `<li>${line}</li>`).join("")}</ul>
+      </div>
+
+      ${recipe.stations.length > 0 ? `
+        <div class="detail-section">
+          <h4>${copy.crafting.station}</h4>
+          <ul>${recipe.stations.map((line) => `<li>${line}</li>`).join("")}</ul>
+        </div>
+      ` : ""}
+
+      ${(content.notes ?? []).length > 0 ? `
+        <div class="detail-section">
+          <h4>${copy.crafting.notes}</h4>
+          <ul>${content.notes.map((line) => `<li>${line}</li>`).join("")}</ul>
+        </div>
+      ` : ""}
+    </article>
+  `;
+}
+
+function syncMetadata() {
+  const copy = getPageCopy();
+  document.documentElement.lang = state.language;
+  document.title = `${getSiteName()} | ${copy.nav.catalog}`;
+  elements.metaDescription.setAttribute("content", "Chaotic Dimensions wiki with library, crafting and progression.");
+  document.body.classList.toggle("sidebar-open", state.sidebarOpen);
+  elements.overlay.hidden = !state.sidebarOpen;
+}
+
+function syncUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("lang", state.language);
+  url.searchParams.set("entry", state.selectedEntryId);
+  url.searchParams.set("recipe", state.selectedRecipeId);
+  url.searchParams.set("category", state.category);
+
+  if (state.search.trim()) {
+    url.searchParams.set("q", state.search.trim());
+  }
+  else {
+    url.searchParams.delete("q");
+  }
+
+  history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+}
+
+function toggleSidebar(isOpen) {
+  state.sidebarOpen = isOpen;
+  document.body.classList.toggle("sidebar-open", isOpen);
+  elements.overlay.hidden = !isOpen;
+}
+
+function getVisibleEntries() {
+  const term = normalize(state.search);
   return allEntries.filter((entry) => {
     if (state.category !== "all" && entry.category !== state.category) {
       return false;
@@ -671,56 +840,105 @@ function getVisibleEntries() {
       return true;
     }
 
-    const content = getLocalizedEntry(entry);
-    const haystack = [
-      entry.id,
-      content.title,
-      content.subtitle,
-      content.summary,
-      content.overview,
-      ...(content.facts ?? []),
-      ...(content.obtain ?? []),
-      ...(content.crafting ?? []),
-      ...(content.drops ?? []),
-      ...(content.notes ?? []),
-      ...(content.tactics ?? [])
-    ].join(" ").toLowerCase();
-
-    return haystack.includes(term);
+    return normalize(buildSearchText(entry)).includes(term);
   });
 }
 
+function getVisibleRecipes() {
+  const term = normalize(state.search);
+  return craftableEntries.filter((entry) => {
+    if (!term) {
+      return true;
+    }
+
+    return normalize(buildSearchText(entry)).includes(term);
+  });
+}
+
+function getEntriesByCategory(category) {
+  return allEntries.filter((entry) => entry.category === category);
+}
+
 function getLocalizedEntry(entry) {
-  return entry.content[state.language] ?? entry.content[siteConfig.defaultLanguage];
+  return entry.content[state.language] ?? entry.content[siteConfig.defaultLanguage] ?? entry.content.en;
 }
 
 function getEntryById(entryId) {
   return allEntries.find((entry) => entry.id === entryId);
 }
 
-function getCopy() {
-  return uiCopy[state.language] ?? uiCopy[siteConfig.defaultLanguage];
-}
-
-function getFrontierCopy() {
-  return frontierUiCopy[state.language] ?? frontierUiCopy[siteConfig.defaultLanguage];
-}
-
 function getCategoryLabel(category) {
-  const copy = getCopy();
-  const frontierCopy = getFrontierCopy();
-  return copy.categories[category] ?? frontierCopy.categories?.[category] ?? category;
+  const baseCopy = uiCopy[state.language] ?? uiCopy[siteConfig.defaultLanguage];
+  const frontierCopy = frontierUiCopy[state.language] ?? frontierUiCopy[siteConfig.defaultLanguage] ?? frontierUiCopy.en;
+  return baseCopy.categories?.[category] ?? frontierCopy.categories?.[category] ?? category;
 }
 
-function syncUrl() {
-  const url = new URL(window.location.href);
-  url.searchParams.set("lang", state.language);
-  url.searchParams.set("entry", state.selectedEntryId);
-  history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+function getPageCopy() {
+  return pageCopy[state.language] ?? pageCopy.en;
+}
+
+function getSiteName() {
+  return (uiCopy[state.language] ?? uiCopy[siteConfig.defaultLanguage]).siteName;
+}
+
+function getTagLabel(entry) {
+  const copy = getPageCopy();
+  const tagKey = entryTags[entry.id] ?? (entry.category === "bosses" ? "boss" : "mob");
+  return copy.tags[tagKey] ?? tagKey;
+}
+
+function buildSearchText(entry) {
+  const content = getLocalizedEntry(entry);
+  return [
+    entry.id,
+    entry.category,
+    content.title,
+    content.subtitle,
+    content.summary,
+    content.overview,
+    ...(content.facts ?? []),
+    ...(content.obtain ?? []),
+    ...(content.crafting ?? []),
+    ...(content.drops ?? []),
+    ...(content.notes ?? []),
+    ...(content.tactics ?? []),
+    ...(content.pieces ?? [])
+  ].filter(Boolean).join(" ");
+}
+
+function splitRecipeLines(lines) {
+  const stationMatchers = ["anvil", "station", "crafting station"];
+  const stations = [];
+  const ingredients = [];
+
+  lines.forEach((line) => {
+    const normalized = normalize(line);
+    const looksLikeIngredientRow = normalized.includes("+") || normalized.includes(":") || /\d/.test(normalized);
+
+    if (!looksLikeIngredientRow && stationMatchers.some((matcher) => normalized.includes(matcher))) {
+      stations.push(line);
+    }
+    else {
+      ingredients.push(line);
+    }
+  });
+
+  return {
+    ingredients: ingredients.length > 0 ? ingredients : lines,
+    stations
+  };
+}
+
+function hasContentList(entry, key) {
+  return Object.values(entry.content ?? {}).some((content) => Array.isArray(content?.[key]) && content[key].length > 0);
+}
+
+function normalize(value) {
+  return String(value ?? "").toLowerCase();
 }
 
 function escapeHtml(value) {
-  return value
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
