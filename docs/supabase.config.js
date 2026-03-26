@@ -1,6 +1,6 @@
 export const supabaseConfig = {
-  url: "",
-  anonKey: "",
+  url: "https://zgxcqkutrcmlqbxyzxwj.supabase.co",
+  anonKey: "sb_publishable_qV3i08A_pDOwQQ4EDU44Fg_uqaWj7at",
   assetsBucket: "wiki-assets"
 };
 
