@@ -87,9 +87,19 @@ namespace ChaoticDimensions.Content.NPCs.OreSpawn
 
 		protected override bool CanSpawnHere(NPCSpawnInfo spawnInfo) {
 			Player player = spawnInfo.Player;
+			OreSpawnDimensionId currentDimension = player.GetModPlayer<Content.Players.OreSpawnDimensionPlayer>().CurrentDimension;
+
 			if (Definition.RequiredEventKey is not null) {
 				return OreSpawnEventStateSystem.IsEventActive(Definition.RequiredEventKey) &&
 					OreSpawnEventStateSystem.CanSpawnEventMob(Definition.RequiredEventKey, player);
+			}
+
+			if (currentDimension != OreSpawnDimensionId.Overworld) {
+				return OreSpawnDimensionSpawnRules.CanSpawnInDimension(Definition, player, currentDimension);
+			}
+
+			if (OreSpawnDimensionSpawnRules.HasDedicatedDimension(Definition.Key)) {
+				return false;
 			}
 
 			return Definition.SpawnKind switch {

@@ -228,6 +228,201 @@ Items: {
 		DisplayName: WTF Signal
 		Tooltip: Summons an OreSpawn beta boss
 	}
+
+	Amethyst: {
+		DisplayName: Amethyst
+		Tooltip: ""
+	}
+
+	AmethystBlock: {
+		DisplayName: Amethyst Block
+		Tooltip: ""
+	}
+
+	CrystalTreeLog: {
+		DisplayName: Crystal Tree Log
+		Tooltip: ""
+	}
+
+	DuplicatorLog: {
+		DisplayName: Duplicator Log
+		Tooltip: ""
+	}
+
+	EnderPearlBlock: {
+		DisplayName: Ender Pearl Block
+		Tooltip: ""
+	}
+
+	EyeOfEnderBlock: {
+		DisplayName: Eye Of Ender Block
+		Tooltip: ""
+	}
+
+	FairyCrystal: {
+		DisplayName: Fairy Crystal
+		Tooltip: ""
+	}
+
+	Kyanite: {
+		DisplayName: Kyanite
+		Tooltip: ""
+	}
+
+	KyaniteBlock: {
+		DisplayName: Kyanite Block
+		Tooltip: ""
+	}
+
+	LavaFoam: {
+		DisplayName: Lava Foam
+		Tooltip: ""
+	}
+
+	MobzillaScale: {
+		DisplayName: Mobzilla Scale
+		Tooltip: ""
+	}
+
+	MolenoidDirt: {
+		DisplayName: Molenoid Dirt
+		Tooltip: ""
+	}
+
+	PinkTourmaline: {
+		DisplayName: Pink Tourmaline
+		Tooltip: ""
+	}
+
+	PinkTourmalineBlock: {
+		DisplayName: Pink Tourmaline Block
+		Tooltip: ""
+	}
+
+	RatCrystal: {
+		DisplayName: Rat Crystal
+		Tooltip: ""
+	}
+
+	RedAntNest: {
+		DisplayName: Red Ant Nest
+		Tooltip: ""
+	}
+
+	Ruby: {
+		DisplayName: Ruby
+		Tooltip: ""
+	}
+
+	RubyBlock: {
+		DisplayName: Ruby Block
+		Tooltip: ""
+	}
+
+	Salt: {
+		DisplayName: Salt
+		Tooltip: ""
+	}
+
+	SaltBlock: {
+		DisplayName: Salt Block
+		Tooltip: ""
+	}
+
+	SkyTreeLog: {
+		DisplayName: Sky Tree Log
+		Tooltip: ""
+	}
+
+	TeleportBlock: {
+		DisplayName: Teleport Block
+		Tooltip: ""
+	}
+
+	TermiteNest: {
+		DisplayName: Termite Nest
+		Tooltip: ""
+	}
+
+	TigersEye: {
+		DisplayName: Tigers Eye
+		Tooltip: ""
+	}
+
+	TigersEyeBlock: {
+		DisplayName: Tigers Eye Block
+		Tooltip: ""
+	}
+
+	TitaniumBlock: {
+		DisplayName: Titanium Block
+		Tooltip: ""
+	}
+
+	TitaniumIngot: {
+		DisplayName: Titanium Ingot
+		Tooltip: ""
+	}
+
+	TitaniumNugget: {
+		DisplayName: Titanium Nugget
+		Tooltip: ""
+	}
+
+	TitaniumOre: {
+		DisplayName: Titanium Ore
+		Tooltip: ""
+	}
+
+	UraniumBlock: {
+		DisplayName: Uranium Block
+		Tooltip: ""
+	}
+
+	UraniumIngot: {
+		DisplayName: Uranium Ingot
+		Tooltip: ""
+	}
+
+	UraniumNugget: {
+		DisplayName: Uranium Nugget
+		Tooltip: ""
+	}
+
+	UraniumOre: {
+		DisplayName: Uranium Ore
+		Tooltip: ""
+	}
+
+	BrownAntItem: {
+		DisplayName: Brown Ant Item
+		Tooltip: ""
+	}
+
+	ButterflyTransportItem: {
+		DisplayName: Butterfly Transport Item
+		Tooltip: ""
+	}
+
+	RainbowAntItem: {
+		DisplayName: Rainbow Ant Item
+		Tooltip: ""
+	}
+
+	RedAntItem: {
+		DisplayName: Red Ant Item
+		Tooltip: ""
+	}
+
+	TermiteItem: {
+		DisplayName: Termite Item
+		Tooltip: ""
+	}
+
+	UnstableAntItem: {
+		DisplayName: Unstable Ant Item
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -327,6 +522,12 @@ NPCs: {
 	Wtf.DisplayName: WTF?
 	YoungAdultPrince.DisplayName: Young Adult Prince
 	YoungPrince.DisplayName: Young Prince
+	BrownAntCritter.DisplayName: Brown Ant Critter
+	ButterflyCritter.DisplayName: Butterfly Critter
+	RainbowAntCritter.DisplayName: Rainbow Ant Critter
+	RedAntCritter.DisplayName: Red Ant Critter
+	TermiteCritter.DisplayName: Termite Critter
+	UnstableAntCritter.DisplayName: Unstable Ant Critter
 }
 
 Projectiles: {
@@ -369,4 +570,32 @@ Buffs: {
 		DisplayName: Crystaline Devour Aegis Buff
 		Description: Mods.ChaoticDimensions.Buffs.CrystalineDevourAegisBuff.Description
 	}
+}
+
+Tiles: {
+	AmethystBlockTile.MapEntry: Amethyst Block Tile
+	AmethystOreTile.MapEntry: Amethyst Ore Tile
+	CrystalTreeLogTile.MapEntry: Crystal Tree Log Tile
+	DuplicatorLogTile.MapEntry: Duplicator Log Tile
+	EnderPearlBlockTile.MapEntry: Ender Pearl Block Tile
+	EyeOfEnderBlockTile.MapEntry: Eye Of Ender Block Tile
+	KyaniteBlockTile.MapEntry: Kyanite Block Tile
+	KyaniteOreTile.MapEntry: Kyanite Ore Tile
+	MolenoidDirtTile.MapEntry: Molenoid Dirt Tile
+	PinkTourmalineBlockTile.MapEntry: Pink Tourmaline Block Tile
+	PinkTourmalineOreTile.MapEntry: Pink Tourmaline Ore Tile
+	RedAntNestTile.MapEntry: Red Ant Nest Tile
+	RubyBlockTile.MapEntry: Ruby Block Tile
+	RubyOreTile.MapEntry: Ruby Ore Tile
+	SaltBlockTile.MapEntry: Salt Block Tile
+	SaltOreTile.MapEntry: Salt Ore Tile
+	SkyTreeLogTile.MapEntry: Sky Tree Log Tile
+	TeleportBlockTile.MapEntry: Teleport Block Tile
+	TermiteNestTile.MapEntry: Termite Nest Tile
+	TigersEyeBlockTile.MapEntry: Tigers Eye Block Tile
+	TigersEyeOreTile.MapEntry: Tigers Eye Ore Tile
+	TitaniumBlockTile.MapEntry: Titanium Block Tile
+	TitaniumOreTile.MapEntry: Titanium Ore Tile
+	UraniumBlockTile.MapEntry: Uranium Block Tile
+	UraniumOreTile.MapEntry: Uranium Ore Tile
 }

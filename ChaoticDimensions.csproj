@@ -17,4 +17,8 @@
 		<None Remove=".analysis\**\*" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\SubworldLibrary\SubworldLibrary.csproj" Private="false" />
+	</ItemGroup>
+
 </Project>

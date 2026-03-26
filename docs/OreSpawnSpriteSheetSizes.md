@@ -1,14 +1,39 @@
-# OreSpawn Sprite Sheet Sizes
+# OreSpawn Sprite and Texture Size Guide
 
-Referencia de tamanho para voce desenhar sem quebrar hitbox, frame count e leitura visual.
+This is the current production guide for OreSpawn art inside Chaotic Dimensions.
 
-Padrao geral:
-- Mobs e bosses novos estao preparados para spritesheet vertical com `4 frames`.
-- `Frame` = largura x altura de um quadro.
-- `Total` = largura x `(altura * 4)` para a spritesheet completa.
-- Itens usam icone unico, sem sheet.
+Use it as the default unless a specific class later overrides the size.
 
-## Bosses Beta
+## General rules
+
+- NPCs and bosses currently use vertical sprite sheets.
+- Default NPC sheet format:
+  - `frame width x frame height`
+  - `4 frames total`
+  - total sheet size = `frame width x (frame height * 4)`
+- Standard item icon:
+  - usually `32x32`
+- Small material icon:
+  - usually `24x24`
+- Standard placeable block tile:
+  - `16x16`
+- Standard armor inventory icon:
+  - `32x32`
+
+## Real working armor texture sizes in this mod
+
+These sizes are already proven by the current Crystaline armor assets and are the safest reference for future equipped armor art.
+
+- Head equip sheet: `40x1120`
+- Legs equip sheet: `40x1120`
+- Body equip sheet: `360x224`
+- Arms equip sheet: `360x224`
+- Female body equip sheet: `360x224`
+- Armor item icon: `32x32`
+
+Use these exact sizes for OreSpawn wearable armor unless we later decide to make a custom equipment pipeline.
+
+## Bosses
 
 - `Kraken`: frame `120x120`, total `120x480`
 - `Mobzilla`: frame `154x154`, total `154x616`
@@ -17,7 +42,9 @@ Padrao geral:
 - `The Queen`: frame `170x140`, total `170x560`
 - `WTF?`: frame `132x132`, total `132x528`
 
-## Mobs Hostis e Elites
+## Mobs
+
+### Hostile and elite mobs
 
 - `Water Dragon`: frame `56x56`, total `56x224`
 - `Mantis`: frame `48x48`, total `48x192`
@@ -64,7 +91,7 @@ Padrao geral:
 - `Triffid`: frame `46x54`, total `46x216`
 - `Vortex`: frame `52x52`, total `52x208`
 
-## Dinossauros e Grandes Bestas
+### Dinosaurs and large beasts
 
 - `Alosaurus`: frame `60x42`, total `60x168`
 - `Baby Dragon`: frame `40x40`, total `40x160`
@@ -76,7 +103,7 @@ Padrao geral:
 - `Pointysaurus`: frame `60x44`, total `60x176`
 - `T-Rex`: frame `74x58`, total `74x232`
 
-## Animais, Ambientes e Utilitarios
+### Ambient, utility, and social mobs
 
 - `Beaver`: frame `28x24`, total `28x96`
 - `Bee`: frame `24x22`, total `24x88`
@@ -105,9 +132,6 @@ Padrao geral:
 - `Termite`: frame `16x16`, total `16x64`
 - `Velocity Raptor`: frame `34x30`, total `34x120`
 - `Whale`: frame `72x34`, total `72x136`
-
-## Linha Real e NPCs Sociais
-
 - `Girlfriend`: frame `28x48`, total `28x192`
 - `Boyfriend`: frame `28x48`, total `28x192`
 - `The Prince`: frame `64x56`, total `64x224`
@@ -115,19 +139,16 @@ Padrao geral:
 - `Young Adult Prince`: frame `96x80`, total `96x320`
 - `The Princess`: frame `72x64`, total `72x256`
 
-## Paginas de Grupo
+### Transport critters
 
-- `Ants`: cada variante em `18x18` por frame, total `18x72`
-- `Birds`: cada variante em `24x24` por frame, total `24x96`
-- `Butterflies`: cada variante em `20x20` por frame, total `20x80`
-- `Cows`: cada variante em `34x26` por frame, total `34x104`
-- `Criminals`: cada variante em `32x48` por frame, total `32x192`
-- `Dragonflies`: cada variante em `26x20` por frame, total `26x80`
-- `Moths`: cada variante em `26x22` por frame, total `26x88`
-- `Nightmares`: use `56x48` por frame para a base; aumente cada tier em blocos de `+12 px`
-- `Worms`: little `28x18`, medium `42x24`, big `64x32`; sempre em sheet vertical de `4 frames`
+- `Brown Ant Critter`: frame `18x18`, total `18x72`
+- `Rainbow Ant Critter`: frame `18x18`, total `18x72`
+- `Red Ant Critter`: frame `18x18`, total `18x72`
+- `Unstable Ant Critter`: frame `18x18`, total `18x72`
+- `Termite Critter`: frame `18x18`, total `18x72`
+- `Butterfly Critter`: frame `20x20`, total `20x80`
 
-## Itens Unicos
+## Unique item icons
 
 - `Attitude Adjuster`: `40x40`
 - `Battle Axe`: `42x42`
@@ -148,37 +169,162 @@ Padrao geral:
 - `Squidzooka`: `44x44`
 - `Thunder Staff`: `42x42`
 
-## Families de Itens
+## Summon and transport item icons
 
-- `Amethyst Armor`: `32x32` por icone de peca
-- `Amethyst Tools and Weapons`: `40x40` por arma/ferramenta, `32x32` para materiais
-- `Emerald Armor`: `32x32` por icone de peca
-- `Emerald Tools and Weapons`: `40x40` por arma/ferramenta
-- `Experience Armor`: `32x32` por icone de peca
-- `Girlfriend/Boyfriend Weapons`: `32x32` para shoes e controllers pequenos, `40x40` para variantes maiores
-- `Kyanite Tools and Weapons`: `40x40` por arma/ferramenta
-- `Lapis Armor`: `32x32` por icone de peca
-- `Lava Eel Armor`: `32x32` por icone de peca
-- `Mobzilla Armor`: `40x40` por icone de peca por ser set final
-- `Moth Scale Armor`: `32x32` por icone de peca
-- `Peacock Feather Armor`: `32x32` por icone de peca
-- `Pink Tourmaline Armor`: `32x32` por icone de peca
-- `Pink Tourmaline Tools and Weapons`: `40x40` por arma/ferramenta
-- `Queen Scale Armor`: `40x40` por icone de peca
-- `Rocks and Crystals`: `28x28` a `32x32` por cristal/material
-- `Royal Guardian Armor`: `40x40` por icone de peca
-- `Ruby Armor`: `32x32` por icone de peca
-- `Ruby Tools and Weapons`: `40x40` por arma/ferramenta
-- `Throwing Weapons`: `32x32` por projecao/arma de arremesso
-- `Tigers Eye Armor`: `32x32` por icone de peca
-- `Tigers Eye Tools and Weapons`: `40x40` por arma/ferramenta
-- `Ultimate Armor`: `40x40` por icone de peca
-- `Ultimate Tools and Weapons`: `42x42` a `54x54` dependendo do porte
-- `Wood Crystal Tools and Weapons`: `36x36` para tools leves, `40x40` para armas
+- miniboss summon items: `32x32`
+- boss summon items: `32x32`
+- captured ant, termite, and butterfly transport items: `24x24`
 
-## Registries de Itens
+## Material and resource item icons
 
-- `Ancient Dried Eggs`: `32x32` por ovo
-- `Food`: `26x26` a `32x32` por item
-- `Materials`: `28x28` a `32x32` por material
-- `Plants and Trees`: `24x24` para sementes/pequenas plantas, `32x32` para frutos, `40x40` para saplings especiais
+Use these defaults unless a specific icon needs more room.
+
+- mob drop materials: `24x24`
+- gems and ore chunks: `24x24`
+- ingots and nuggets: `24x24`
+- special crystals: `24x24`
+- log items: `24x24`
+- nest block items: `24x24`
+- placeable block items with complex silhouette: `32x32`
+
+Current OreSpawn resource item sizes to follow:
+
+- `Amethyst`, `Ruby`, `PinkTourmaline`, `TigersEye`, `Kyanite`, `Salt`: `24x24`
+- `TitaniumOre`, `UraniumOre`: `24x24`
+- `TitaniumNugget`, `TitaniumIngot`, `UraniumNugget`, `UraniumIngot`: `24x24`
+- `FairyCrystal`, `RatCrystal`, `LavaFoam`, `MobzillaScale`: `24x24`
+- `WaterDragonScale`, `EmperorScorpionScale`, `CaterkillerJaw`, `CephadromeHorn`: `24x24`
+
+## Armor item icons
+
+Use:
+
+- helmet item icon: `32x32`
+- chestplate item icon: `32x32`
+- greaves item icon: `32x32`
+
+For oversized endgame sets, `40x40` is acceptable, but keep all three pieces of the same set consistent.
+
+## Accessory item icons
+
+Use:
+
+- normal accessory icon: `32x32`
+- oversized relic-like accessory: `36x36`
+
+If the accessory does not visibly render on the player, no extra wearable sheet is needed.
+
+## Block, tile, and world texture sizes
+
+These are the most important additions for the dimension rebuild.
+
+### Single-tile world blocks
+
+Each block texture should be drawn as:
+
+- `16x16`
+
+This applies to:
+
+- crystal dirt
+- crystal grass
+- crystal stone
+- crystal sand
+- crystal hardened sand
+- crystal ice
+- crystal wood
+- crystal leaves
+- crystal ore blocks
+- ore blocks for `Ruby`, `Pink Tourmaline`, `Tigers Eye`, `Kyanite`, `Titanium`, `Uranium`, `Salt`
+- `Molenoid Dirt`
+- `Red Ant Nest`
+- `Termite Nest`
+- `Teleport Block`
+- `Ender Pearl Block`
+- `Eye of Ender Block`
+
+### Trees using vanilla materials
+
+For `Utopia`, `Danger`, and `Mining`:
+
+- no custom tree tile sprites are required if we stay on vanilla `Living Wood` and `Leaf Block`
+- the important work there is structure generation, not new tile art
+
+### Crystal tree family
+
+If we replace vanilla tree visuals in the Crystal dimension with custom crystal tiles:
+
+- crystal trunk tile: `16x16`
+- crystal leaf tile: `16x16`
+- crystal branch tile variants: `16x16` each
+- optional glow overlays: `16x16`
+
+## Armor family production defaults
+
+Use these as the starting sizes for the OreSpawn armor lanes that still need art.
+
+- early and midgame armor item icons: `32x32`
+- late and endgame armor item icons: `40x40`
+- all head equip sheets: `40x1120`
+- all leg equip sheets: `40x1120`
+- all body equip sheets: `360x224`
+- all arm equip sheets: `360x224`
+- all female body equip sheets: `360x224`
+
+Suggested icon scale by set:
+
+- `Amethyst Armor`: `32x32`
+- `Emerald Armor`: `32x32`
+- `Lapis Armor`: `32x32`
+- `Ruby Armor`: `32x32`
+- `Pink Tourmaline Armor`: `32x32`
+- `Tigers Eye Armor`: `32x32`
+- `Moth Scale Armor`: `32x32`
+- `Peacock Feather Armor`: `32x32`
+- `Lava Eel Armor`: `32x32`
+- `Experience Armor`: `32x32`
+- `Mobzilla Armor`: `40x40`
+- `Queen Scale Armor`: `40x40`
+- `Royal Guardian Armor`: `40x40`
+- `Ultimate Armor`: `40x40`
+
+## Tool and weapon family production defaults
+
+- small tool icons: `36x36`
+- standard weapon icons: `40x40`
+- large late-game weapon icons: `42x42` to `54x54`
+- giant endgame swords and axes: up to `64x64` if needed
+
+Apply this to:
+
+- `Amethyst Tools and Weapons`
+- `Emerald Tools and Weapons`
+- `Ruby Tools and Weapons`
+- `Pink Tourmaline Tools and Weapons`
+- `Tigers Eye Tools and Weapons`
+- `Kyanite Tools and Weapons`
+- `Wood Crystal Tools and Weapons`
+- `Ultimate Tools and Weapons`
+
+## Food, plants, and eggs
+
+- food icons: `26x26` to `32x32`
+- seeds and small plants: `24x24`
+- fruit icons: `32x32`
+- special saplings: `32x32` to `40x40`
+- ancient dried eggs: `32x32`
+
+## Dimension production summary
+
+If you only need the short version:
+
+- NPC frame art: use the exact sizes listed above
+- item icons: `24x24`, `32x32`, or `40x40` depending on class
+- block textures: `16x16`
+- armor item icons: `32x32`
+- armor wearable sheets:
+  - head `40x1120`
+  - legs `40x1120`
+  - body `360x224`
+  - arms `360x224`
+  - female body `360x224`

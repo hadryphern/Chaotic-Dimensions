@@ -97,6 +97,25 @@ namespace ChaoticDimensions.Common.Systems
 
 		public static bool IsUnlocked(string key) => UnlockedEvents.Contains(key);
 
+		internal static List<string> GetUnlockedEventKeys() {
+			return UnlockedEvents.OrderBy(static key => key).ToList();
+		}
+
+		internal static void GetVillageNightSiegeState(out bool active, out int timeLeft) {
+			active = VillageNightSiegeActive;
+			timeLeft = villageNightSiegeTimeLeft;
+		}
+
+		internal static void RestoreTransferredState(IEnumerable<string> unlockedEvents, bool villageNightSiegeActiveState, int villageNightSiegeTimeLeftState) {
+			UnlockedEvents.Clear();
+			foreach (string key in unlockedEvents) {
+				UnlockedEvents.Add(key);
+			}
+
+			VillageNightSiegeActive = villageNightSiegeActiveState && UnlockedEvents.Contains(OreSpawnWorldCatalog.VillageNightSiegeKey);
+			villageNightSiegeTimeLeft = VillageNightSiegeActive ? villageNightSiegeTimeLeftState : 0;
+		}
+
 		public static bool IsEventActive(string key) {
 			return key switch {
 				OreSpawnWorldCatalog.VillageNightSiegeKey => VillageNightSiegeActive,
@@ -106,7 +125,11 @@ namespace ChaoticDimensions.Common.Systems
 
 		public static bool CanSpawnEventMob(string key, Player player) {
 			return key switch {
-				OreSpawnWorldCatalog.VillageNightSiegeKey => player.active && !player.dead && player.ZoneOverworldHeight && !player.ZoneBeach && !player.ZoneDungeon,
+				OreSpawnWorldCatalog.VillageNightSiegeKey => player.active &&
+					!player.dead &&
+					OreSpawnDimensionLayout.TryGetDimensionAtWorldPosition(player.Center, out OreSpawnDimensionId dimensionId) &&
+					dimensionId == OreSpawnDimensionId.Village &&
+					player.ZoneOverworldHeight,
 				_ => false
 			};
 		}

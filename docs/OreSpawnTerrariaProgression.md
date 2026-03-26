@@ -2,12 +2,19 @@
 
 This document is the first practical blueprint for folding OreSpawn content into Chaotic Dimensions without letting it erase the mod's own identity.
 
+Dimension architecture note:
+
+- The old "OreSpawn dimensions as regions inside one large Terraria world" prototype should now be treated as deprecated.
+- For the dimension rebuild plan, use [OreSpawnDimensionsRebuild.md](OreSpawnDimensionsRebuild.md).
+- `Utopia`, `Danger`, `Mining`, and `Crystal` should move toward real subworlds.
+- `Village` and `Chaos` are no longer first-pass priorities.
+
 The main idea is simple:
 
 - Chaotic Dimensions keeps its own endgame identity.
 - Most OreSpawn boss pages become elite mobs or natural minibosses in Terraria.
 - Only the biggest Apex OreSpawn encounters stay as full bosses with music, presentation, and progression weight.
-- Ant, termite, and butterfly travel should be reinterpreted as expeditions, rifts, or staged biome events instead of literal Minecraft-style teleports.
+- Ant, termite, and butterfly travel should now move toward literal dimension travel via subworlds rather than temporary expedition regions.
 
 ## Core adaptation rules
 
@@ -398,16 +405,16 @@ Progression notes:
 Implementation priority should be:
 
 1. Overworld fauna and early minibosses
-2. Mining Expedition
-3. Village Siege / Rainbow Rift
-4. Kraken lane
-5. Crystal Expedition
-6. Danger Expedition
-7. Chaos Rift sandbox
-8. the future Chaotic post-Devour trio
-9. Kraken
-10. Mobzilla
-11. Utopia endgame
+2. Danger subworld
+3. Mining subworld
+4. Crystal subworld
+5. Utopia subworld
+6. Kraken lane
+7. the future Chaotic post-Devour trio
+8. Kraken
+9. Mobzilla
+10. Utopia endgame
+11. postponed Village and Chaos work
 
 This order gives you content across the whole Terraria run instead of locking everything to the end.
 
