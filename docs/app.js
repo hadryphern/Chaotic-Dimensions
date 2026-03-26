@@ -1,10 +1,12 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
+import { frontierEntries, frontierSection, frontierUiCopy } from "./orespawn-data.js";
 
 const elements = {
   sidebar: document.querySelector("#sidebar"),
   hero: document.querySelector("#home"),
   download: document.querySelector("#download"),
   wiki: document.querySelector("#wiki"),
+  frontier: document.querySelector("#frontier"),
   bosses: document.querySelector("#bosses"),
   roadmap: document.querySelector("#roadmap"),
   footer: document.querySelector("#site-footer"),
@@ -14,7 +16,8 @@ const elements = {
   metaDescription: document.querySelector("#meta-description")
 };
 
-const allCategories = Array.from(new Set(entries.map((entry) => entry.category)));
+const allEntries = [...entries, ...frontierEntries];
+const allCategories = Array.from(new Set(allEntries.map((entry) => entry.category)));
 
 const state = {
   language: siteConfig.defaultLanguage,
@@ -41,7 +44,7 @@ function hydrateStateFromUrl() {
     state.language = language;
   }
 
-  if (entries.some((entry) => entry.id === entryId)) {
+  if (allEntries.some((entry) => entry.id === entryId)) {
     state.selectedEntryId = entryId;
   }
 }
@@ -74,6 +77,7 @@ function render() {
   renderHero();
   renderDownload();
   renderWiki();
+  renderFrontier();
   renderBossSpotlight();
   renderRoadmap();
   renderFooter();
@@ -105,6 +109,7 @@ function renderSidebar() {
     { href: "#home", label: copy.nav.overview },
     { href: "#download", label: copy.nav.download },
     { href: "#wiki", label: copy.nav.explorer },
+    { href: "#frontier", label: getFrontierCopy().nav.frontier },
     { href: "#bosses", label: copy.nav.boss },
     { href: "#roadmap", label: copy.nav.roadmap }
   ].map((item) => `<a class="sidebar-nav__link" href="${item.href}">${item.label}</a>`).join("");
@@ -159,7 +164,7 @@ function renderSidebar() {
 function renderHero() {
   const copy = getCopy();
   const metricCards = [
-    { value: `${entries.length}`, label: copy.hero.metrics.entries },
+    { value: `${allEntries.length}`, label: copy.hero.metrics.entries },
     { value: `${allCategories.length}`, label: copy.hero.metrics.categories },
     { value: `${languageOptions.length}`, label: copy.hero.metrics.languages },
     { value: "24/7", label: copy.hero.metrics.hosting }
@@ -281,12 +286,12 @@ function renderWiki() {
     {
       key: "all",
       label: copy.categories.all,
-      count: entries.length
+      count: allEntries.length
     },
     ...allCategories.map((category) => ({
       key: category,
-      label: copy.categories[category],
-      count: entries.filter((entry) => entry.category === category).length
+      label: getCategoryLabel(category),
+      count: allEntries.filter((entry) => entry.category === category).length
     }))
   ].map((category) => `
     <button
@@ -354,6 +359,110 @@ function renderWiki() {
       state.selectedEntryId = button.dataset.entryId;
       renderWiki();
       syncUrl();
+    });
+  });
+}
+
+function renderFrontier() {
+  const frontierCopy = getFrontierCopy().frontier;
+  const rosterEntries = frontierSection.rosterIds.map((entryId) => getEntryById(entryId)).filter(Boolean);
+  const supportEntries = frontierSection.supportIds.map((entryId) => getEntryById(entryId)).filter(Boolean);
+  const biomeCount = new Set(["beach", "forest-jungle", "desert", "snow"]).size;
+  const gateCount = new Set(
+    rosterEntries.map((entry) => getLocalizedEntry(entry).facts?.[0]).filter(Boolean)
+  ).size;
+
+  const metricCards = [
+    { value: `${rosterEntries.length}`, label: frontierCopy.metrics.mobs },
+    { value: `${supportEntries.filter((entry) => entry.category === "summons").length}`, label: frontierCopy.metrics.summons },
+    { value: `${gateCount}`, label: frontierCopy.metrics.gates },
+    { value: `${biomeCount}`, label: frontierCopy.metrics.biomes }
+  ].map((metric) => `
+    <article class="metric-card glass-card">
+      <strong>${metric.value}</strong>
+      <span>${metric.label}</span>
+    </article>
+  `).join("");
+
+  const rosterCards = rosterEntries.map((entry) => {
+    const content = getLocalizedEntry(entry);
+    const previewFacts = (content.facts ?? []).slice(0, 3).map((fact) => `<li>${fact}</li>`).join("");
+
+    return `
+      <article class="frontier-card glass-card">
+        <div class="frontier-card__media">
+          <img class="sprite-art sprite-art--large" src="${entry.image}" alt="${content.title}">
+        </div>
+        <div class="frontier-card__body">
+          <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
+          <h3>${content.title}</h3>
+          <p>${content.summary}</p>
+          <ul class="fact-preview">${previewFacts}</ul>
+          <button class="button button--secondary" type="button" data-frontier-entry="${entry.id}">${frontierCopy.openEntry}</button>
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  const supportCards = supportEntries.map((entry) => {
+    const content = getLocalizedEntry(entry);
+    const listSource = content.crafting ?? content.obtain ?? content.facts ?? [];
+    const previewFacts = listSource.slice(0, 3).map((item) => `<li>${item}</li>`).join("");
+
+    return `
+      <article class="support-card glass-card">
+        <div class="support-card__head">
+          <div class="entry-card__media support-card__media">
+            <img class="sprite-art" src="${entry.image}" alt="${content.title}">
+          </div>
+          <div>
+            <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
+            <h3>${content.title}</h3>
+            <p>${content.summary}</p>
+          </div>
+        </div>
+        <ul class="fact-preview">${previewFacts}</ul>
+        <button class="button button--ghost" type="button" data-frontier-entry="${entry.id}">${frontierCopy.openEntry}</button>
+      </article>
+    `;
+  }).join("");
+
+  elements.frontier.innerHTML = `
+    <div class="section-heading">
+      <p class="eyebrow">${frontierCopy.eyebrow}</p>
+      <h2>${frontierCopy.title}</h2>
+      <p>${frontierCopy.intro}</p>
+    </div>
+
+    <div class="frontier-metrics">
+      ${metricCards}
+    </div>
+
+    <div class="section-heading frontier-heading">
+      <h3>${frontierCopy.rosterTitle}</h3>
+      <p>${frontierCopy.rosterIntro}</p>
+    </div>
+
+    <div class="frontier-grid">
+      ${rosterCards}
+    </div>
+
+    <div class="section-heading frontier-heading">
+      <h3>${frontierCopy.supportTitle}</h3>
+      <p>${frontierCopy.supportIntro}</p>
+    </div>
+
+    <div class="support-grid">
+      ${supportCards}
+    </div>
+  `;
+
+  elements.frontier.querySelectorAll("[data-frontier-entry]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedEntryId = button.dataset.frontierEntry;
+      renderWiki();
+      syncUrl();
+      document.querySelector("#wiki")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 }
@@ -469,7 +578,7 @@ function renderEntryCard(entry) {
         <img class="sprite-art" src="${entry.image}" alt="${content.title}">
       </div>
       <div class="entry-card__body">
-        <span class="entry-badge" data-category="${entry.category}">${copy.categories[entry.category]}</span>
+        <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
         <h3>${content.title}</h3>
         <p>${content.summary}</p>
         <ul class="fact-preview">${previewFacts}</ul>
@@ -519,7 +628,7 @@ function renderEntryDetail(entry) {
     <article class="glass-card detail-card">
       <div class="detail-hero">
         <div class="detail-copy">
-          <span class="entry-badge" data-category="${entry.category}">${copy.categories[entry.category]}</span>
+          <span class="entry-badge" data-category="${entry.category}">${getCategoryLabel(entry.category)}</span>
           <h3>${content.title}</h3>
           <p class="detail-subtitle">${content.subtitle}</p>
           <p>${content.overview}</p>
@@ -553,7 +662,7 @@ function renderListSection(label, items) {
 function getVisibleEntries() {
   const term = state.search.trim().toLowerCase();
 
-  return entries.filter((entry) => {
+  return allEntries.filter((entry) => {
     if (state.category !== "all" && entry.category !== state.category) {
       return false;
     }
@@ -586,11 +695,21 @@ function getLocalizedEntry(entry) {
 }
 
 function getEntryById(entryId) {
-  return entries.find((entry) => entry.id === entryId);
+  return allEntries.find((entry) => entry.id === entryId);
 }
 
 function getCopy() {
   return uiCopy[state.language] ?? uiCopy[siteConfig.defaultLanguage];
+}
+
+function getFrontierCopy() {
+  return frontierUiCopy[state.language] ?? frontierUiCopy[siteConfig.defaultLanguage];
+}
+
+function getCategoryLabel(category) {
+  const copy = getCopy();
+  const frontierCopy = getFrontierCopy();
+  return copy.categories[category] ?? frontierCopy.categories?.[category] ?? category;
 }
 
 function syncUrl() {

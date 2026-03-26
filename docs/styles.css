@@ -642,6 +642,10 @@ pre {
   background: rgba(191, 133, 255, 0.18);
 }
 
+.entry-badge[data-category="mobs"] {
+  background: rgba(255, 99, 153, 0.16);
+}
+
 .fact-preview {
   margin: 12px 0 0;
   padding-left: 18px;
@@ -720,6 +724,84 @@ pre {
 
 .spotlight-layout {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.frontier-heading h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-family: "Cinzel", serif;
+}
+
+.frontier-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.frontier-grid,
+.support-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.frontier-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.support-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.frontier-card,
+.support-card {
+  padding: 22px;
+}
+
+.frontier-card {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.frontier-card__media {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at center, rgba(255, 170, 233, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(103, 42, 186, 0.12));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.frontier-card__body h3,
+.support-card h3 {
+  margin: 12px 0 10px;
+  font-size: 1.15rem;
+}
+
+.frontier-card__body p,
+.support-card__head p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+
+.support-card {
+  display: grid;
+  gap: 14px;
+}
+
+.support-card__head {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.support-card__media {
+  min-height: 96px;
 }
 
 .spotlight-gallery {
@@ -801,12 +883,18 @@ pre {
   }
 
   .metrics-grid,
+  .frontier-metrics,
   .phase-grid,
   .roadmap-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .download-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .frontier-grid,
+  .support-grid {
     grid-template-columns: 1fr;
   }
 
@@ -869,12 +957,18 @@ pre {
   .hero-gallery,
   .detail-hero,
   .metrics-grid,
+  .frontier-metrics,
   .phase-grid,
   .roadmap-grid {
     grid-template-columns: 1fr;
   }
 
   .entry-card {
+    grid-template-columns: 1fr;
+  }
+
+  .frontier-card,
+  .support-card__head {
     grid-template-columns: 1fr;
   }
 
