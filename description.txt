@@ -1,1 +1,11 @@
-Modify this file with a description of your mod.
+Chaotic Dimensions e um mod original para Terraria / tModLoader focado em conteudo autoral pos-Moon Lord, atmosfera cristalina cosmica e encounters com apresentacao cinematica.
+
+A versao atual introduz o Crystaline Devour, o primeiro boss oficial do projeto, junto com armas, acessorios, armadura modular e uma luta completa com intro, arena, musica, sky e boss bar personalizados.
+
+O mod esta em desenvolvimento ativo e foi planejado para crescer com novos bosses, itens, dimensoes e sistemas proprios.
+
+Chaotic Dimensions is an original Terraria / tModLoader mod focused on handcrafted post-Moon Lord content, crystal-cosmic atmosphere and cinematic encounters.
+
+The current version introduces Crystaline Devour, the first official boss of the project, alongside original weapons, accessories, a modular armor set, and a full fight featuring a custom intro, arena, music, sky and boss bar.
+
+Active development is ongoing, with more bosses, items, dimensions and original systems planned.
