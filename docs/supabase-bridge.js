@@ -65,8 +65,6 @@ export async function initBackend() {
     applySession(session);
   });
 
-  await loadPublishedEntries();
-
   backendState.ready = true;
   notify();
 }
@@ -227,11 +225,17 @@ export async function loadComments(entryId) {
   };
   notify();
 
-  const result = await supabaseClient
+  let query = supabaseClient
     .from("wiki_comments")
     .select("id, entry_id, display_name, body, is_hidden, created_at")
     .eq("entry_id", entryId)
     .order("created_at", { ascending: false });
+
+  if (!backendState.isAdmin) {
+    query = query.eq("is_hidden", false);
+  }
+
+  const result = await query;
 
   if (result.error) {
     backendState.commentsByEntry[entryId] = {
@@ -411,6 +415,7 @@ export async function setCommentHidden(commentId, isHidden) {
 }
 
 async function applySession(session) {
+  const currentEntryId = getCurrentEntryId();
   backendState.user = session?.user ?? null;
   backendState.profile = null;
   backendState.isAdmin = false;
@@ -418,15 +423,32 @@ async function applySession(session) {
   if (backendState.user) {
     await ensureProfile(localStorage.getItem("cd_pending_display_name"));
     await refreshProfile();
+    await loadPublishedEntries();
+    if (currentEntryId) {
+      await loadComments(currentEntryId);
+    }
     if (backendState.isAdmin) {
       await loadAdminComments();
     }
   }
   else {
     backendState.adminComments = [];
+    await loadPublishedEntries();
+    if (currentEntryId) {
+      await loadComments(currentEntryId);
+    }
   }
 
   notify();
+}
+
+function getCurrentEntryId() {
+  if (!window.location.pathname.endsWith("/entry.html")) {
+    return "";
+  }
+
+  const url = new URL(window.location.href);
+  return url.searchParams.get("entry") ?? "";
 }
 
 async function ensureProfile(displayNameHint) {
