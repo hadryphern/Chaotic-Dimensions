@@ -77,6 +77,14 @@ const PROGRESSION_GROUPS = [
   }
 ];
 
+const WORKSTATIONS = [
+  { id: "lunar-crafting-station", label: "Lunar Crafting Station", short: "LC", keywords: ["lunar crafting station"] },
+  { id: "ancient-manipulator", label: "Ancient Manipulator", short: "AM", keywords: ["ancient manipulator"] },
+  { id: "mythril-anvil", label: "Mythril Anvil", short: "MY", keywords: ["mythril anvil", "orichalcum anvil"] },
+  { id: "anvil", label: "Anvil", short: "AN", keywords: [" anvil", "anvil "] },
+  { id: "forge", label: "Forge", short: "FG", keywords: ["hellforge", "forge", "furnace"] }
+];
+
 const staticEntries = [...entries, ...frontierEntries];
 const pageId = document.body.dataset.page ?? "home";
 
@@ -797,7 +805,7 @@ function renderEntryPage() {
     <section class="page-section">
       <div class="content-grid">
         ${renderContentBlock(copy.entry.obtain, content.obtain)}
-        ${renderContentBlock(copy.entry.crafting, content.crafting)}
+        ${renderCraftingContentBlock(copy.entry.crafting, entry)}
         ${renderContentBlock(copy.entry.drops, content.drops)}
         ${renderContentBlock(copy.entry.pieces, content.pieces)}
         ${renderContentBlock(copy.entry.notes, content.notes)}
@@ -1369,7 +1377,7 @@ function renderEntryCard(entry, includeFacts = false) {
 function renderRecipeCard(entry) {
   const copy = getCopy();
   const content = getLocalizedEntry(entry);
-  const recipe = splitRecipeLines(content.crafting ?? []);
+  const recipe = parseRecipeModel(entry);
 
   return `
     <article class="recipe-card">
@@ -1387,19 +1395,80 @@ function renderRecipeCard(entry) {
           </a>
         </div>
       </div>
+      ${recipe.stations.length > 0 ? `
+        <div class="recipe-stations">
+          <strong>${copy.crafting.station}</strong>
+          <div class="workstation-list">
+            ${recipe.stations.map((station) => renderWorkstationPill(station)).join("")}
+          </div>
+        </div>
+      ` : ""}
       <div class="recipe-meta">
         <div>
           <strong>${copy.crafting.ingredients}</strong>
-          <ul class="content-list">${recipe.ingredients.slice(0, 4).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
-        </div>
-        ${recipe.stations.length > 0 ? `
-          <div>
-            <strong>${copy.crafting.station}</strong>
-            <p>${escapeHtml(recipe.stations.join(", "))}</p>
+          <div class="recipe-entry-list">
+            ${recipe.ingredients.slice(0, 6).map((ingredient) => renderRecipeIngredient(ingredient)).join("")}
           </div>
-        ` : ""}
+        </div>
       </div>
     </article>
+  `;
+}
+
+function renderCraftingContentBlock(label, entry) {
+  const recipe = parseRecipeModel(entry);
+
+  if (recipe.lines.length === 0) {
+    return "";
+  }
+
+  return `
+    <article class="content-block">
+      <h3>${label}</h3>
+      ${recipe.stations.length > 0 ? `
+        <div class="recipe-stations">
+          <strong>${getCopy().crafting.station}</strong>
+          <div class="workstation-list">
+            ${recipe.stations.map((station) => renderWorkstationPill(station)).join("")}
+          </div>
+        </div>
+      ` : ""}
+      <div class="recipe-entry-list recipe-entry-list--stacked">
+        ${recipe.ingredients.length > 0
+          ? recipe.ingredients.map((ingredient) => renderRecipeIngredient(ingredient)).join("")
+          : recipe.lines.map((line) => `<div class="recipe-entry recipe-entry--plain">${escapeHtml(line)}</div>`).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderWorkstationPill(station) {
+  const stationEntry = findEntryByMention(station.label);
+
+  return `
+    <div class="workstation-pill" title="${escapeHtml(station.label)}">
+      ${stationEntry
+        ? `<img class="workstation-pill__image" src="${escapeHtml(stationEntry.image)}" alt="${escapeHtml(station.label)}">`
+        : `<span class="workstation-pill__icon">${escapeHtml(station.short)}</span>`}
+      <span>${escapeHtml(station.label)}</span>
+    </div>
+  `;
+}
+
+function renderRecipeIngredient(ingredient) {
+  const image = ingredient.entry?.image;
+  const labelMarkup = ingredient.entry
+    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(ingredient.label)}</a>`
+    : `<span>${escapeHtml(ingredient.label)}</span>`;
+
+  return `
+    <div class="recipe-entry">
+      ${image ? `<img class="recipe-entry__image" src="${escapeHtml(image)}" alt="${escapeHtml(ingredient.label)}">` : `<span class="recipe-entry__fallback">${escapeHtml((ingredient.label || "?").slice(0, 2).toUpperCase())}</span>`}
+      <div class="recipe-entry__body">
+        ${labelMarkup}
+        ${ingredient.amount ? `<small>x${escapeHtml(ingredient.amount)}</small>` : ""}
+      </div>
+    </div>
   `;
 }
 
@@ -1934,27 +2003,117 @@ function buildLocalizedContentPayload(baseEntry, draft) {
   return nextContent;
 }
 
-function splitRecipeLines(lines) {
-  const stationMatchers = ["anvil", "station", "crafting station", "altar", "forge"];
-  const stations = [];
+function parseRecipeModel(entry) {
+  const content = getLocalizedEntry(entry);
+  const lines = content.crafting ?? [];
+  const stations = extractWorkstations(lines);
   const ingredients = [];
 
   lines.forEach((line) => {
-    const normalized = normalize(line);
-    const looksLikeIngredientRow = normalized.includes("+") || normalized.includes(":") || /\d/.test(normalized);
+    const cleanedLine = stripStationClause(line);
+    if (!cleanedLine) {
+      return;
+    }
 
-    if (!looksLikeIngredientRow && stationMatchers.some((matcher) => normalized.includes(matcher))) {
-      stations.push(line);
-    }
-    else {
-      ingredients.push(line);
-    }
+    cleanedLine
+      .split("+")
+      .map((segment) => segment.trim())
+      .filter(Boolean)
+      .forEach((segment) => {
+        ingredients.push(parseRecipeIngredientLine(segment));
+      });
   });
 
   return {
-    ingredients: ingredients.length > 0 ? ingredients : lines,
-    stations
+    lines,
+    stations,
+    ingredients
   };
+}
+
+function parseRecipeIngredientLine(segment) {
+  const normalizedSegment = segment.includes(":")
+    ? segment.split(":").pop().trim()
+    : segment.trim();
+  const suffixAmount = normalizedSegment.match(/^(.+?)\s+x(\d+(?:-\d+)?)$/i);
+  const prefixAmount = normalizedSegment.match(/^(\d+(?:-\d+)?)\s+(.+)$/i);
+  const amount = prefixAmount?.[1] ?? suffixAmount?.[2] ?? "";
+  const label = (prefixAmount?.[2] ?? suffixAmount?.[1] ?? normalizedSegment).trim();
+  const entry = findEntryByMention(label);
+
+  return {
+    raw: segment,
+    amount,
+    label,
+    entry
+  };
+}
+
+function extractWorkstations(lines) {
+  const stations = [];
+  const seen = new Set();
+
+  lines.forEach((line) => {
+    const normalizedLine = ` ${normalize(line)} `;
+    WORKSTATIONS.forEach((station) => {
+      if (station.id === "anvil" && (normalizedLine.includes(" mythril anvil ") || normalizedLine.includes(" orichalcum anvil "))) {
+        return;
+      }
+
+      if (!seen.has(station.id) && station.keywords.some((keyword) => normalizedLine.includes(keyword))) {
+        seen.add(station.id);
+        stations.push(station);
+      }
+    });
+  });
+
+  return stations;
+}
+
+function stripStationClause(line) {
+  const trimmed = String(line ?? "").trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  const stationOnly = extractWorkstations([trimmed]);
+  if (stationOnly.length > 0 && !trimmed.includes("+") && !/\d/.test(trimmed)) {
+    return "";
+  }
+
+  const matcher = trimmed.match(/^(.*?)(?:\s+(?:na|no|em|at)\s+.+)$/i);
+  if (matcher && extractWorkstations([trimmed]).length > 0) {
+    return matcher[1].trim();
+  }
+
+  return trimmed;
+}
+
+function findEntryByMention(label) {
+  const normalizedLabel = normalize(label).replace(/^the\s+/, "").trim();
+  if (!normalizedLabel) {
+    return null;
+  }
+
+  const candidateEntries = [...allEntries].sort((left, right) => {
+    const leftTitle = getLocalizedEntry(left).title ?? left.id;
+    const rightTitle = getLocalizedEntry(right).title ?? right.id;
+    return normalize(rightTitle).length - normalize(leftTitle).length;
+  });
+
+  const exact = candidateEntries.find((entry) => {
+    const content = getLocalizedEntry(entry);
+    return normalize(entry.id) === normalizedLabel || normalize(content.title) === normalizedLabel;
+  });
+
+  if (exact) {
+    return exact;
+  }
+
+  return candidateEntries.find((entry) => {
+    const content = getLocalizedEntry(entry);
+    return normalizedLabel.includes(normalize(content.title)) || normalizedLabel.includes(normalize(entry.id));
+  }) ?? null;
 }
 
 function hasContentList(entry, key) {
