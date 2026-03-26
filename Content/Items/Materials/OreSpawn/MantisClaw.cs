@@ -1,9 +1,10 @@
-using Terraria.ID;
+using ChaoticDimensions.Common.OreSpawn;
+using ChaoticDimensions.Content.Items.OreSpawn;
 
 namespace ChaoticDimensions.Content.Items.Materials.OreSpawn
 {
-	public sealed class MantisClaw : OreSpawnMaterialItem
+	public sealed class MantisClaw : OreSpawnCatalogItemBase
 	{
-		protected override int PrototypeRare => ItemRarityID.Green;
+		protected override OreSpawnItemDefinition Definition => OreSpawnItemCatalog.MantisClaw;
 	}
 }

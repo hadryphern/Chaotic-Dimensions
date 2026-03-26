@@ -1,9 +1,51 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
 import { frontierEntries, frontierUiCopy } from "./orespawn-data.js";
+import {
+  backendState,
+  initBackend,
+  loadComments,
+  loadPublishedEntries,
+  loadAdminComments,
+  postComment,
+  registerEditorAccount,
+  saveWikiEntry,
+  setBackendListener,
+  setCommentHidden,
+  signInAdmin,
+  signInGuest,
+  signOutUser,
+  uploadWikiAsset
+} from "./supabase-bridge.js";
 
-const allEntries = [...entries, ...frontierEntries];
-const orderedCategories = ["bosses", "mobs", "summons", "weapons", "armor", "accessories", "consumables", "materials", "buffs"];
-const craftableEntries = allEntries.filter((entry) => hasContentList(entry, "crafting"));
+const defaultCategories = [
+  "bosses",
+  "superbosses",
+  "minibosses",
+  "mobs",
+  "summons",
+  "weapons",
+  "armor",
+  "accessories",
+  "consumables",
+  "materials",
+  "buffs",
+  "blocks",
+  "tools",
+  "ammo",
+  "vanity",
+  "pets",
+  "mounts",
+  "npcs",
+  "biomes",
+  "dimensions",
+  "events",
+  "lore",
+  "systems"
+];
+const staticEntries = [...entries, ...frontierEntries];
+let allEntries = mergeEntries(staticEntries, []);
+let orderedCategories = buildCategoryList(allEntries);
+let craftableEntries = allEntries.filter((entry) => hasContentList(entry, "crafting"));
 
 const entryTags = {
   "crystaline-devourer": "boss",
@@ -105,22 +147,53 @@ const pageCopy = {
     community: {
       eyebrow: "Feedback",
       title: "Comentarios da comunidade",
-      intro: "A estrutura visual ja esta pronta, mas comentarios publicos reais precisam de backend para salvar nome, mensagem e moderacao.",
-      cardTitle: "Base preparada para comentarios",
-      cardBody: "Posso ligar aqui um sistema simples de feedback com nome e comentario, mas isso precisa de um servico para gravar os dados de verdade.",
+      intro: "Agora esta area tambem serve para autenticacao basica e comentarios reais por entrada quando o Supabase estiver configurado.",
+      cardTitle: "Conta rapida para comentar",
+      cardBody: "Quem visitar a wiki pode criar uma conta simples com nome para comentar nas paginas.",
+      adminCardTitle: "Login de admin",
+      adminCardBody: "Sua conta admin usa email e senha para publicar, editar e moderar.",
       name: "Nome",
+      email: "Email",
+      password: "Senha",
       message: "Comentario",
-      button: "Enviar feedback",
-      note: "No estado atual do GitHub Pages, este formulario e apenas estrutural."
+      button: "Entrar com conta rapida",
+      adminButton: "Entrar como admin",
+      signOut: "Sair",
+      note: "Sem configurar o Supabase, os comentarios continuam desativados.",
+      activeTitle: "Conta conectada",
+      activeBody: "Com a conta conectada, o formulario de comentarios aparece dentro da pagina da entrada selecionada."
     },
     admin: {
       eyebrow: "Admin",
       title: "Painel para gestao da wiki",
-      intro: "Tambem da para deixar uma area admin para upload de imagens, escolha de categoria, criacao de receita e organizacao do conteudo.",
-      uploadTitle: "Ferramentas previstas",
+      intro: "Aqui fica o editor real para publicar, substituir e organizar entradas da wiki usando o Supabase como backend.",
+      uploadTitle: "Upload de imagens",
       uploadItems: ["login de admin", "upload de imagens", "cadastro de categorias", "editor de crafting", "moderacao de comentarios"],
       requirementTitle: "O que falta para ativar",
-      requirementBody: "Para isso funcionar de verdade, precisamos conectar a wiki a um backend. Minha recomendacao e GitHub Pages para o site e Supabase para auth, storage e comentarios."
+      requirementBody: "Para isso funcionar de verdade, preencha a configuracao publica do Supabase e rode o SQL do projeto.",
+      editorTitle: "Publicar ou editar entrada",
+      uploadButton: "Enviar imagem",
+      saveButton: "Salvar entrada",
+      moderationTitle: "Moderacao de comentarios",
+      imagePath: "Pasta da imagem",
+      imageFile: "Arquivo",
+      entryId: "ID / slug",
+      category: "Categoria",
+      imageUrl: "URL da imagem",
+      related: "Relacionados (separados por virgula)",
+      titleLabel: "Titulo",
+      subtitleLabel: "Subtitulo",
+      summaryLabel: "Resumo",
+      overviewLabel: "Overview",
+      factsLabel: "Fatos (1 por linha)",
+      obtainLabel: "Como obter (1 por linha)",
+      craftingLabel: "Crafting (1 por linha)",
+      dropsLabel: "Drops (1 por linha)",
+      notesLabel: "Notas (1 por linha)",
+      tacticsLabel: "Taticas (1 por linha)",
+      publishedLabel: "Publicado",
+      accessDenied: "Entre com uma conta admin para editar entradas e moderar comentarios.",
+      backendMissing: "O Supabase ainda nao foi configurado nesta build."
     },
     footer: { text: "Chaotic Dimensions Wiki" },
     tags: { boss: "Boss", miniboss: "Mini-Boss", mob: "Mob" }
@@ -204,22 +277,53 @@ const pageCopy = {
     community: {
       eyebrow: "Feedback",
       title: "Community comments",
-      intro: "The UI is ready, but real public comments need a backend to store names, messages and moderation.",
-      cardTitle: "Comment area prepared",
-      cardBody: "I can wire a simple name-and-comment system here, but it needs a service that actually stores data.",
+      intro: "This area now also handles quick sign-in and real comments when Supabase is configured.",
+      cardTitle: "Quick account for comments",
+      cardBody: "Visitors can create a very basic account with only a display name to comment on wiki entries.",
+      adminCardTitle: "Admin login",
+      adminCardBody: "Your admin account uses email and password to publish, edit and moderate.",
       name: "Name",
+      email: "Email",
+      password: "Password",
       message: "Comment",
-      button: "Send feedback",
-      note: "Right now on GitHub Pages this form is only structural."
+      button: "Create quick account",
+      adminButton: "Sign in as admin",
+      signOut: "Sign out",
+      note: "Until Supabase is configured, comments stay disabled.",
+      activeTitle: "Connected account",
+      activeBody: "Once connected, the comment form appears inside the currently selected entry."
     },
     admin: {
       eyebrow: "Admin",
       title: "Wiki management panel",
-      intro: "This can become the area for image uploads, category selection, recipe editing and content organization.",
-      uploadTitle: "Planned tools",
+      intro: "This panel publishes and edits real wiki entries through Supabase.",
+      uploadTitle: "Image uploads",
       uploadItems: ["admin login", "image upload", "category editor", "crafting editor", "comment moderation"],
       requirementTitle: "What still needs to be connected",
-      requirementBody: "To make this real, the wiki needs a backend. My recommendation is GitHub Pages for the site and Supabase for auth, storage and comments."
+      requirementBody: "To make this live, fill the public Supabase config and run the project SQL.",
+      editorTitle: "Publish or edit entry",
+      uploadButton: "Upload image",
+      saveButton: "Save entry",
+      moderationTitle: "Comment moderation",
+      imagePath: "Image folder",
+      imageFile: "File",
+      entryId: "ID / slug",
+      category: "Category",
+      imageUrl: "Image URL",
+      related: "Related IDs (comma separated)",
+      titleLabel: "Title",
+      subtitleLabel: "Subtitle",
+      summaryLabel: "Summary",
+      overviewLabel: "Overview",
+      factsLabel: "Facts (1 per line)",
+      obtainLabel: "How to obtain (1 per line)",
+      craftingLabel: "Crafting (1 per line)",
+      dropsLabel: "Drops (1 per line)",
+      notesLabel: "Notes (1 per line)",
+      tacticsLabel: "Tactics (1 per line)",
+      publishedLabel: "Published",
+      accessDenied: "Sign in with an admin account to edit entries and moderate comments.",
+      backendMissing: "Supabase is not configured in this build yet."
     },
     footer: { text: "Chaotic Dimensions Wiki" },
     tags: { boss: "Boss", miniboss: "Mini-Boss", mob: "Mob" }
@@ -246,14 +350,27 @@ const state = {
   category: "all",
   selectedEntryId: siteConfig.defaultEntryId,
   selectedRecipeId: craftableEntries[0]?.id ?? siteConfig.defaultEntryId,
-  sidebarOpen: false
+  sidebarOpen: false,
+  adminDraft: null,
+  adminDraftSourceId: ""
 };
 
 bootstrap();
 
-function bootstrap() {
+setBackendListener(async () => {
+  refreshEntryCache();
+  await ensureSelectedEntryComments();
+  render();
+});
+
+async function bootstrap() {
   hydrateStateFromUrl();
   bindGlobalEvents();
+  refreshEntryCache();
+  render();
+  await initBackend();
+  refreshEntryCache();
+  await ensureSelectedEntryComments();
   render();
 }
 
@@ -312,6 +429,16 @@ function render() {
 
 function renderTopbar() {
   const copy = getPageCopy();
+  const runtime = getRuntimeCopy();
+  const accountMarkup = backendState.enabled
+    ? backendState.user
+      ? `
+        <span class="tag">${escapeHtml(backendState.profile?.display_name ?? "Signed in")}</span>
+        <button class="link-button" type="button" id="sign-out-button">${copy.community.signOut}</button>
+      `
+      : `<a class="link-button" href="#community">${runtime.accountLabel}</a>`
+    : `<span class="tag tag--subtle">Static</span>`;
+
   const languageMarkup = languageOptions.map((option) => `
     <button class="chip ${option.code === state.language ? "is-active" : ""}" type="button" data-language="${option.code}">
       ${option.label}
@@ -340,6 +467,7 @@ function renderTopbar() {
 
     <div class="topbar__right">
       <div class="language-row">${languageMarkup}</div>
+      ${accountMarkup}
       <a class="link-button" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">GitHub</a>
     </div>
   `;
@@ -358,10 +486,21 @@ function renderTopbar() {
       render();
     });
   });
+
+  elements.topbar.querySelector("#sign-out-button")?.addEventListener("click", async () => {
+    await signOutUser();
+  });
 }
 
 function renderSidebar() {
   const copy = getPageCopy();
+  const runtime = getRuntimeCopy();
+  const statusBody = backendState.enabled
+    ? backendState.user
+      ? runtime.sidebarSignedIn.replace("{name}", escapeHtml(backendState.profile?.display_name ?? runtime.connectedFallback))
+      : runtime.sidebarAvailable
+    : copy.sidebar.statusBody;
+
   const navItems = [
     { href: "#overview", label: copy.nav.overview },
     { href: "#progression", label: copy.nav.progression },
@@ -399,7 +538,7 @@ function renderSidebar() {
 
     <div class="sidebar-card sidebar-card--muted">
       <p class="section-kicker">${copy.sidebar.status}</p>
-      <p>${copy.sidebar.statusBody}</p>
+      <p>${statusBody}</p>
     </div>
   `;
 
@@ -419,6 +558,7 @@ function renderSidebar() {
 
 function renderOverview() {
   const copy = getPageCopy();
+  const runtime = getRuntimeCopy();
   const stats = [
     { value: allEntries.length, label: copy.overview.stats.entries },
     { value: craftableEntries.length, label: copy.overview.stats.recipes },
@@ -435,7 +575,7 @@ function renderOverview() {
     <article class="mini-card">
       <h3>${item.title}</h3>
       <p>${item.body}</p>
-      <a class="text-link" href="${item.target}">Abrir</a>
+      <a class="text-link" href="${item.target}">${runtime.openLabel}</a>
     </article>
   `).join("");
 
@@ -478,8 +618,13 @@ function renderProgression() {
   const copy = getPageCopy();
   const cards = progressionFlow.map((step) => {
     const entry = getEntryById(step.id);
+    if (!entry) {
+      return "";
+    }
     const content = getLocalizedEntry(entry);
-    const preview = (content.facts ?? []).slice(0, 2).map((fact) => `<li>${fact}</li>`).join("");
+    const preview = (content.facts ?? []).slice(0, 2).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("");
+    const title = escapeHtml(content.title ?? entry.id);
+    const summary = escapeHtml(content.summary ?? "");
 
     return `
       <article class="timeline-card">
@@ -488,10 +633,10 @@ function renderProgression() {
           <span class="tag tag--subtle">${getTagLabel(entry)}</span>
         </div>
         <div class="timeline-card__body">
-          <img class="icon icon--large" src="${entry.image}" alt="${content.title}">
+          <img class="icon icon--large" src="${escapeHtml(entry.image)}" alt="${title}">
           <div>
-            <h3>${content.title}</h3>
-            <p>${content.summary}</p>
+            <h3>${title}</h3>
+            <p>${summary}</p>
             <ul class="compact-list">${preview}</ul>
           </div>
         </div>
@@ -565,9 +710,20 @@ function renderCatalog() {
   elements.catalog.querySelectorAll("[data-entry-id]").forEach((button) => {
     button.addEventListener("click", () => {
       state.selectedEntryId = button.dataset.entryId;
+      ensureSelectedEntryComments();
       renderCatalog();
       syncUrl();
     });
+  });
+
+  elements.catalog.querySelector("#entry-comment-form")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const ok = await postComment(state.selectedEntryId, formData.get("commentBody"));
+    if (ok) {
+      event.currentTarget.reset();
+    }
+    renderCatalog();
   });
 }
 
@@ -610,6 +766,79 @@ function renderCrafting() {
 
 function renderCommunity() {
   const copy = getPageCopy();
+  const runtime = getRuntimeCopy();
+
+  if (!backendState.enabled) {
+    elements.community.innerHTML = `
+      <div class="section-heading">
+        <p class="section-kicker">${copy.community.eyebrow}</p>
+        <h2>${copy.community.title}</h2>
+        <p>${copy.community.intro}</p>
+      </div>
+
+      <div class="placeholder-grid placeholder-grid--two">
+        <article class="panel">
+          <h3>${runtime.setupTitle}</h3>
+          <p>${runtime.setupBody}</p>
+          <div class="button-row">
+            <a class="link-button" href="${getRepositoryFileUrl("docs/SUPABASE_SETUP.md")}" target="_blank" rel="noreferrer">${runtime.setupLinkLabel}</a>
+            <a class="link-button" href="${getRepositoryFileUrl("supabase/wiki_schema.sql")}" target="_blank" rel="noreferrer">${runtime.sqlLinkLabel}</a>
+          </div>
+          ${backendState.error ? `<p class="message-bar message-bar--error">${escapeHtml(backendState.error)}</p>` : ""}
+        </article>
+
+        <article class="panel panel--muted">
+          <h3>${copy.community.cardTitle}</h3>
+          <p>${copy.community.cardBody}</p>
+          <p class="helper-text">${copy.community.note}</p>
+        </article>
+      </div>
+    `;
+    return;
+  }
+
+  if (backendState.user) {
+    elements.community.innerHTML = `
+      <div class="section-heading">
+        <p class="section-kicker">${copy.community.eyebrow}</p>
+        <h2>${copy.community.title}</h2>
+        <p>${copy.community.intro}</p>
+      </div>
+
+      <div class="placeholder-grid placeholder-grid--two">
+        <article class="panel">
+          <h3>${copy.community.activeTitle}</h3>
+          <p>${copy.community.activeBody}</p>
+          <div class="meta-row">
+            <span class="tag">${escapeHtml(backendState.profile?.display_name ?? runtime.connectedFallback)}</span>
+            <span class="tag tag--subtle">${backendState.isAdmin ? runtime.adminRoleLabel : runtime.memberRoleLabel}</span>
+          </div>
+          ${(backendState.authMessage || backendState.authError) ? `
+            <p class="message-bar ${backendState.authError ? "message-bar--error" : "message-bar--success"}">
+              ${escapeHtml(backendState.authError || backendState.authMessage)}
+            </p>
+          ` : ""}
+          <div class="button-row">
+            <a class="link-button" href="#catalog">${copy.nav.catalog}</a>
+            ${backendState.isAdmin ? `<a class="link-button" href="#admin">${copy.nav.admin}</a>` : ""}
+            <button class="button button--primary" type="button" id="community-sign-out">${copy.community.signOut}</button>
+          </div>
+        </article>
+
+        <article class="panel panel--muted">
+          <h3>${backendState.isAdmin ? copy.admin.title : copy.community.cardTitle}</h3>
+          <p>${backendState.isAdmin ? runtime.adminSignedInBody : runtime.memberSignedInBody}</p>
+          <p class="helper-text">${runtime.commentHint.replace("{title}", escapeHtml(getLocalizedEntry(getEntryById(state.selectedEntryId))?.title ?? state.selectedEntryId))}</p>
+        </article>
+      </div>
+    `;
+
+    elements.community.querySelector("#community-sign-out")?.addEventListener("click", async () => {
+      await signOutUser();
+    });
+    return;
+  }
+
   elements.community.innerHTML = `
     <div class="section-heading">
       <p class="section-kicker">${copy.community.eyebrow}</p>
@@ -617,19 +846,60 @@ function renderCommunity() {
       <p>${copy.community.intro}</p>
     </div>
 
-    <div class="placeholder-grid">
+    <div class="placeholder-grid placeholder-grid--two">
       <article class="panel">
         <h3>${copy.community.cardTitle}</h3>
         <p>${copy.community.cardBody}</p>
-        <div class="stub-form">
-          <input type="text" placeholder="${copy.community.name}" disabled>
-          <textarea rows="5" placeholder="${copy.community.message}" disabled></textarea>
-          <button class="button button--primary" type="button" disabled>${copy.community.button}</button>
-        </div>
-        <p class="helper-text">${copy.community.note}</p>
+        <form class="stub-form" id="guest-sign-in-form">
+          <input type="text" name="displayName" placeholder="${copy.community.name}" required>
+          <button class="button button--primary" type="submit">${copy.community.button}</button>
+        </form>
+        <p class="helper-text">${runtime.guestAccountHint}</p>
+      </article>
+
+      <article class="panel panel--muted">
+        <h3>${copy.community.adminCardTitle}</h3>
+        <p>${copy.community.adminCardBody}</p>
+        <form class="stub-form" id="admin-auth-form">
+          <input type="text" name="displayName" placeholder="${copy.community.name}">
+          <input type="email" name="email" placeholder="${copy.community.email}" required>
+          <input type="password" name="password" placeholder="${copy.community.password}" required>
+          <div class="button-row">
+            <button class="link-button" type="submit" name="mode" value="signup">${runtime.createEditorButton}</button>
+            <button class="button button--primary" type="submit" name="mode" value="signin">${copy.community.adminButton}</button>
+          </div>
+        </form>
+        <p class="helper-text">${runtime.editorCandidateNote}</p>
+        ${(backendState.authMessage || backendState.authError) ? `
+          <p class="message-bar ${backendState.authError ? "message-bar--error" : "message-bar--success"}">
+            ${escapeHtml(backendState.authError || backendState.authMessage)}
+          </p>
+        ` : ""}
       </article>
     </div>
   `;
+
+  elements.community.querySelector("#guest-sign-in-form")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    await signInGuest(formData.get("displayName"));
+  });
+
+  elements.community.querySelector("#admin-auth-form")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitter = event.submitter;
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const displayName = formData.get("displayName");
+
+    if (submitter?.value === "signup") {
+      await registerEditorAccount(displayName, email, password);
+    }
+    else {
+      await signInAdmin(email, password);
+    }
+  });
 }
 
 function renderAdmin() {

@@ -71,52 +71,162 @@ Items: {
 
 	WaterDragonScale: {
 		DisplayName: Water Dragon Scale
-		Tooltip: "Prototype OreSpawn material"
+		Tooltip: Prototype OreSpawn material
 	}
 
 	MantisClaw: {
 		DisplayName: Mantis Claw
-		Tooltip: "Prototype OreSpawn material"
+		Tooltip: Prototype OreSpawn material
 	}
 
 	EmperorScorpionScale: {
 		DisplayName: Emperor Scorpion Scale
-		Tooltip: "Prototype OreSpawn material"
+		Tooltip: Prototype OreSpawn material
 	}
 
 	CaterkillerJaw: {
 		DisplayName: Caterkiller Jaw
-		Tooltip: "Prototype OreSpawn material"
+		Tooltip: Prototype OreSpawn material
 	}
 
 	CephadromeHorn: {
 		DisplayName: Cephadrome Horn
-		Tooltip: "Prototype OreSpawn material"
+		Tooltip: Prototype OreSpawn material
 	}
 
 	BigHammer: {
 		DisplayName: Big Hammer
-		Tooltip: "Prototype Hercules drop"
+		Tooltip: Prototype Hercules drop
 	}
 
 	EmperorScorpionIdol: {
 		DisplayName: Emperor Scorpion Idol
-		Tooltip: "Summons the prototype Emperor Scorpion"
+		Tooltip: Summons the prototype Emperor Scorpion
 	}
 
 	HerculesTotem: {
 		DisplayName: Hercules Totem
-		Tooltip: "Summons the prototype Hercules"
+		Tooltip: Summons the prototype Hercules
 	}
 
 	CaterkillerBait: {
 		DisplayName: Caterkiller Bait
-		Tooltip: "Summons the prototype Caterkiller"
+		Tooltip: Summons the prototype Caterkiller
 	}
 
 	CephadromeCaller: {
 		DisplayName: Cephadrome Caller
-		Tooltip: "Summons the prototype Cephadrome"
+		Tooltip: Summons the prototype Cephadrome
+	}
+
+	AttitudeAdjuster: {
+		DisplayName: Attitude Adjuster
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	BattleAxe: {
+		DisplayName: Battle Axe
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	BigBerthaSword: {
+		DisplayName: Big Bertha Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	Chainsaw: {
+		DisplayName: Chainsaw
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	ExperienceSword: {
+		DisplayName: Experience Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	FairySword: {
+		DisplayName: Fairy Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	NightmareSword: {
+		DisplayName: Nightmare Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	PoisonSword: {
+		DisplayName: Poison Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	QueenScaleBattleAxe: {
+		DisplayName: Queen Scale Battle Axe
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	RatSword: {
+		DisplayName: Rat Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	RayGun: {
+		DisplayName: Ray Gun
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	RoyalGuardianSword: {
+		DisplayName: Royal Guardian Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	SkateBowAndIrukandjiArrows: {
+		DisplayName: Skate Bow & Irukandji Arrows
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	SliceSword: {
+		DisplayName: Slice Sword
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	Squidzooka: {
+		DisplayName: Squidzooka
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	ThunderStaff: {
+		DisplayName: Thunder Staff
+		Tooltip: OreSpawn catalog item placeholder
+	}
+
+	KingsEmblem: {
+		DisplayName: King's Emblem
+		Tooltip: Summons an OreSpawn beta boss
+	}
+
+	KrakenBeacon: {
+		DisplayName: Kraken Beacon
+		Tooltip: Summons an OreSpawn beta boss
+	}
+
+	MobzillaSignal: {
+		DisplayName: Mobzilla Signal
+		Tooltip: Summons an OreSpawn beta boss
+	}
+
+	MothraTotem: {
+		DisplayName: Mothra Totem
+		Tooltip: Summons an OreSpawn beta boss
+	}
+
+	QueensBloom: {
+		DisplayName: Queen's Bloom
+		Tooltip: Summons an OreSpawn beta boss
+	}
+
+	WtfSignal: {
+		DisplayName: WTF Signal
+		Tooltip: Summons an OreSpawn beta boss
 	}
 }
 
@@ -131,6 +241,92 @@ NPCs: {
 	Hercules.DisplayName: Hercules
 	Caterkiller.DisplayName: Caterkiller
 	Cephadrome.DisplayName: Cephadrome
+	Alien.DisplayName: Alien
+	Alosaurus.DisplayName: Alosaurus
+	AttackSquid.DisplayName: Attack Squid
+	BabyDragon.DisplayName: Baby Dragon
+	Baryonyx.DisplayName: Baryonyx
+	Basilisc.DisplayName: Basilisc
+	Beaver.DisplayName: Beaver
+	Bee.DisplayName: Bee
+	BombOmb.DisplayName: Bomb-omb
+	Boyfriend.DisplayName: Boyfriend
+	Brutalfly.DisplayName: Brutalfly
+	Camarasaurus.DisplayName: Camarasaurus
+	Cassowary.DisplayName: Cassowary
+	CaveFisher.DisplayName: Cave Fisher
+	Chipmunk.DisplayName: Chipmunk
+	CliffRacer.DisplayName: Cliff Racer
+	CloudShark.DisplayName: Cloud Shark
+	Crab.DisplayName: Crab
+	CreepingHorror.DisplayName: Creeping Horror
+	Cricket.DisplayName: Cricket
+	Cryolophosaurus.DisplayName: Cryolophosaurus
+	CrystalUrchin.DisplayName: Crystal Urchin
+	Dragon.DisplayName: Dragon
+	DungeonBeast.DisplayName: Dungeon Beast
+	EasterBunny.DisplayName: Easter Bunny
+	EnderKnight.DisplayName: Ender Knight
+	EnderReaper.DisplayName: Ender Reaper
+	Fairy.DisplayName: Fairy
+	Firefly.DisplayName: Firefly
+	Flounder.DisplayName: Flounder
+	Frog.DisplayName: Frog
+	Gazelle.DisplayName: Gazelle
+	Ghost.DisplayName: Ghost
+	GhostSkeleton.DisplayName: Ghost Skeleton
+	Girlfriend.DisplayName: Girlfriend
+	GoldFish.DisplayName: Gold Fish
+	Hammerhead.DisplayName: Hammerhead
+	Hydrolisc.DisplayName: Hydrolisc
+	Irukandji.DisplayName: Irukandji
+	JumpyBug.DisplayName: Jumpy Bug
+	Kraken.DisplayName: Kraken
+	Kyuubi.DisplayName: Kyuubi
+	LeafMonster.DisplayName: Leaf Monster
+	Leonopteryx.DisplayName: Leonopteryx
+	Lizard.DisplayName: Lizard
+	LurkingTerror.DisplayName: Lurking Terror
+	Mobzilla.DisplayName: Mobzilla
+	Molenoid.DisplayName: Molenoid
+	Mosquito.DisplayName: Mosquito
+	Mothra.DisplayName: Mothra
+	Nastysaurus.DisplayName: Nastysaurus
+	Ostrich.DisplayName: Ostrich
+	Peacock.DisplayName: Peacock
+	Pointysaurus.DisplayName: Pointysaurus
+	Rat.DisplayName: Rat
+	RedAntRobot.DisplayName: Red Ant Robot
+	RoboGunner.DisplayName: Robo Gunner
+	RoboJeffery.DisplayName: Robo Jeffery
+	RoboPounder.DisplayName: Robo Pounder
+	RoboSniper.DisplayName: Robo Sniper
+	RoboWarrior.DisplayName: Robo Warrior
+	Rotator.DisplayName: Rotator
+	RubberDucky.DisplayName: Rubber Ducky
+	Scorpion.DisplayName: Scorpion
+	SeaMonster.DisplayName: Sea Monster
+	SeaViper.DisplayName: Sea Viper
+	Skate.DisplayName: Skate
+	SpiderDriver.DisplayName: Spider Driver
+	SpiderRobot.DisplayName: Spider Robot
+	SpitBug.DisplayName: Spit Bug
+	StinkBug.DisplayName: Stink Bug
+	Stinky.DisplayName: Stinky
+	Termite.DisplayName: Termite
+	TerribleTerror.DisplayName: Terrible Terror
+	TheKing.DisplayName: The King
+	ThePrince.DisplayName: The Prince
+	ThePrincess.DisplayName: The Princess
+	TheQueen.DisplayName: The Queen
+	TRex.DisplayName: T-Rex
+	Triffid.DisplayName: Triffid
+	VelocityRaptor.DisplayName: Velocity Raptor
+	Vortex.DisplayName: Vortex
+	Whale.DisplayName: Whale
+	Wtf.DisplayName: WTF?
+	YoungAdultPrince.DisplayName: Young Adult Prince
+	YoungPrince.DisplayName: Young Prince
 }
 
 Projectiles: {
