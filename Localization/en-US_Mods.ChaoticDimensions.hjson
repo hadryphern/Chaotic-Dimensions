@@ -68,6 +68,56 @@ Items: {
 		DisplayName: Crystaline Devour Summoner Helm
 		Tooltip: ""
 	}
+
+	WaterDragonScale: {
+		DisplayName: Water Dragon Scale
+		Tooltip: "Prototype OreSpawn material"
+	}
+
+	MantisClaw: {
+		DisplayName: Mantis Claw
+		Tooltip: "Prototype OreSpawn material"
+	}
+
+	EmperorScorpionScale: {
+		DisplayName: Emperor Scorpion Scale
+		Tooltip: "Prototype OreSpawn material"
+	}
+
+	CaterkillerJaw: {
+		DisplayName: Caterkiller Jaw
+		Tooltip: "Prototype OreSpawn material"
+	}
+
+	CephadromeHorn: {
+		DisplayName: Cephadrome Horn
+		Tooltip: "Prototype OreSpawn material"
+	}
+
+	BigHammer: {
+		DisplayName: Big Hammer
+		Tooltip: "Prototype Hercules drop"
+	}
+
+	EmperorScorpionIdol: {
+		DisplayName: Emperor Scorpion Idol
+		Tooltip: "Summons the prototype Emperor Scorpion"
+	}
+
+	HerculesTotem: {
+		DisplayName: Hercules Totem
+		Tooltip: "Summons the prototype Hercules"
+	}
+
+	CaterkillerBait: {
+		DisplayName: Caterkiller Bait
+		Tooltip: "Summons the prototype Caterkiller"
+	}
+
+	CephadromeCaller: {
+		DisplayName: Cephadrome Caller
+		Tooltip: "Summons the prototype Cephadrome"
+	}
 }
 
 NPCs: {
@@ -75,6 +125,12 @@ NPCs: {
 	CrystalineDevourerHead.DisplayName: Crystaline Devourer Head
 	CrystalineDevourerTail.DisplayName: Crystaline Devourer Tail
 	CrystalineShard.DisplayName: Crystaline Shard
+	WaterDragon.DisplayName: Water Dragon
+	Mantis.DisplayName: Mantis
+	EmperorScorpion.DisplayName: Emperor Scorpion
+	Hercules.DisplayName: Hercules
+	Caterkiller.DisplayName: Caterkiller
+	Cephadrome.DisplayName: Cephadrome
 }
 
 Projectiles: {

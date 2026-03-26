@@ -712,6 +712,10 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		public override void OnKill() {
+			if (!TwinIsAlive) {
+				NPC.SetEventFlagCleared(ref ChaoticDownedBossSystem.downedCrystalineDevourer, -1);
+			}
+
 			if (TwinIsAlive) {
 				TwinNPC.boss = true;
 			}
