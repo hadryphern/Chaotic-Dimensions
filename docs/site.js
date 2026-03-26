@@ -85,6 +85,11 @@ const WORKSTATIONS = [
   { id: "forge", label: "Forge", short: "FG", keywords: ["hellforge", "forge", "furnace"] }
 ];
 
+const TERRARIA_WIKI = {
+  apiUrl: "https://terraria.wiki.gg/api.php",
+  pageBaseUrl: "https://terraria.wiki.gg/wiki/"
+};
+
 const staticEntries = [...entries, ...frontierEntries];
 const pageId = document.body.dataset.page ?? "home";
 
@@ -450,6 +455,9 @@ pageCopy.ru = pageCopy.en;
 let allEntries = [];
 let orderedCategories = [];
 let craftableEntries = [];
+const externalAssetState = {
+  cache: loadExternalAssetCache()
+};
 
 const state = {
   language: siteConfig.defaultLanguage,
@@ -1444,21 +1452,39 @@ function renderCraftingContentBlock(label, entry) {
 
 function renderWorkstationPill(station) {
   const stationEntry = findEntryByMention(station.label);
+  const vanillaAsset = !stationEntry ? getExternalAsset(station.label) : null;
+
+  if (!stationEntry && !vanillaAsset) {
+    ensureExternalAsset(station.label);
+  }
 
   return `
-    <div class="workstation-pill" title="${escapeHtml(station.label)}">
+    <${stationEntry || vanillaAsset ? "a" : "div"} class="workstation-pill" title="${escapeHtml(station.label)}" ${stationEntry
+        ? `href="${buildPageUrl("entry", { entry: stationEntry.id })}"`
+        : vanillaAsset
+          ? `href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer"`
+          : ""}>
       ${stationEntry
         ? `<img class="workstation-pill__image" src="${escapeHtml(stationEntry.image)}" alt="${escapeHtml(station.label)}">`
+        : vanillaAsset?.imageUrl
+          ? `<img class="workstation-pill__image" src="${escapeHtml(vanillaAsset.imageUrl)}" alt="${escapeHtml(station.label)}">`
         : `<span class="workstation-pill__icon">${escapeHtml(station.short)}</span>`}
       <span>${escapeHtml(station.label)}</span>
-    </div>
+    </${stationEntry || vanillaAsset ? "a" : "div"}>
   `;
 }
 
 function renderRecipeIngredient(ingredient) {
-  const image = ingredient.entry?.image;
+  const vanillaAsset = !ingredient.entry ? getExternalAsset(ingredient.label) : null;
+  if (!ingredient.entry && !vanillaAsset) {
+    ensureExternalAsset(ingredient.label);
+  }
+
+  const image = ingredient.entry?.image ?? vanillaAsset?.imageUrl;
   const labelMarkup = ingredient.entry
     ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(ingredient.label)}</a>`
+    : vanillaAsset
+      ? `<a class="entry-title-link" href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer">${escapeHtml(ingredient.label)}</a>`
     : `<span>${escapeHtml(ingredient.label)}</span>`;
 
   return `
@@ -2114,6 +2140,165 @@ function findEntryByMention(label) {
     const content = getLocalizedEntry(entry);
     return normalizedLabel.includes(normalize(content.title)) || normalizedLabel.includes(normalize(entry.id));
   }) ?? null;
+}
+
+function loadExternalAssetCache() {
+  try {
+    const raw = window.localStorage?.getItem("cd_external_asset_cache_v1");
+    return raw ? JSON.parse(raw) : {};
+  }
+  catch {
+    return {};
+  }
+}
+
+function saveExternalAssetCache() {
+  try {
+    window.localStorage?.setItem("cd_external_asset_cache_v1", JSON.stringify(externalAssetState.cache));
+  }
+  catch {
+    // Ignore storage quota or privacy mode issues.
+  }
+}
+
+function getExternalAsset(label) {
+  const record = externalAssetState.cache[getExternalAssetKey(label)];
+  return record?.status === "ready" ? record.data : null;
+}
+
+function ensureExternalAsset(label) {
+  const key = getExternalAssetKey(label);
+  if (!key || !shouldResolveExternalAsset(label)) {
+    return;
+  }
+
+  const current = externalAssetState.cache[key];
+  if (current?.status === "loading" || current?.status === "ready" || current?.status === "missing") {
+    return;
+  }
+
+  externalAssetState.cache[key] = { status: "loading" };
+
+  fetchTerrariaWikiAsset(label)
+    .then((asset) => {
+      externalAssetState.cache[key] = asset
+        ? { status: "ready", data: asset }
+        : { status: "missing" };
+      saveExternalAssetCache();
+      render();
+    })
+    .catch(() => {
+      externalAssetState.cache[key] = { status: "missing" };
+      saveExternalAssetCache();
+      render();
+    });
+}
+
+function getExternalAssetKey(label) {
+  return normalize(label)
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function shouldResolveExternalAsset(label) {
+  const clean = String(label ?? "").trim();
+  return Boolean(clean && clean.length <= 48 && !clean.includes("/") && !clean.includes("\\"));
+}
+
+async function fetchTerrariaWikiAsset(label) {
+  const candidates = buildTerrariaWikiCandidates(label);
+
+  for (const candidate of candidates) {
+    const resolvedTitle = await resolveTerrariaWikiTitle(candidate);
+    const data = await fetchTerrariaWikiParse(resolvedTitle || candidate);
+    if (!data?.parse?.text?.["*"]) {
+      continue;
+    }
+
+    const imageUrl = extractTerrariaWikiImage(data.parse.text["*"]);
+    if (!imageUrl) {
+      continue;
+    }
+
+    const title = data.parse.title ?? candidate;
+    return {
+      title,
+      imageUrl,
+      pageUrl: `${TERRARIA_WIKI.pageBaseUrl}${encodeURIComponent(title.replaceAll(" ", "_"))}`
+    };
+  }
+
+  return null;
+}
+
+async function resolveTerrariaWikiTitle(candidate) {
+  const url = new URL(TERRARIA_WIKI.apiUrl);
+  url.searchParams.set("action", "query");
+  url.searchParams.set("titles", candidate);
+  url.searchParams.set("redirects", "1");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("origin", "*");
+
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    return "";
+  }
+
+  const data = await response.json();
+  const page = Object.values(data?.query?.pages ?? {})[0];
+  return page?.missing === "" ? "" : page?.title ?? "";
+}
+
+async function fetchTerrariaWikiParse(title) {
+  const url = new URL(TERRARIA_WIKI.apiUrl);
+  url.searchParams.set("action", "parse");
+  url.searchParams.set("page", title);
+  url.searchParams.set("prop", "text");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("origin", "*");
+
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json();
+}
+
+function buildTerrariaWikiCandidates(label) {
+  const clean = String(label ?? "")
+    .replace(/\s+x\d+(?:-\d+)?$/i, "")
+    .replace(/^\d+(?:-\d+)?\s+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const candidates = new Set([clean]);
+  if (clean.endsWith("s")) {
+    candidates.add(clean.slice(0, -1));
+  }
+
+  return [...candidates].filter(Boolean);
+}
+
+function extractTerrariaWikiImage(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const preferredImage = doc.querySelector('.infobox.item .section.images img[alt*="sprite"], .infobox.item .section.images img');
+  const src = preferredImage?.getAttribute("src");
+
+  if (!src) {
+    return "";
+  }
+
+  if (src.startsWith("//")) {
+    return `https:${src}`;
+  }
+
+  if (src.startsWith("/")) {
+    return `https://terraria.wiki.gg${src}`;
+  }
+
+  return src;
 }
 
 function hasContentList(entry, key) {
