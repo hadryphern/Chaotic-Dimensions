@@ -2,6 +2,15 @@
   <img src=".github/readme/banner.png" alt="Chaotic Dimensions banner" width="100%" />
 </div>
 
+<div align="center">
+  <img src=".github/readme/gallery/crystaline-devour-title.png" alt="Crystaline Devour title card" width="100%" />
+</div>
+
+<p align="center">
+  <img src=".github/readme/gallery/crystaline-devour-ring.png" alt="Crystaline Devour arena showcase" width="49%" />
+  <img src=".github/readme/gallery/crystaline-devour-blaster.png" alt="Crystaline Devour sky blaster showcase" width="49%" />
+</p>
+
 <p align="center">
   <strong>Chaotic Dimensions</strong> e um mod autoral para <strong>Terraria / tModLoader</strong>, criado como projeto de TCC em Portugal e pensado para crescer como um universo proprio, com varios bosses, progressoes, biomas, dimensoes e encounters com identidade forte.
   <br />
