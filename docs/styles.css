@@ -504,6 +504,11 @@ h3 {
   text-transform: uppercase;
 }
 
+.field-hint {
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
 .field-input {
   width: 100%;
   padding: 13px 14px;
@@ -574,6 +579,40 @@ h3 {
   align-items: start;
 }
 
+.admin-browser-card,
+.admin-rail,
+.admin-workspace-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-browser-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-stat-tile {
+  padding: 16px;
+  min-height: 0;
+}
+
+.admin-stat-tile strong {
+  display: block;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.admin-stat-tile span {
+  color: var(--text-dim);
+  font-size: 0.86rem;
+}
+
+.admin-filter-grid {
+  display: grid;
+  gap: 12px;
+}
+
 .admin-sidebar {
   position: sticky;
   top: 24px;
@@ -581,6 +620,15 @@ h3 {
 
 .admin-main {
   display: grid;
+  gap: 16px;
+}
+
+.admin-workspace-grid {
+  grid-template-columns: 320px minmax(0, 1fr);
+  align-items: start;
+}
+
+.admin-editor-form {
   gap: 16px;
 }
 
@@ -727,6 +775,10 @@ h3 {
   background: var(--surface-muted);
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
 }
 
 .admin-entry-button:hover,
@@ -736,11 +788,36 @@ h3 {
   background: var(--surface);
 }
 
+.admin-entry-button__thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.admin-entry-button__copy,
+.admin-entry-button__meta {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-entry-button__copy strong {
+  color: var(--text);
+}
+
 .admin-entry-button small {
   display: block;
-  margin-top: 4px;
   color: var(--text-dim);
 }
+
+.admin-entry-button__meta {
+  grid-column: 2 / -1;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  align-items: center;
+ }
 
 .checkbox-row {
   display: inline-flex;
@@ -816,6 +893,7 @@ h3 {
 
   .entry-hero,
   .admin-layout,
+  .admin-workspace-grid,
   .feature-grid,
   .summary-grid,
   .entry-grid,
@@ -833,6 +911,10 @@ h3 {
 
   .admin-sidebar {
     position: static;
+  }
+
+  .admin-browser-stats {
+    grid-template-columns: 1fr;
   }
 }
 

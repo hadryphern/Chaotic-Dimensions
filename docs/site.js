@@ -85,6 +85,7 @@ const WORKSTATIONS = [
   { id: "forge", label: "Forge", short: "FG", keywords: ["hellforge", "forge", "furnace"] }
 ];
 
+const DEFAULT_ENTRY_IMAGE = "./assets/images/favicon.png";
 const TERRARIA_WIKI = {
   apiUrl: "https://terraria.wiki.gg/api.php",
   pageBaseUrl: "https://terraria.wiki.gg/wiki/"
@@ -224,11 +225,23 @@ const pageCopy = {
       setupBody: "Crie sua conta no Feedback, promova para admin no SQL e depois volte aqui para publicar e editar.",
       browserTitle: "Browser de entradas",
       browserSearch: "Buscar entrada por nome ou slug",
+      browserFilter: "Filtrar categoria",
+      browserAll: "Todas as categorias",
       browserNew: "Nova entrada",
+      browserResults: "resultados",
+      browserPublished: "publicadas",
+      browserDrafts: "rascunhos",
+      browserEmpty: "Nenhuma entrada bateu com a busca atual.",
       browserLoad: "Carregar",
       editorTitle: "Editor de entrada",
       workspaceTitle: "Workspace de publicacao",
       workspaceBody: "Edite metadados, conteudo principal, imagem e relacoes sem misturar tudo em uma pagina publica.",
+      identityTitle: "Identidade e publicacao",
+      identityBody: "Defina slug, categoria, ordem, relacoes e status de publicacao da entrada.",
+      mediaTitle: "Midia principal",
+      mediaBody: "Escolha a imagem principal da pagina e faça upload sem sair do painel.",
+      discoveryTitle: "Sprite fallback e wiki vanilla",
+      discoveryBody: "Use alias e fonte wiki quando o nome nao bater sozinho. A fallback image entra se nao houver sprite local.",
       metadataTitle: "Metadados",
       contentTitle: "Conteudo da pagina",
       previewTitle: "Preview rapido",
@@ -244,7 +257,10 @@ const pageCopy = {
         slug: "Slug",
         category: "Categoria",
         order: "Ordem",
-        imageUrl: "URL da imagem",
+        imageUrl: "Imagem principal",
+        fallbackImage: "Fallback image URL",
+        vanillaAlias: "Alias vanilla",
+        wikiSource: "Wiki source",
         imageFolder: "Pasta da imagem",
         imageFile: "Arquivo",
         related: "Relacionados (slug, slug)",
@@ -260,6 +276,14 @@ const pageCopy = {
         notes: "Notas (1 por linha)",
         tactics: "Taticas (1 por linha)",
         published: "Publicado"
+      },
+      hints: {
+        imageUrl: "URL principal da imagem usada pela pagina e pelo card da biblioteca.",
+        fallbackImage: "Imagem reserva se a entrada ainda nao tiver sprite propria.",
+        vanillaAlias: "Nome vanilla exato para buscar sprite automaticamente na Terraria Wiki.",
+        wikiSource: "Titulo da pagina vanilla ou URL completa da Terraria Wiki para forcar a origem.",
+        related: "Use slugs separados por virgula para ligar summon, set, drops ou paginas irmas.",
+        crafting: "Uma linha por receita. O parser detecta ingredientes, quantidades e bancada automaticamente."
       },
       moderationHide: "Ocultar",
       moderationShow: "Mostrar"
@@ -397,11 +421,23 @@ const pageCopy = {
       setupBody: "Create your account in Feedback, promote it to admin in SQL and then come back here to publish and edit.",
       browserTitle: "Entry browser",
       browserSearch: "Search entry by title or slug",
+      browserFilter: "Filter category",
+      browserAll: "All categories",
       browserNew: "New entry",
+      browserResults: "results",
+      browserPublished: "published",
+      browserDrafts: "drafts",
+      browserEmpty: "No entries matched the current filters.",
       browserLoad: "Load",
       editorTitle: "Entry editor",
       workspaceTitle: "Publishing workspace",
       workspaceBody: "Edit metadata, main content, image and relationships without mixing everything into a public-facing page.",
+      identityTitle: "Identity and publishing",
+      identityBody: "Set slug, category, order, related entries and the publication state.",
+      mediaTitle: "Primary media",
+      mediaBody: "Choose the main page image and upload assets without leaving the workspace.",
+      discoveryTitle: "Vanilla wiki and sprite fallback",
+      discoveryBody: "Use alias and wiki source when the name does not match by itself. Fallback image is used when there is no local sprite yet.",
       metadataTitle: "Metadata",
       contentTitle: "Page content",
       previewTitle: "Quick preview",
@@ -417,7 +453,10 @@ const pageCopy = {
         slug: "Slug",
         category: "Category",
         order: "Order",
-        imageUrl: "Image URL",
+        imageUrl: "Primary image",
+        fallbackImage: "Fallback image URL",
+        vanillaAlias: "Vanilla alias",
+        wikiSource: "Wiki source",
         imageFolder: "Image folder",
         imageFile: "File",
         related: "Related (slug, slug)",
@@ -433,6 +472,14 @@ const pageCopy = {
         notes: "Notes (1 per line)",
         tactics: "Tactics (1 per line)",
         published: "Published"
+      },
+      hints: {
+        imageUrl: "Primary image used by the entry page and library card.",
+        fallbackImage: "Reserve image when the entry does not have its own sprite yet.",
+        vanillaAlias: "Exact vanilla Terraria item name used for automatic sprite lookup.",
+        wikiSource: "Terraria Wiki page title or full URL to force a specific source.",
+        related: "Use comma-separated slugs to connect summons, sets, drops or sibling pages.",
+        crafting: "One recipe per line. The parser detects ingredients, amounts and workstation automatically."
       },
       moderationHide: "Hide",
       moderationShow: "Show"
@@ -465,6 +512,7 @@ const state = {
   category: "all",
   entryId: siteConfig.defaultEntryId,
   adminSearch: "",
+  adminCategory: "all",
   adminDraft: null
 };
 
@@ -729,6 +777,7 @@ function renderEntryPage() {
   }
 
   const content = getLocalizedEntry(entry);
+  const entryAsset = getEntryDisplayAsset(entry);
   const recipeUrl = hasContentList(entry, "crafting") ? buildPageUrl("crafting", { q: content.title }) : "";
   const summonEntry = findSummonEntry(entry);
   const summonContent = getLocalizedEntry(summonEntry);
@@ -743,9 +792,10 @@ function renderEntryPage() {
   }).join("");
   const usedInMarkup = usedInEntries.map((usedInEntry) => {
     const usedInContent = getLocalizedEntry(usedInEntry);
+    const usedInAsset = getEntryDisplayAsset(usedInEntry);
     return `
       <a class="entry-inline-row" href="${buildPageUrl("entry", { entry: usedInEntry.id })}">
-        <img class="entry-inline-row__image" src="${escapeHtml(usedInEntry.image)}" alt="${escapeHtml(usedInContent.title ?? usedInEntry.id)}">
+        <img class="entry-inline-row__image" src="${escapeHtml(usedInAsset.imageUrl)}" alt="${escapeHtml(usedInContent.title ?? usedInEntry.id)}">
         <span>${escapeHtml(usedInContent.title ?? usedInEntry.id)}</span>
       </a>
     `;
@@ -787,7 +837,7 @@ function renderEntryPage() {
         </div>
         <aside class="entry-aside">
           <div class="aside-card">
-            <img class="entry-image entry-image--showcase" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+            <img class="entry-image entry-image--showcase" src="${escapeHtml(entryAsset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
             <div class="meta-stack">
               <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
               <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
@@ -1075,6 +1125,52 @@ function renderFeedbackPage() {
   });
 }
 
+function getDraftPreviewAsset(draft) {
+  const baseEntry = draft.id ? getEntryById(draft.id) : null;
+  const baseContent = baseEntry?.content ?? {};
+  const previewContent = {
+    ...baseContent,
+    _meta: {
+      ...(baseContent._meta ?? {}),
+      vanillaAlias: draft.vanillaAlias,
+      wikiSource: draft.wikiSource,
+      fallbackImage: draft.fallbackImage
+    },
+    [state.language]: {
+      ...(getLocalizedEntry(baseEntry) ?? {}),
+      title: draft.title || getLocalizedEntry(baseEntry)?.title || "",
+      subtitle: draft.subtitle || getLocalizedEntry(baseEntry)?.subtitle || "",
+      summary: draft.summary || getLocalizedEntry(baseEntry)?.summary || "",
+      overview: draft.overview || getLocalizedEntry(baseEntry)?.overview || ""
+    }
+  };
+
+  return getEntryDisplayAsset({
+    id: draft.id || baseEntry?.id || "preview",
+    image: draft.imageUrl || baseEntry?.image || DEFAULT_ENTRY_IMAGE,
+    content: previewContent
+  });
+}
+
+function renderAdminBrowserEntry(entry, activeEntryId, copy) {
+  const content = getLocalizedEntry(entry);
+  const asset = getEntryDisplayAsset(entry, { ensure: false });
+
+  return `
+    <button class="admin-entry-button ${activeEntryId === entry.id ? "is-active" : ""}" type="button" data-admin-entry="${entry.id}">
+      <img class="admin-entry-button__thumb" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
+      <span class="admin-entry-button__copy">
+        <strong>${escapeHtml(content.title ?? entry.id)}</strong>
+        <small>${escapeHtml(entry.id)}</small>
+      </span>
+      <span class="admin-entry-button__meta">
+        <span class="inline-tag inline-tag--subtle">${getCategoryLabel(entry.category)}</span>
+        <span class="inline-tag inline-tag--subtle">${entry.isPublished ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
+      </span>
+    </button>
+  `;
+}
+
 function renderAdminPage() {
   const copy = getCopy();
 
@@ -1121,6 +1217,11 @@ function renderAdminPage() {
   const previewSummary = draft.summary || draft.overview || copy.admin.previewEmpty;
   const previewHref = draft.id ? buildPageUrl("entry", { entry: draft.id }) : "";
   const categoryOptions = [...new Set([...CATEGORY_ORDER, ...orderedCategories, draft.category].filter(Boolean))];
+  const browserCategoryOptions = ["all", ...new Set([...CATEGORY_ORDER, ...orderedCategories].filter(Boolean))];
+  const previewAsset = getDraftPreviewAsset(draft);
+  const totalEntries = allEntries.length;
+  const publishedEntries = allEntries.filter((entry) => entry.isPublished).length;
+  const draftEntries = Math.max(totalEntries - publishedEntries, 0);
 
   elements.main.innerHTML = `
     <section class="page-hero page-hero--compact">
@@ -1132,22 +1233,41 @@ function renderAdminPage() {
     <section class="page-section">
       <div class="admin-layout">
         <aside class="admin-sidebar">
-          <article class="panel-card">
+          <article class="panel-card admin-browser-card">
             <div class="section-head section-head--inline">
-              <h2>${copy.admin.browserTitle}</h2>
+              <div>
+                <h2>${copy.admin.browserTitle}</h2>
+                <p>${adminEntries.length} ${copy.admin.browserResults}</p>
+              </div>
               <button class="action-button action-button--secondary" type="button" id="admin-new-entry">${copy.admin.browserNew}</button>
             </div>
-            <input class="field-input" id="admin-search" type="search" value="${escapeHtml(state.adminSearch)}" placeholder="${copy.admin.browserSearch}">
+            <div class="admin-browser-stats">
+              <article class="summary-tile admin-stat-tile">
+                <strong>${totalEntries}</strong>
+                <span>${copy.admin.browserResults}</span>
+              </article>
+              <article class="summary-tile admin-stat-tile">
+                <strong>${publishedEntries}</strong>
+                <span>${copy.admin.browserPublished}</span>
+              </article>
+              <article class="summary-tile admin-stat-tile">
+                <strong>${draftEntries}</strong>
+                <span>${copy.admin.browserDrafts}</span>
+              </article>
+            </div>
+            <div class="admin-filter-grid">
+              <input class="field-input" id="admin-search" type="search" value="${escapeHtml(state.adminSearch)}" placeholder="${copy.admin.browserSearch}">
+              <label class="field-group">
+                <span>${copy.admin.browserFilter}</span>
+                <select class="field-input" id="admin-category-filter">
+                  ${browserCategoryOptions.map((option) => `
+                    <option value="${escapeHtml(option)}" ${state.adminCategory === option ? "selected" : ""}>${escapeHtml(option === "all" ? copy.admin.browserAll : getCategoryLabel(option))}</option>
+                  `).join("")}
+                </select>
+              </label>
+            </div>
             <div class="admin-entry-list">
-              ${adminEntries.length > 0 ? adminEntries.map((entry) => {
-                const content = getLocalizedEntry(entry);
-                return `
-                  <button class="admin-entry-button ${draft.id === entry.id ? "is-active" : ""}" type="button" data-admin-entry="${entry.id}">
-                    <span>${escapeHtml(content.title ?? entry.id)}</span>
-                    <small>${escapeHtml(entry.id)}</small>
-                  </button>
-                `;
-              }).join("") : `<div class="empty-card">${copy.common.noData}</div>`}
+              ${adminEntries.length > 0 ? adminEntries.map((entry) => renderAdminBrowserEntry(entry, draft.id, copy)).join("") : `<div class="empty-card">${copy.admin.browserEmpty}</div>`}
             </div>
           </article>
         </aside>
@@ -1165,81 +1285,112 @@ function renderAdminPage() {
               </div>
             </div>
 
-            <div class="admin-subgrid">
-              <article class="panel-card panel-card--nested admin-preview">
-                <h3>${copy.admin.previewTitle}</h3>
-                <img class="entry-image entry-image--large" src="${escapeHtml(draft.imageUrl || "./assets/images/favicon.png")}" alt="${escapeHtml(draft.title || draft.id || "Preview")}">
-                <div class="tag-row">
-                  <span class="inline-tag">${getCategoryLabel(draft.category || "materials")}</span>
-                  ${draft.id ? `<span class="inline-tag inline-tag--subtle">${escapeHtml(draft.id)}</span>` : ""}
-                </div>
-                <strong>${escapeHtml(draft.title || copy.admin.editorTitle)}</strong>
-                <p>${escapeHtml(previewSummary)}</p>
-              </article>
+            <div class="admin-workspace-grid">
+              <div class="admin-rail">
+                <article class="panel-card panel-card--nested admin-preview">
+                  <h3>${copy.admin.previewTitle}</h3>
+                  <img class="entry-image entry-image--large" src="${escapeHtml(previewAsset.imageUrl)}" alt="${escapeHtml(draft.title || draft.id || "Preview")}">
+                  <div class="tag-row">
+                    <span class="inline-tag">${getCategoryLabel(draft.category || "materials")}</span>
+                    ${draft.id ? `<span class="inline-tag inline-tag--subtle">${escapeHtml(draft.id)}</span>` : ""}
+                    <span class="inline-tag inline-tag--subtle">${draft.published ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
+                  </div>
+                  <strong>${escapeHtml(draft.title || copy.admin.editorTitle)}</strong>
+                  <p>${escapeHtml(previewSummary)}</p>
+                </article>
 
-              <article class="panel-card panel-card--nested">
-                <h3>${copy.admin.uploadTitle}</h3>
-                <form class="editor-form" id="asset-form">
-                  ${renderField(copy.admin.fields.imageFolder, "pathPrefix", draft.imagePath)}
-                  <label class="field-group">
-                    <span>${copy.admin.fields.imageFile}</span>
-                    <input class="field-input" type="file" name="imageFile" accept="image/*" required>
-                  </label>
-                  <button class="action-button" type="submit">${copy.admin.upload}</button>
-                </form>
-                ${renderStatusMessage(backendState.uploadError || backendState.uploadMessage, Boolean(backendState.uploadError))}
-              </article>
+                <article class="panel-card panel-card--nested">
+                  <div class="section-head section-head--inline">
+                    <div>
+                      <h3>${copy.admin.mediaTitle}</h3>
+                      <p>${copy.admin.mediaBody}</p>
+                    </div>
+                  </div>
+                  <form class="editor-form" id="asset-form">
+                    ${renderField(copy.admin.fields.imageFolder, "pathPrefix", draft.imagePath)}
+                    <label class="field-group">
+                      <span>${copy.admin.fields.imageFile}</span>
+                      <input class="field-input" type="file" name="imageFile" accept="image/*" required>
+                    </label>
+                    <button class="action-button" type="submit">${copy.admin.upload}</button>
+                  </form>
+                  ${renderStatusMessage(backendState.uploadError || backendState.uploadMessage, Boolean(backendState.uploadError))}
+                </article>
+              </div>
+
+              <form class="editor-form admin-editor-form" id="admin-editor-form">
+                <div class="form-section">
+                  <div class="section-head section-head--inline">
+                    <div>
+                      <h3>${copy.admin.identityTitle}</h3>
+                      <p>${copy.admin.identityBody}</p>
+                    </div>
+                  </div>
+                  <div class="field-grid field-grid--triple">
+                    ${renderField(copy.admin.fields.slug, "id", draft.id)}
+                    ${renderSelectField(copy.admin.fields.category, "category", draft.category, categoryOptions)}
+                    ${renderField(copy.admin.fields.order, "sortOrder", draft.sortOrder, "number")}
+                  </div>
+                  <div class="field-grid field-grid--double">
+                    ${renderField(copy.admin.fields.imageUrl, "imageUrl", draft.imageUrl, "url", { hint: copy.admin.hints.imageUrl })}
+                    ${renderField(copy.admin.fields.related, "related", draft.related, "text", { hint: copy.admin.hints.related })}
+                  </div>
+                  <div class="checkbox-row">
+                    <input type="checkbox" name="published" ${draft.published ? "checked" : ""}>
+                    <span>${copy.admin.fields.published}</span>
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <div class="section-head section-head--inline">
+                    <div>
+                      <h3>${copy.admin.discoveryTitle}</h3>
+                      <p>${copy.admin.discoveryBody}</p>
+                    </div>
+                  </div>
+                  <div class="field-grid field-grid--double">
+                    ${renderField(copy.admin.fields.fallbackImage, "fallbackImage", draft.fallbackImage, "url", { hint: copy.admin.hints.fallbackImage })}
+                    ${renderField(copy.admin.fields.vanillaAlias, "vanillaAlias", draft.vanillaAlias, "text", { hint: copy.admin.hints.vanillaAlias })}
+                  </div>
+                  ${renderField(copy.admin.fields.wikiSource, "wikiSource", draft.wikiSource, "text", { hint: copy.admin.hints.wikiSource })}
+                </div>
+
+                <div class="form-section">
+                  <div class="section-head section-head--inline">
+                    <div>
+                      <h3>${copy.admin.contentTitle}</h3>
+                      <p>${copy.admin.workspaceBody}</p>
+                    </div>
+                  </div>
+                  <div class="field-grid field-grid--double">
+                    ${renderField(copy.admin.fields.title, "title", draft.title)}
+                    ${renderField(copy.admin.fields.subtitle, "subtitle", draft.subtitle)}
+                  </div>
+                  ${renderTextarea(copy.admin.fields.summary, "summary", draft.summary, 3)}
+                  ${renderTextarea(copy.admin.fields.overview, "overview", draft.overview, 5)}
+                  <div class="field-grid field-grid--double">
+                    ${renderTextarea(copy.admin.fields.facts, "facts", draft.facts, 6)}
+                    ${renderTextarea(copy.admin.fields.obtain, "obtain", draft.obtain, 6)}
+                  </div>
+                  <div class="field-grid field-grid--double">
+                    ${renderTextarea(copy.admin.fields.crafting, "crafting", draft.crafting, 6, { hint: copy.admin.hints.crafting })}
+                    ${renderTextarea(copy.admin.fields.drops, "drops", draft.drops, 6)}
+                  </div>
+                  <div class="field-grid field-grid--double">
+                    ${renderTextarea(copy.admin.fields.pieces, "pieces", draft.pieces, 5)}
+                    ${renderTextarea(copy.admin.fields.notes, "notes", draft.notes, 5)}
+                  </div>
+                  ${renderTextarea(copy.admin.fields.tactics, "tactics", draft.tactics, 5)}
+                </div>
+
+                <div class="form-section">
+                  <div class="button-row">
+                    <button class="action-button" type="submit">${copy.admin.save}</button>
+                    ${previewHref ? `<a class="header-link header-link--button" href="${previewHref}">${copy.admin.openEntry}</a>` : ""}
+                  </div>
+                </div>
+              </form>
             </div>
-
-            <form class="editor-form" id="admin-editor-form">
-              <div class="form-section">
-                <div class="section-head section-head--inline">
-                  <h3>${copy.admin.metadataTitle}</h3>
-                </div>
-                <div class="field-grid field-grid--triple">
-                  ${renderField(copy.admin.fields.slug, "id", draft.id)}
-                  ${renderSelectField(copy.admin.fields.category, "category", draft.category, categoryOptions)}
-                  ${renderField(copy.admin.fields.order, "sortOrder", draft.sortOrder, "number")}
-                </div>
-                <div class="field-grid field-grid--double">
-                  ${renderField(copy.admin.fields.imageUrl, "imageUrl", draft.imageUrl, "url")}
-                  ${renderField(copy.admin.fields.related, "related", draft.related)}
-                </div>
-              </div>
-
-              <div class="form-section">
-                <div class="section-head section-head--inline">
-                  <h3>${copy.admin.contentTitle}</h3>
-                </div>
-                <div class="field-grid field-grid--double">
-                  ${renderField(copy.admin.fields.title, "title", draft.title)}
-                  ${renderField(copy.admin.fields.subtitle, "subtitle", draft.subtitle)}
-                </div>
-                ${renderTextarea(copy.admin.fields.summary, "summary", draft.summary, 3)}
-                ${renderTextarea(copy.admin.fields.overview, "overview", draft.overview, 5)}
-                <div class="field-grid field-grid--double">
-                  ${renderTextarea(copy.admin.fields.facts, "facts", draft.facts, 6)}
-                  ${renderTextarea(copy.admin.fields.obtain, "obtain", draft.obtain, 6)}
-                </div>
-                <div class="field-grid field-grid--double">
-                  ${renderTextarea(copy.admin.fields.crafting, "crafting", draft.crafting, 6)}
-                  ${renderTextarea(copy.admin.fields.drops, "drops", draft.drops, 6)}
-                </div>
-                <div class="field-grid field-grid--double">
-                  ${renderTextarea(copy.admin.fields.pieces, "pieces", draft.pieces, 5)}
-                  ${renderTextarea(copy.admin.fields.notes, "notes", draft.notes, 5)}
-                </div>
-                ${renderTextarea(copy.admin.fields.tactics, "tactics", draft.tactics, 5)}
-              </div>
-
-              <div class="form-section">
-                <div class="checkbox-row">
-                  <input type="checkbox" name="published" ${draft.published ? "checked" : ""}>
-                  <span>${copy.admin.fields.published}</span>
-                </div>
-                <button class="action-button" type="submit">${copy.admin.save}</button>
-              </div>
-            </form>
             ${renderStatusMessage(backendState.entryError || backendState.entryMessage, Boolean(backendState.entryError))}
           </article>
 
@@ -1272,6 +1423,11 @@ function renderAdminPage() {
 
   elements.main.querySelector("#admin-search")?.addEventListener("input", (event) => {
     state.adminSearch = event.target.value;
+    renderAdminPage();
+  });
+
+  elements.main.querySelector("#admin-category-filter")?.addEventListener("change", (event) => {
+    state.adminCategory = event.target.value;
     renderAdminPage();
   });
 
@@ -1315,7 +1471,7 @@ function renderAdminPage() {
     const payload = {
       id: draftState.id,
       category: draftState.category,
-      image_url: draftState.imageUrl || baseEntry?.image || "./assets/images/favicon.png",
+      image_url: draftState.imageUrl || baseEntry?.image || DEFAULT_ENTRY_IMAGE,
       related_ids: parseCsvList(draftState.related),
       sort_order: Number(draftState.sortOrder || 0),
       is_published: draftState.published,
@@ -1358,13 +1514,14 @@ function renderFooter() {
 
 function renderEntryCard(entry, includeFacts = false) {
   const content = getLocalizedEntry(entry);
+  const asset = getEntryDisplayAsset(entry);
   const facts = includeFacts ? (content.facts ?? []).slice(0, 2) : [];
 
   return `
     <article class="entry-card">
       <div class="entry-card-head">
         <a class="entry-card-thumb" href="${buildPageUrl("entry", { entry: entry.id })}">
-          <img class="entry-card-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+          <img class="entry-card-image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
         </a>
         <div>
           <div class="tag-row">
@@ -1385,13 +1542,14 @@ function renderEntryCard(entry, includeFacts = false) {
 function renderRecipeCard(entry) {
   const copy = getCopy();
   const content = getLocalizedEntry(entry);
+  const asset = getEntryDisplayAsset(entry);
   const recipe = parseRecipeModel(entry);
 
   return `
     <article class="recipe-card">
       <div class="entry-card-head">
         <a class="entry-card-thumb" href="${buildPageUrl("entry", { entry: entry.id })}">
-          <img class="entry-card-image" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+          <img class="entry-card-image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
         </a>
         <div>
           <div class="tag-row">
@@ -1452,7 +1610,11 @@ function renderCraftingContentBlock(label, entry) {
 
 function renderWorkstationPill(station) {
   const stationEntry = findEntryByMention(station.label);
+  const stationAsset = stationEntry ? getEntryDisplayAsset(stationEntry) : null;
   const vanillaAsset = !stationEntry ? getExternalAsset(station.label) : null;
+  const stationImage = stationAsset?.sourceType && stationAsset.sourceType !== "default"
+    ? stationAsset.imageUrl
+    : "";
 
   if (!stationEntry && !vanillaAsset) {
     ensureExternalAsset(station.label);
@@ -1464,8 +1626,8 @@ function renderWorkstationPill(station) {
         : vanillaAsset
           ? `href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer"`
           : ""}>
-      ${stationEntry
-        ? `<img class="workstation-pill__image" src="${escapeHtml(stationEntry.image)}" alt="${escapeHtml(station.label)}">`
+      ${stationEntry && stationImage
+        ? `<img class="workstation-pill__image" src="${escapeHtml(stationImage)}" alt="${escapeHtml(station.label)}">`
         : vanillaAsset?.imageUrl
           ? `<img class="workstation-pill__image" src="${escapeHtml(vanillaAsset.imageUrl)}" alt="${escapeHtml(station.label)}">`
         : `<span class="workstation-pill__icon">${escapeHtml(station.short)}</span>`}
@@ -1475,12 +1637,15 @@ function renderWorkstationPill(station) {
 }
 
 function renderRecipeIngredient(ingredient) {
+  const entryAsset = ingredient.entry ? getEntryDisplayAsset(ingredient.entry) : null;
   const vanillaAsset = !ingredient.entry ? getExternalAsset(ingredient.label) : null;
   if (!ingredient.entry && !vanillaAsset) {
     ensureExternalAsset(ingredient.label);
   }
 
-  const image = ingredient.entry?.image ?? vanillaAsset?.imageUrl;
+  const image = entryAsset?.sourceType && entryAsset.sourceType !== "default"
+    ? entryAsset.imageUrl
+    : vanillaAsset?.imageUrl;
   const labelMarkup = ingredient.entry
     ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(ingredient.label)}</a>`
     : vanillaAsset
@@ -1501,6 +1666,7 @@ function renderRecipeIngredient(ingredient) {
 function renderProgressionCard(entry) {
   const copy = getCopy();
   const content = getLocalizedEntry(entry);
+  const asset = getEntryDisplayAsset(entry);
   const summonEntry = findSummonEntry(entry);
   const summonContent = getLocalizedEntry(summonEntry);
   const summonLines = summonContent.crafting?.length ? summonContent.crafting.slice(0, 4) : (summonContent.obtain ?? []).slice(0, 3);
@@ -1508,7 +1674,7 @@ function renderProgressionCard(entry) {
 
   return `
     <article class="progress-card progress-card--detailed">
-      <img class="progress-image progress-image--large" src="${escapeHtml(entry.image)}" alt="${escapeHtml(content.title ?? entry.id)}">
+      <img class="progress-image progress-image--large" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
       <div class="progress-copy">
         <div class="tag-row">
           <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
@@ -1580,16 +1746,19 @@ function renderNotFound(title, body, href, label) {
   `;
 }
 
-function renderField(label, name, value, type = "text") {
+function renderField(label, name, value, type = "text", options = {}) {
+  const { placeholder = "", hint = "" } = options;
   return `
     <label class="field-group">
       <span>${label}</span>
-      <input class="field-input" type="${type}" name="${name}" value="${escapeHtml(value ?? "")}">
+      <input class="field-input" type="${type}" name="${name}" value="${escapeHtml(value ?? "")}" placeholder="${escapeHtml(placeholder)}">
+      ${hint ? `<small class="field-hint">${escapeHtml(hint)}</small>` : ""}
     </label>
   `;
 }
 
-function renderSelectField(label, name, value, options) {
+function renderSelectField(label, name, value, options, config = {}) {
+  const { hint = "" } = config;
   return `
     <label class="field-group">
       <span>${label}</span>
@@ -1598,15 +1767,18 @@ function renderSelectField(label, name, value, options) {
           <option value="${escapeHtml(option)}" ${option === value ? "selected" : ""}>${escapeHtml(getCategoryLabel(option))}</option>
         `).join("")}
       </select>
+      ${hint ? `<small class="field-hint">${escapeHtml(hint)}</small>` : ""}
     </label>
   `;
 }
 
-function renderTextarea(label, name, value, rows) {
+function renderTextarea(label, name, value, rows, options = {}) {
+  const { placeholder = "", hint = "" } = options;
   return `
     <label class="field-group">
       <span>${label}</span>
-      <textarea class="field-input field-input--textarea" name="${name}" rows="${rows}">${escapeHtml(value ?? "")}</textarea>
+      <textarea class="field-input field-input--textarea" name="${name}" rows="${rows}" placeholder="${escapeHtml(placeholder)}">${escapeHtml(value ?? "")}</textarea>
+      ${hint ? `<small class="field-hint">${escapeHtml(hint)}</small>` : ""}
     </label>
   `;
 }
@@ -1733,7 +1905,12 @@ function getVisibleRecipes() {
 
 function getAdminBrowserEntries() {
   const term = normalize(state.adminSearch);
+  const category = state.adminCategory;
   return allEntries.filter((entry) => {
+    if (category !== "all" && entry.category !== category) {
+      return false;
+    }
+
     if (!term) {
       return true;
     }
@@ -1760,7 +1937,7 @@ function getUsedInEntries(entry) {
       return false;
     }
 
-    return Object.values(candidate.content ?? {}).some((candidateContent) => {
+    return getEntryLanguageContents(candidate).some((candidateContent) => {
       return (candidateContent?.crafting ?? []).some((line) => {
         const normalizedLine = normalize(line);
         return needles.some((needle) => needle && normalizedLine.includes(needle));
@@ -1781,6 +1958,16 @@ function findSummonEntry(entry) {
   return allEntries.find((candidate) => candidate.category === "summons" && (candidate.related ?? []).includes(entry.id));
 }
 
+function getEntryMeta(entry) {
+  return entry?.content?._meta ?? {};
+}
+
+function getEntryLanguageContents(entry) {
+  return Object.entries(entry?.content ?? {})
+    .filter(([languageCode]) => !languageCode.startsWith("_"))
+    .map(([, content]) => content);
+}
+
 function getLocalizedEntry(entry) {
   if (!entry) {
     return {};
@@ -1789,7 +1976,7 @@ function getLocalizedEntry(entry) {
   return entry.content?.[state.language]
     ?? entry.content?.[siteConfig.defaultLanguage]
     ?? entry.content?.en
-    ?? Object.values(entry.content ?? {})[0]
+    ?? getEntryLanguageContents(entry)[0]
     ?? {};
 }
 
@@ -1807,6 +1994,69 @@ function getCopy() {
   return pageCopy[state.language] ?? pageCopy.en;
 }
 
+function isDefaultEntryImage(imageUrl) {
+  const clean = String(imageUrl ?? "").trim();
+  return !clean || clean === DEFAULT_ENTRY_IMAGE;
+}
+
+function getEntryExternalLookup(entry) {
+  const meta = getEntryMeta(entry);
+  const content = getLocalizedEntry(entry);
+  return parseTerrariaWikiReference(meta.wikiSource)
+    || String(meta.vanillaAlias ?? "").trim()
+    || String(content.title ?? "").trim()
+    || String(entry?.id ?? "").trim();
+}
+
+function getEntryDisplayAsset(entry, options = {}) {
+  if (!entry) {
+    return {
+      imageUrl: DEFAULT_ENTRY_IMAGE,
+      externalPageUrl: "",
+      sourceType: "default"
+    };
+  }
+
+  const meta = getEntryMeta(entry);
+  const primaryImage = String(entry.image ?? "").trim();
+  if (!isDefaultEntryImage(primaryImage)) {
+    return {
+      imageUrl: primaryImage,
+      externalPageUrl: "",
+      sourceType: "primary"
+    };
+  }
+
+  const fallbackImage = String(meta.fallbackImage ?? "").trim();
+  if (fallbackImage) {
+    return {
+      imageUrl: fallbackImage,
+      externalPageUrl: buildTerrariaWikiPageUrl(meta.wikiSource),
+      sourceType: "fallback"
+    };
+  }
+
+  const lookupLabel = getEntryExternalLookup(entry);
+  const externalAsset = lookupLabel ? getExternalAsset(lookupLabel) : null;
+  if (!externalAsset && options.ensure !== false && lookupLabel) {
+    ensureExternalAsset(lookupLabel);
+  }
+
+  if (externalAsset?.imageUrl) {
+    return {
+      imageUrl: externalAsset.imageUrl,
+      externalPageUrl: externalAsset.pageUrl,
+      sourceType: "wiki"
+    };
+  }
+
+  return {
+    imageUrl: primaryImage || DEFAULT_ENTRY_IMAGE,
+    externalPageUrl: buildTerrariaWikiPageUrl(meta.wikiSource),
+    sourceType: "default"
+  };
+}
+
 function getTagLabel(entry) {
   const tagKey = ENTRY_TAGS[entry.id]
     ?? (entry.category === "bosses" || entry.category === "superbosses" ? "boss" : entry.category === "minibosses" ? "miniboss" : "mob");
@@ -1819,6 +2069,7 @@ function getTagLabel(entry) {
 
 function buildSearchText(entry) {
   const content = getLocalizedEntry(entry);
+  const meta = getEntryMeta(entry);
   return [
     entry.id,
     entry.category,
@@ -1832,7 +2083,9 @@ function buildSearchText(entry) {
     ...(content.drops ?? []),
     ...(content.notes ?? []),
     ...(content.tactics ?? []),
-    ...(content.pieces ?? [])
+    ...(content.pieces ?? []),
+    meta.vanillaAlias,
+    meta.wikiSource
   ].filter(Boolean).join(" ");
 }
 
@@ -1848,7 +2101,7 @@ function mergeEntries(baseEntries, publishedEntries) {
     merged.set(entry.id, {
       id: entry.id,
       category: entry.category ?? existing?.category ?? "materials",
-      image: entry.image ?? existing?.image ?? "./assets/images/favicon.png",
+      image: entry.image ?? existing?.image ?? DEFAULT_ENTRY_IMAGE,
       banner: entry.banner ?? existing?.banner ?? "",
       related: Array.isArray(entry.related) ? [...entry.related] : [...(existing?.related ?? [])],
       sortOrder: Number(entry.sortOrder ?? existing?.sortOrder ?? 0),
@@ -1921,12 +2174,16 @@ function ensureAdminDraft() {
 function loadEntryIntoDraft(entryId) {
   const entry = getEntryById(entryId);
   const content = getLocalizedEntry(entry);
+  const meta = getEntryMeta(entry);
 
   state.adminDraft = {
     id: entry?.id ?? "",
     category: entry?.category ?? "materials",
     sortOrder: String(entry?.sortOrder ?? 0),
-    imageUrl: entry?.image ?? "",
+    imageUrl: !isDefaultEntryImage(entry?.image) ? entry?.image ?? "" : "",
+    fallbackImage: String(meta?.fallbackImage ?? ""),
+    vanillaAlias: String(meta?.vanillaAlias ?? ""),
+    wikiSource: String(meta?.wikiSource ?? ""),
     imagePath: state.adminDraft?.imagePath ?? "entries",
     related: (entry?.related ?? []).join(", "),
     title: content?.title ?? "",
@@ -1947,9 +2204,16 @@ function loadEntryIntoDraft(entryId) {
 function clearAdminDraft() {
   state.adminDraft = {
     id: "",
-    category: state.category !== "all" ? state.category : "materials",
+    category: state.adminCategory !== "all"
+      ? state.adminCategory
+      : state.category !== "all"
+        ? state.category
+        : "materials",
     sortOrder: "0",
     imageUrl: "",
+    fallbackImage: "",
+    vanillaAlias: "",
+    wikiSource: "",
     imagePath: "entries",
     related: "",
     title: "",
@@ -1974,6 +2238,9 @@ function updateDraftFromForm(form) {
     category: String(formData.get("category") ?? "").trim(),
     sortOrder: String(formData.get("sortOrder") ?? "0").trim(),
     imageUrl: String(formData.get("imageUrl") ?? "").trim(),
+    fallbackImage: String(formData.get("fallbackImage") ?? "").trim(),
+    vanillaAlias: String(formData.get("vanillaAlias") ?? "").trim(),
+    wikiSource: String(formData.get("wikiSource") ?? "").trim(),
     imagePath: state.adminDraft?.imagePath ?? "entries",
     related: String(formData.get("related") ?? "").trim(),
     title: String(formData.get("title") ?? "").trim(),
@@ -2017,6 +2284,12 @@ function buildLocalizedContentPayload(baseEntry, draft) {
 
   const nextContent = {
     ...existingContent,
+    _meta: {
+      ...(existingContent._meta ?? {}),
+      vanillaAlias: draft.vanillaAlias,
+      wikiSource: draft.wikiSource,
+      fallbackImage: draft.fallbackImage
+    },
     [state.language]: nextLanguageContent
   };
 
@@ -2129,7 +2402,11 @@ function findEntryByMention(label) {
 
   const exact = candidateEntries.find((entry) => {
     const content = getLocalizedEntry(entry);
-    return normalize(entry.id) === normalizedLabel || normalize(content.title) === normalizedLabel;
+    const meta = getEntryMeta(entry);
+    const alias = normalize(meta.vanillaAlias).trim();
+    return normalize(entry.id) === normalizedLabel
+      || normalize(content.title) === normalizedLabel
+      || (alias && alias === normalizedLabel);
   });
 
   if (exact) {
@@ -2138,7 +2415,11 @@ function findEntryByMention(label) {
 
   return candidateEntries.find((entry) => {
     const content = getLocalizedEntry(entry);
-    return normalizedLabel.includes(normalize(content.title)) || normalizedLabel.includes(normalize(entry.id));
+    const meta = getEntryMeta(entry);
+    const alias = normalize(meta.vanillaAlias).trim();
+    return normalizedLabel.includes(normalize(content.title))
+      || normalizedLabel.includes(normalize(entry.id))
+      || (alias && normalizedLabel.includes(alias));
   }) ?? null;
 }
 
@@ -2195,13 +2476,13 @@ function ensureExternalAsset(label) {
 }
 
 function getExternalAssetKey(label) {
-  return normalize(label)
+  return normalize(parseTerrariaWikiReference(label) || label)
     .replace(/\s+/g, " ")
     .trim();
 }
 
 function shouldResolveExternalAsset(label) {
-  const clean = String(label ?? "").trim();
+  const clean = parseTerrariaWikiReference(label) || String(label ?? "").trim();
   return Boolean(clean && clean.length <= 48 && !clean.includes("/") && !clean.includes("\\"));
 }
 
@@ -2266,7 +2547,7 @@ async function fetchTerrariaWikiParse(title) {
 }
 
 function buildTerrariaWikiCandidates(label) {
-  const clean = String(label ?? "")
+  const clean = (parseTerrariaWikiReference(label) || String(label ?? ""))
     .replace(/\s+x\d+(?:-\d+)?$/i, "")
     .replace(/^\d+(?:-\d+)?\s+/, "")
     .replace(/\s+/g, " ")
@@ -2278,6 +2559,35 @@ function buildTerrariaWikiCandidates(label) {
   }
 
   return [...candidates].filter(Boolean);
+}
+
+function parseTerrariaWikiReference(reference) {
+  const raw = String(reference ?? "").trim();
+  if (!raw) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      const url = new URL(raw);
+      if (!/terraria\.wiki\.gg$/i.test(url.hostname)) {
+        return "";
+      }
+
+      const pagePath = url.pathname.replace(/^\/wiki\//, "");
+      return decodeURIComponent(pagePath).replaceAll("_", " ").trim();
+    }
+    catch {
+      return "";
+    }
+  }
+
+  return raw.replaceAll("_", " ").trim();
+}
+
+function buildTerrariaWikiPageUrl(reference) {
+  const title = parseTerrariaWikiReference(reference);
+  return title ? `${TERRARIA_WIKI.pageBaseUrl}${encodeURIComponent(title.replaceAll(" ", "_"))}` : "";
 }
 
 function extractTerrariaWikiImage(html) {
@@ -2302,13 +2612,13 @@ function extractTerrariaWikiImage(html) {
 }
 
 function hasContentList(entry, key) {
-  return Object.values(entry.content ?? {}).some((content) => Array.isArray(content?.[key]) && content[key].length > 0);
+  return getEntryLanguageContents(entry).some((content) => Array.isArray(content?.[key]) && content[key].length > 0);
 }
 
 function getEntrySortTitle(entry) {
   return entry?.content?.[siteConfig.defaultLanguage]?.title
     ?? entry?.content?.en?.title
-    ?? Object.values(entry?.content ?? {})[0]?.title
+    ?? getEntryLanguageContents(entry)[0]?.title
     ?? entry?.id
     ?? "";
 }
