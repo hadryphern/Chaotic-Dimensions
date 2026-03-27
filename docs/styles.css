@@ -652,6 +652,18 @@ h3 {
   gap: 16px;
 }
 
+.entry-narrative,
+.entry-inline-row__body {
+  display: grid;
+  gap: 10px;
+}
+
+.entry-narrative p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.78;
+}
+
 .entry-inline-list {
   display: grid;
   gap: 10px;
@@ -672,11 +684,38 @@ h3 {
   border-color: var(--line-strong);
 }
 
+.entry-inline-row--detail {
+  align-items: start;
+}
+
 .entry-inline-row__image {
   width: 44px;
   height: 44px;
   object-fit: contain;
   image-rendering: pixelated;
+}
+
+.entry-inline-row__body {
+  min-width: 0;
+  gap: 4px;
+}
+
+.entry-inline-row__body strong {
+  color: var(--text);
+}
+
+.entry-inline-row__subtitle,
+.entry-inline-row__summary {
+  display: block;
+  line-height: 1.55;
+}
+
+.entry-inline-row__subtitle {
+  color: var(--text-dim);
+}
+
+.entry-inline-row__summary {
+  color: var(--text-soft);
 }
 
 .entry-banner-art {

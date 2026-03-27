@@ -873,31 +873,28 @@ function renderEntryPage() {
     return;
   }
 
-  const content = getLocalizedEntry(entry);
-  const entryAsset = getEntryDisplayAsset(entry);
-  const bannerImage = entry.banner || "";
-  const recipeUrl = hasContentList(entry, "crafting") ? buildPageUrl("crafting", { q: content.title }) : "";
-  const summonEntry = findSummonEntry(entry);
-  const summonContent = getLocalizedEntry(summonEntry);
-  const usedInEntries = getUsedInEntries(entry).slice(0, 12);
-  const relatedMarkup = (entry.related ?? []).map((entryId) => {
-    const relatedEntry = getEntryById(entryId);
-    if (!relatedEntry) {
-      return "";
-    }
-    const relatedContent = getLocalizedEntry(relatedEntry);
-    return `<a class="inline-tag" href="${buildPageUrl("entry", { entry: relatedEntry.id })}">${escapeHtml(relatedContent.title ?? relatedEntry.id)}</a>`;
-  }).join("");
-  const usedInMarkup = usedInEntries.map((usedInEntry) => {
-    const usedInContent = getLocalizedEntry(usedInEntry);
-    const usedInAsset = getEntryDisplayAsset(usedInEntry);
-    return `
-      <a class="entry-inline-row" href="${buildPageUrl("entry", { entry: usedInEntry.id })}">
-        <img class="entry-inline-row__image" src="${escapeHtml(usedInAsset.imageUrl)}" alt="${escapeHtml(usedInContent.title ?? usedInEntry.id)}">
-        <span>${escapeHtml(usedInContent.title ?? usedInEntry.id)}</span>
-      </a>
-    `;
-  }).join("");
+  const detailModel = buildEntryDetailModel(entry);
+  const {
+    content,
+    entryAsset,
+    bannerImage,
+    recipeUrl,
+    summonEntry,
+    summonContent,
+    usedInEntries,
+    relatedEntries,
+    narrativeParagraphs,
+    factItems,
+    contextItems,
+    obtainItems,
+    usageItems,
+    progressionItems,
+    dropItems,
+    pieceItems,
+    noteItems,
+    tacticItems
+  } = detailModel;
+  const detailCopy = getExpandedEntryCopy();
 
   const thread = backendState.commentsByEntry[entry.id];
   const commentsMarkup = thread?.loading
@@ -928,6 +925,11 @@ function renderEntryPage() {
           <h1>${escapeHtml(content.title ?? entry.id)}</h1>
           <p class="entry-subtitle">${escapeHtml(content.subtitle ?? "")}</p>
           <p class="hero-lead">${escapeHtml(content.overview ?? content.summary ?? "")}</p>
+          ${narrativeParagraphs.length > 0 ? `
+            <div class="entry-narrative">
+              ${narrativeParagraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+            </div>
+          ` : ""}
           <div class="entry-inline-links">
             ${recipeUrl ? `<a class="inline-link" href="${recipeUrl}">${copy.entry.openCrafting}</a>` : ""}
             <a class="inline-link" href="${buildPageUrl("feedback")}">${copy.entry.comments}</a>
@@ -947,10 +949,10 @@ function renderEntryPage() {
                 ${summonContent.crafting?.length ? `<ul class="content-list">${summonContent.crafting.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
               </div>
             ` : ""}
-            ${(content.facts ?? []).length > 0 ? `
+            ${factItems.length > 0 ? `
               <div class="content-block content-block--compact">
                 <h3>${copy.entry.facts}</h3>
-                <ul class="content-list">${(content.facts ?? []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+                <ul class="content-list">${factItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
               </div>
             ` : ""}
           </div>
@@ -960,25 +962,18 @@ function renderEntryPage() {
 
     <section class="page-section">
       <div class="content-grid">
-        ${renderContentBlock(copy.entry.obtain, content.obtain)}
+        ${renderContentBlock(detailCopy.context, contextItems)}
+        ${renderContentBlock(copy.entry.obtain, obtainItems)}
         ${renderCraftingContentBlock(copy.entry.crafting, entry)}
-        ${renderContentBlock(copy.entry.drops, content.drops)}
-        ${renderContentBlock(copy.entry.pieces, content.pieces)}
-        ${renderContentBlock(copy.entry.notes, content.notes)}
-        ${renderContentBlock(copy.entry.tactics, content.tactics)}
+        ${renderContentBlock(detailCopy.usage, usageItems)}
+        ${renderContentBlock(detailCopy.progression, progressionItems)}
+        ${renderContentBlock(copy.entry.drops, dropItems)}
+        ${renderContentBlock(copy.entry.pieces, pieceItems)}
+        ${renderContentBlock(copy.entry.notes, noteItems)}
+        ${renderContentBlock(copy.entry.tactics, tacticItems)}
       </div>
-      ${usedInMarkup ? `
-        <div class="content-block">
-          <h3>${copy.entry.usedIn}</h3>
-          <div class="entry-inline-list">${usedInMarkup}</div>
-        </div>
-      ` : ""}
-      ${relatedMarkup ? `
-        <div class="content-block">
-          <h3>${copy.entry.related}</h3>
-          <div class="tag-row">${relatedMarkup}</div>
-        </div>
-      ` : ""}
+      ${renderLinkedEntriesBlock(copy.entry.usedIn, usedInEntries)}
+      ${renderLinkedEntriesBlock(copy.entry.related, relatedEntries)}
     </section>
 
     <section class="page-section">
@@ -1015,6 +1010,737 @@ function renderEntryPage() {
     await ensureCurrentEntryComments(true);
     renderEntryPage();
   });
+}
+
+function buildEntryDetailModel(entry) {
+  const content = getLocalizedEntry(entry);
+  const entryAsset = getEntryDisplayAsset(entry);
+  const bannerImage = entry.banner || "";
+  const recipeUrl = hasContentList(entry, "crafting") ? buildPageUrl("crafting", { q: content.title }) : "";
+  const summonEntry = findSummonEntry(entry);
+  const summonContent = getLocalizedEntry(summonEntry);
+  const recipe = parseRecipeModel(entry);
+  const usedInEntries = getUsedInEntries(entry).slice(0, 12);
+  const relatedEntries = (entry.related ?? [])
+    .map((entryId) => getEntryById(entryId))
+    .filter(Boolean);
+  const relatedBossEntries = relatedEntries.filter((candidate) => isEncounterCategory(candidate?.category));
+  const relatedBuffEntries = relatedEntries.filter((candidate) => candidate?.category === "buffs");
+  const relatedArmorEntries = relatedEntries.filter((candidate) => candidate?.category === "armor");
+  const progressionStage = getEntryProgressionStage(entry, relatedEntries, summonEntry);
+
+  const detailContext = {
+    entry,
+    content,
+    entryAsset,
+    bannerImage,
+    recipeUrl,
+    summonEntry,
+    summonContent,
+    recipe,
+    usedInEntries,
+    relatedEntries,
+    relatedBossEntries,
+    relatedBuffEntries,
+    relatedArmorEntries,
+    progressionStage
+  };
+
+  return {
+    ...detailContext,
+    narrativeParagraphs: buildEntryNarrativeParagraphs(detailContext),
+    factItems: buildExpandedFacts(detailContext),
+    contextItems: buildEntryContextItems(detailContext),
+    obtainItems: buildEntryObtainItems(detailContext),
+    usageItems: buildEntryUsageItems(detailContext),
+    progressionItems: buildEntryProgressionItems(detailContext),
+    dropItems: buildEntryDropItems(detailContext),
+    pieceItems: buildEntryPieceItems(detailContext),
+    noteItems: buildEntryNoteItems(detailContext),
+    tacticItems: buildEntryTacticItems(detailContext)
+  };
+}
+
+function getExpandedEntryCopy() {
+  const copy = {
+    "pt-BR": {
+      context: "Contexto e papel na progressao",
+      usage: "Uso, valor e sinergias",
+      progression: "Onde entra na progressao"
+    },
+    en: {
+      context: "Context and progression role",
+      usage: "Use cases, value and synergy",
+      progression: "Where it fits in progression"
+    }
+  };
+
+  return copy[state.language] ?? copy.en;
+}
+
+function buildEntryNarrativeParagraphs(detailContext) {
+  const {
+    entry,
+    content,
+    recipe,
+    summonEntry,
+    summonContent,
+    usedInEntries,
+    relatedEntries,
+    relatedBossEntries,
+    relatedBuffEntries,
+    progressionStage
+  } = detailContext;
+  const title = content.title ?? entry.id;
+  const lines = [];
+
+  if (state.language === "pt-BR") {
+    switch (entry.category) {
+      case "bosses":
+      case "superbosses":
+      case "minibosses":
+        lines.push(
+          `${title} funciona hoje como um encontro-chave da linha atual do mod, servindo como ponte entre a progressao vanilla avancada e os sistemas proprios do Chaotic Dimensions. ${progressionStage ? `Dentro da wiki, ele se encaixa em ${progressionStage}.` : ""}`.trim()
+        );
+        if (summonEntry) {
+          lines.push(
+            `A leitura desta pagina fica mais completa quando combinada com ${summonContent.title ?? summonEntry.id}, porque a invocacao, o preparo da receita e o ritmo das tentativas fazem parte do mesmo ciclo de progressao.`
+          );
+        }
+        if (relatedEntries.length > 0) {
+          lines.push(
+            `As recompensas e paginas mais ligadas a esse encontro hoje incluem ${formatEntryTitleList(relatedEntries, 4)}, o que ajuda a mostrar por que derrotar o boss impacta diretamente no resto do arsenal cristalino.`
+          );
+        }
+        break;
+      case "summons":
+        lines.push(
+          `${title} existe para abrir um encontro ou uma etapa importante da wiki. Mesmo quando a pagina ja lista a receita, o valor real do item esta em controlar quando e como o jogador acessa o conteudo ligado a ele.`
+        );
+        if (relatedBossEntries.length > 0) {
+          lines.push(
+            `Hoje a funcao principal desta invocacao e levar o jogador ate ${formatEntryTitleList(relatedBossEntries, 3)}, entao a propria receita dela ajuda a ditar o ritmo das tentativas e do farm.`
+          );
+        }
+        break;
+      case "materials":
+        lines.push(
+          `${title} atua como material-base do arco cristalino atual. Em vez de ser apenas um drop numerico, ele funciona como a ponte pratica entre o loot de um encontro e a construcao de armas, armaduras, acessorios e outros upgrades.`
+        );
+        if (usedInEntries.length > 0) {
+          lines.push(
+            `No estado atual da wiki, esse material ja aparece em ${usedInEntries.length} receita(s) rastreada(s), incluindo ${formatEntryTitleList(usedInEntries, 4)}, o que transforma a pagina dele em uma referencia natural para planejar o proximo craft.`
+          );
+        }
+        break;
+      case "weapons":
+        lines.push(
+          `${title} ocupa um lugar direto no arsenal cristalino do mod. A pagina nao serve so para listar dano e recipe: ela tambem ajuda a mostrar de onde vem o item, em que etapa ele aparece e como ele conversa com outras pecas do mesmo tier.`
+        );
+        if (recipe.ingredients.length > 0) {
+          lines.push(
+            `A receita rastreada para essa arma passa por ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` em ${formatStationLabelList(recipe.stations, 2)}` : ""}, o que deixa claro como ela converte recursos de progressao em poder ofensivo imediato.`
+          );
+        }
+        break;
+      case "armor":
+        lines.push(
+          `${title} organiza a camada defensiva do tier atual e, ao mesmo tempo, abre variacoes reais por classe. Isso faz a pagina da armadura funcionar tanto como ficha de status quanto como guia de montagem do set.`
+        );
+        if (relatedBuffEntries.length > 0) {
+          lines.push(
+            `Como o set tambem se conecta a efeitos como ${formatEntryTitleList(relatedBuffEntries, 3)}, vale ler a armadura junto desses buffs para entender o pacote completo de defesa, mobilidade e resposta ao dano.`
+          );
+        }
+        break;
+      case "accessories":
+        lines.push(
+          `${title} mistura utilidade e sobrevivencia numa unica peca. Em paginas assim, o que importa nao e so o valor numerico do acessorio, mas o tipo de rota, luta ou reposicionamento que ele viabiliza dentro do mod.`
+        );
+        if (relatedBuffEntries.length > 0) {
+          lines.push(
+            `A leitura tambem fica melhor quando voce acompanha os efeitos ligados a ele, como ${formatEntryTitleList(relatedBuffEntries, 3)}, porque o acessorio nao termina no tooltip principal.`
+          );
+        }
+        break;
+      case "consumables":
+        lines.push(
+          `${title} entra como consumivel premium do pacote cristalino. O papel dessa pagina e mostrar nao so a cura ou o buff isolado, mas o quanto o item estende a consistencia de tentativas, farm e lutas longas no mesmo tier.`
+        );
+        if (relatedBuffEntries.length > 0) {
+          lines.push(
+            `Como a entrada ja se conecta a ${formatEntryTitleList(relatedBuffEntries, 3)}, ela tambem funciona como ponto central para entender todo o pacote de efeitos que o uso do consumivel entrega.`
+          );
+        }
+        break;
+      case "buffs":
+        lines.push(
+          `${title} representa um efeito temporario, entao esta pagina faz mais sentido quando lida como extensao da fonte que o aplica. Em outras palavras, o buff explica o resultado final de uma mecanica maior do mod.`
+        );
+        if (relatedEntries.length > 0) {
+          lines.push(
+            `Hoje ele aparece ligado a ${formatEntryTitleList(relatedEntries, 3)}, o que ajuda a entender quando esse efeito entra em cena, quanto ele reforca a build e por que vale documenta-lo separadamente.`
+          );
+        }
+        break;
+      default:
+        if (relatedEntries.length > 0) {
+          lines.push(
+            `${title} faz parte de uma rede maior de paginas relacionadas, principalmente ${formatEntryTitleList(relatedEntries, 3)}, e a ideia desta entrada e ajudar a ligar tudo isso num fluxo mais legivel.`
+          );
+        }
+        break;
+    }
+  }
+  else {
+    switch (entry.category) {
+      case "bosses":
+      case "superbosses":
+      case "minibosses":
+        lines.push(`${title} currently acts as a key encounter in the mod, bridging late vanilla progression and the mod's own reward loop.${progressionStage ? ` In the wiki it fits into ${progressionStage}.` : ""}`);
+        if (summonEntry) {
+          lines.push(`This page reads best together with ${summonContent.title ?? summonEntry.id}, because the summon item, its recipe and the attempt loop all belong to the same progression flow.`);
+        }
+        break;
+      case "materials":
+        lines.push(`${title} acts as a core material for the current crystal branch. Instead of being just another drop, it turns encounter rewards into weapons, armor pieces, accessories and follow-up upgrades.`);
+        if (usedInEntries.length > 0) {
+          lines.push(`The current wiki already tracks ${usedInEntries.length} recipe link(s) for this material, including ${formatEntryTitleList(usedInEntries, 4)}, which makes this page a natural reference when planning the next craft.`);
+        }
+        break;
+      default:
+        lines.push(`${title} is documented here not only as a stat sheet, but as part of a larger progression path that links obtain methods, connected entries, crafting and practical value.`);
+        break;
+    }
+  }
+
+  return dedupeLines(lines).slice(0, 3);
+}
+
+function buildExpandedFacts(detailContext) {
+  const { recipe, summonEntry, summonContent, usedInEntries, relatedEntries, progressionStage, content } = detailContext;
+  const lines = [...(content.facts ?? [])];
+
+  if (progressionStage) {
+    lines.push(state.language === "pt-BR"
+      ? `Etapa atual: ${progressionStage}`
+      : `Current stage: ${progressionStage}`);
+  }
+
+  if (usedInEntries.length > 0) {
+    lines.push(state.language === "pt-BR"
+      ? `Usado em ${usedInEntries.length} entrada(s) rastreada(s)`
+      : `Used in ${usedInEntries.length} tracked entries`);
+  }
+
+  if (recipe.ingredients.length > 0) {
+    lines.push(state.language === "pt-BR"
+      ? `Receita rastreada com ${recipe.ingredients.length} componente(s)`
+      : `Tracked recipe with ${recipe.ingredients.length} component(s)`);
+  }
+
+  if (recipe.stations.length > 0) {
+    lines.push(state.language === "pt-BR"
+      ? `Estacao principal: ${formatStationLabelList(recipe.stations, 1)}`
+      : `Main station: ${formatStationLabelList(recipe.stations, 1)}`);
+  }
+
+  if (summonEntry) {
+    lines.push(state.language === "pt-BR"
+      ? `Invocacao ligada: ${summonContent.title ?? summonEntry.id}`
+      : `Linked summon: ${summonContent.title ?? summonEntry.id}`);
+  }
+
+  if (relatedEntries.length > 0) {
+    lines.push(state.language === "pt-BR"
+      ? `${relatedEntries.length} pagina(s) relacionada(s) na wiki`
+      : `${relatedEntries.length} related wiki page(s)`);
+  }
+
+  return dedupeLines(lines).slice(0, 8);
+}
+
+function buildEntryContextItems(detailContext) {
+  const { entry, content, progressionStage, relatedEntries, usedInEntries } = detailContext;
+  const title = content.title ?? entry.id;
+  const lines = [];
+
+  if (state.language === "pt-BR") {
+    switch (entry.category) {
+      case "bosses":
+      case "superbosses":
+      case "minibosses":
+        lines.push(`${title} e tratado pela wiki como um encontro central, entao a pagina dele precisa servir tanto para leitura rapida quanto para consulta de recompensas, invocacao e rota de progressao.`);
+        break;
+      case "summons":
+        lines.push(`${title} funciona como gatilho de encontro ou chave de acesso para outra parte do mod, entao o valor dele vai alem do item em si.`);
+        break;
+      case "materials":
+        lines.push(`${title} e um material de conversao: ele sai de uma etapa da progressao e reaparece em outra na forma de equipamentos, armas ou utilitarios.`);
+        break;
+      case "weapons":
+        lines.push(`${title} entra como arma do tier cristalino atual e existe para transformar recursos de progressao em dano e pressao imediata.`);
+        break;
+      case "armor":
+        lines.push(`${title} organiza a parte defensiva do tier atual e distribui o valor do set entre base fixa e variacoes por classe.`);
+        break;
+      case "accessories":
+        lines.push(`${title} ocupa um papel de utilidade ativa, misturando reposicionamento, defesa e suporte para encontros mais exigentes.`);
+        break;
+      case "consumables":
+        lines.push(`${title} foi pensado como consumivel de sustain e preparo, o tipo de item que melhora uma tentativa antes mesmo de a luta ficar caotica.`);
+        break;
+      case "buffs":
+        lines.push(`${title} representa um efeito temporario, entao esta pagina existe para explicar a camada mecanica que fica escondida atras de um item, acessorio ou set.`);
+        break;
+      default:
+        lines.push(`${title} faz parte da malha principal da wiki e serve para ligar nome, funcao, obtencao e relacoes com outras paginas do mod.`);
+        break;
+    }
+
+    if (progressionStage) {
+      lines.push(`Dentro da progressao atual da wiki, a etapa mais clara para esta entrada e ${progressionStage}.`);
+    }
+
+    if (relatedEntries.length > 0) {
+      lines.push(`As paginas mais ligadas a esta entrada hoje sao ${formatEntryTitleList(relatedEntries, 4)}.`);
+    }
+
+    if (entry.category === "materials" && usedInEntries.length > 0) {
+      lines.push(`${title} ja aparece em ${usedInEntries.length} uso(s) direto(s) rastreado(s), entao farmar esse material significa abrir espaco para uma parte relevante do conteudo atual.`);
+    }
+  }
+  else {
+    lines.push(`${title} is framed by the wiki as part of a bigger progression web, connecting identity, obtain methods, crafting and other related pages.`);
+    if (progressionStage) {
+      lines.push(`The clearest progression stage for this entry is ${progressionStage}.`);
+    }
+    if (relatedEntries.length > 0) {
+      lines.push(`The closest linked pages right now are ${formatEntryTitleList(relatedEntries, 4)}.`);
+    }
+  }
+
+  return dedupeLines(lines);
+}
+
+function buildEntryObtainItems(detailContext) {
+  const { entry, content, recipe, summonEntry, summonContent, relatedEntries, progressionStage } = detailContext;
+  const title = content.title ?? entry.id;
+  const lines = [...(content.obtain ?? [])];
+
+  if (state.language === "pt-BR") {
+    if (entry.category === "bosses" && summonEntry) {
+      lines.push(`O jeito pratico de iniciar esse encontro e usando ${summonContent.title ?? summonEntry.id}.`);
+      if (summonContent.crafting?.length) {
+        lines.push(`A invocacao ligada ja tem receita propria, entao o preparo da luta comeca antes do spawn com ${summonContent.crafting[0]}.`);
+      }
+    }
+
+    if (lines.length === 0 && recipe.ingredients.length > 0) {
+      lines.push(`${title} e obtido principalmente por crafting, nao por drop direto.`);
+      lines.push(`A receita rastreada usa ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` em ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+    }
+
+    if (entry.category === "buffs" && relatedEntries.length > 0) {
+      lines.push(`Esse buff nao e adquirido isoladamente: ele e aplicado por ${formatEntryTitleList(relatedEntries, 3)}.`);
+    }
+
+    if (progressionStage && entry.category !== "bosses") {
+      lines.push(`A entrada esta amarrada ao momento de ${progressionStage}, entao costuma aparecer quando o jogador ja chegou nesse marco.`);
+    }
+  }
+  else {
+    if (lines.length === 0 && recipe.ingredients.length > 0) {
+      lines.push(`${title} is primarily obtained through crafting rather than direct drops.`);
+      lines.push(`The tracked recipe uses ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` at ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+    }
+    if (entry.category === "buffs" && relatedEntries.length > 0) {
+      lines.push(`This buff is not obtained directly: it is applied by ${formatEntryTitleList(relatedEntries, 3)}.`);
+    }
+  }
+
+  return dedupeLines(lines);
+}
+
+function buildEntryUsageItems(detailContext) {
+  const { entry, content, recipe, usedInEntries, relatedEntries, relatedBuffEntries, relatedArmorEntries, relatedBossEntries } = detailContext;
+  const title = content.title ?? entry.id;
+  const lines = [];
+
+  if (state.language === "pt-BR") {
+    switch (entry.category) {
+      case "materials":
+        if (usedInEntries.length > 0) {
+          lines.push(`O uso principal de ${title} hoje e alimentar crafts como ${formatEntryTitleList(usedInEntries, 4)}.`);
+          lines.push(`Na pratica, esse material mede o quanto da linha cristalina voce ja consegue converter em upgrade real.`);
+        }
+        break;
+      case "weapons":
+        lines.push(`${title} serve como opcao ofensiva direta do arco cristalino atual, entao o valor dela aparece quando o jogador quer transformar farm em poder imediato.`);
+        if (relatedArmorEntries.length > 0) {
+          lines.push(`Ela conversa especialmente bem com ${formatEntryTitleList(relatedArmorEntries, 3)}, porque essas paginas pertencem ao mesmo pacote de progressao.`);
+        }
+        if (recipe.ingredients.length > 0) {
+          lines.push(`A propria receita mostra quais recursos precisam ser guardados para priorizar essa arma sobre outras escolhas do mesmo tier.`);
+        }
+        break;
+      case "armor":
+        lines.push(`O set muda bastante de funcao conforme o helm escolhido, entao a pagina dele serve tanto para leitura de defesa quanto para comparacao entre estilos de jogo.`);
+        if (relatedBuffEntries.length > 0) {
+          lines.push(`Os buffs ligados, como ${formatEntryTitleList(relatedBuffEntries, 3)}, ajudam a explicar o valor total do conjunto depois que ele entra em combate.`);
+        }
+        break;
+      case "accessories":
+        lines.push(`${title} vale principalmente em lutas com muita pressao de reposicionamento, porque a pagina descreve um acessorio que resolve defesa e movimento ao mesmo tempo.`);
+        if (relatedBuffEntries.length > 0) {
+          lines.push(`O acessorio tambem estende seu valor atraves de ${formatEntryTitleList(relatedBuffEntries, 3)}.`);
+        }
+        break;
+      case "consumables":
+        lines.push(`${title} entra melhor em tentativas longas, repeticao de boss e janelas em que sobreviver por mais alguns segundos ja muda a consistencia da luta.`);
+        if (relatedBuffEntries.length > 0) {
+          lines.push(`Depois do uso, a entrada ainda se desdobra em ${formatEntryTitleList(relatedBuffEntries, 3)}, entao o efeito real do consumivel vai alem da cura imediata.`);
+        }
+        break;
+      case "buffs":
+        lines.push(`${title} deve ser lido como extensao da fonte que o ativa, nao como efeito isolado. Em termos praticos, ele ajuda a explicar por que um item ou set funciona tao bem em campo.`);
+        if (relatedEntries.length > 0) {
+          lines.push(`A melhor leitura de uso continua sendo junto de ${formatEntryTitleList(relatedEntries, 3)}.`);
+        }
+        break;
+      case "summons":
+        lines.push(`${title} e valioso porque controla o acesso ao encontro ligado a ele, permitindo repetir tentativas e planejar o farm em vez de depender de spawn aleatorio.`);
+        if (relatedBossEntries.length > 0) {
+          lines.push(`Hoje ele se conecta diretamente a ${formatEntryTitleList(relatedBossEntries, 3)}, entao a pagina tambem funciona como atalho para esse encontro.`);
+        }
+        break;
+      case "bosses":
+      case "superbosses":
+      case "minibosses":
+        lines.push(`Derrotar ${title} nao serve so para fechar uma luta: o encontro alimenta drops, crafts e paginas que sustentam o restante do tier atual.`);
+        if (relatedEntries.length > 0) {
+          lines.push(`As conexoes mais claras do loot e da progressao daqui hoje passam por ${formatEntryTitleList(relatedEntries, 4)}.`);
+        }
+        break;
+      default:
+        if (usedInEntries.length > 0) {
+          lines.push(`${title} continua relevante porque ainda aparece em ${usedInEntries.length} receita(s) ou pagina(s) ligada(s) dentro da wiki.`);
+        }
+        break;
+    }
+  }
+  else {
+    if (usedInEntries.length > 0) {
+      lines.push(`${title} stays relevant because it already appears in ${usedInEntries.length} tracked recipe or progression links across the wiki.`);
+    }
+    if (relatedEntries.length > 0) {
+      lines.push(`Its closest synergy pages right now are ${formatEntryTitleList(relatedEntries, 3)}.`);
+    }
+  }
+
+  return dedupeLines(lines);
+}
+
+function buildEntryProgressionItems(detailContext) {
+  const { entry, content, summonEntry, summonContent, usedInEntries, relatedEntries, relatedBossEntries, progressionStage } = detailContext;
+  const title = content.title ?? entry.id;
+  const lines = [];
+
+  if (state.language === "pt-BR") {
+    if (progressionStage) {
+      lines.push(`A etapa mais natural para encaixar ${title} dentro do mod hoje e ${progressionStage}.`);
+    }
+
+    if (entry.category === "bosses" && relatedEntries.length > 0) {
+      lines.push(`Uma vitoria aqui prepara o caminho para paginas como ${formatEntryTitleList(relatedEntries, 4)}.`);
+    }
+
+    if (entry.category === "summons" && relatedBossEntries.length > 0) {
+      lines.push(`O fluxo mais direto e montar ${title}, abrir ${formatEntryTitleList(relatedBossEntries, 2)} e converter o loot desse encontro em upgrades.`);
+    }
+
+    if (entry.category === "materials" && relatedBossEntries.length > 0 && usedInEntries.length > 0) {
+      lines.push(`A rota mais clara hoje e ${getLocalizedEntry(relatedBossEntries[0]).title ?? relatedBossEntries[0].id} -> ${title} -> ${formatEntryTitleList(usedInEntries, 3)}.`);
+    }
+
+    if (entry.category !== "bosses" && summonEntry) {
+      lines.push(`A pagina da invocacao ${summonContent.title ?? summonEntry.id} ajuda a localizar onde esta entrada encosta nos encontros da wiki.`);
+    }
+  }
+  else {
+    if (progressionStage) {
+      lines.push(`The clearest stage for ${title} in the current wiki is ${progressionStage}.`);
+    }
+    if (entry.category === "materials" && usedInEntries.length > 0) {
+      lines.push(`The cleanest path currently looks like reward -> ${title} -> ${formatEntryTitleList(usedInEntries, 3)}.`);
+    }
+  }
+
+  return dedupeLines(lines);
+}
+
+function buildEntryDropItems(detailContext) {
+  const { entry, content, relatedEntries } = detailContext;
+  const lines = [...(content.drops ?? [])];
+
+  if (state.language === "pt-BR") {
+    if (entry.category === "bosses" && relatedEntries.length > 0) {
+      lines.push(`As paginas mais claramente alimentadas pelo loot atual deste encontro sao ${formatEntryTitleList(relatedEntries, 4)}.`);
+    }
+  }
+  else if (entry.category === "bosses" && relatedEntries.length > 0) {
+    lines.push(`The current reward loop of this encounter most clearly feeds pages like ${formatEntryTitleList(relatedEntries, 4)}.`);
+  }
+
+  return dedupeLines(lines);
+}
+
+function buildEntryPieceItems(detailContext) {
+  const { entry, content } = detailContext;
+  const lines = [...(content.pieces ?? [])];
+
+  if (state.language === "pt-BR" && entry.category === "armor" && lines.length > 0) {
+    lines.push(`As pecas listadas acima mostram como o set muda de funcao sem mudar a base de peito e pernas.`);
+  }
+  else if (entry.category === "armor" && lines.length > 0) {
+    lines.push(`The listed pieces show how the set changes role while keeping the same chest and leg core.`);
+  }
+
+  return dedupeLines(lines);
+}
+
+function buildEntryNoteItems(detailContext) {
+  const { entry, content, recipe, summonEntry, summonContent, usedInEntries, relatedEntries } = detailContext;
+  const title = content.title ?? entry.id;
+  const lines = [...(content.notes ?? [])];
+
+  if (state.language === "pt-BR") {
+    if (usedInEntries.length > 0) {
+      lines.push(`A wiki ja rastreia ${usedInEntries.length} uso(s) direto(s) para ${title}, entao esta pagina pode funcionar como referencia central sempre que novos crafts forem entrando.`);
+    }
+
+    if (relatedEntries.length > 0) {
+      lines.push(`Entre as conexoes mais importantes desta entrada hoje estao ${formatEntryTitleList(relatedEntries, 4)}.`);
+    }
+
+    if (recipe.stations.length > 0 && entry.category !== "summons") {
+      lines.push(`Toda a montagem registrada para esta entrada passa por ${formatStationLabelList(recipe.stations, 2)}.`);
+    }
+
+    if (summonEntry && isEncounterCategory(entry.category)) {
+      lines.push(`Ler ${summonContent.title ?? summonEntry.id} junto desta pagina ajuda a fechar o contexto completo do spawn e da preparacao da luta.`);
+    }
+  }
+  else {
+    if (usedInEntries.length > 0) {
+      lines.push(`The wiki already tracks ${usedInEntries.length} direct follow-up use(s) for ${title}, so this page can act as a central reference as more crafts are added.`);
+    }
+
+    if (relatedEntries.length > 0) {
+      lines.push(`Important linked pages currently include ${formatEntryTitleList(relatedEntries, 4)}.`);
+    }
+  }
+
+  return dedupeLines(lines);
+}
+
+function buildEntryTacticItems(detailContext) {
+  const { entry, content, relatedBuffEntries } = detailContext;
+  const lines = [...(content.tactics ?? [])];
+
+  if (state.language === "pt-BR") {
+    switch (entry.category) {
+      case "bosses":
+      case "superbosses":
+      case "minibosses":
+        lines.push(`Vale tratar esta pagina como um guia de preparacao: invocacao, espaco de luta, recompensas e leitura de fases costumam importar tanto quanto os numeros do boss.`);
+        break;
+      case "weapons":
+        lines.push(`Como arma de tier avancado, ela rende melhor quando o jogador ja consegue sustentar a janela de dano para explorar o padrao principal do disparo.`);
+        break;
+      case "armor":
+        lines.push(`A decisao mais importante em combate costuma ser qual helm fecha a build, porque e isso que transforma o set em dano, sustain ou pressao por classe.`);
+        break;
+      case "accessories":
+        lines.push(`O melhor valor desta entrada costuma aparecer quando o efeito ativo e guardado para reposicionamento ou para corrigir uma troca ruim de arena.`);
+        break;
+      case "consumables":
+        lines.push(`Use esse tipo de consumivel em lutas longas ou em sequencias de tentativa, quando a cura imediata e os buffs extras realmente conseguem mudar a consistencia do encontro.`);
+        break;
+      case "buffs":
+        lines.push(`Como buff, ele vale mais quando o jogador entende o timing da fonte que o aplica e aproveita a janela extra de defesa, regen ou mobilidade.`);
+        if (relatedBuffEntries.length > 0) {
+          lines.push(`Se houver outros buffs ligados a mesma linha, vale compara-los para entender que parte do pacote vem de cada efeito.`);
+        }
+        break;
+      case "summons":
+        lines.push(`A melhor forma de usar uma invocacao como esta e planejar o custo por tentativa antes do farm, para que o encontro possa ser repetido sem travar a progressao.`);
+        break;
+      default:
+        break;
+    }
+  }
+  else {
+    switch (entry.category) {
+      case "bosses":
+      case "superbosses":
+      case "minibosses":
+        lines.push(`Treat this page as a prep guide as much as a stat sheet: summon timing, arena space, rewards and phase reading all matter.`);
+        break;
+      case "weapons":
+        lines.push(`This kind of advanced-tier weapon performs best once the player can reliably hold its main damage window.`);
+        break;
+      case "buffs":
+        lines.push(`As a buff, it matters most when the player understands the timing of the source that applies it.`);
+        break;
+      default:
+        break;
+    }
+  }
+
+  return dedupeLines(lines);
+}
+
+function renderLinkedEntriesBlock(label, entries) {
+  if (!label || !entries || entries.length === 0) {
+    return "";
+  }
+
+  return `
+    <div class="content-block">
+      <h3>${label}</h3>
+      <div class="entry-inline-list">${entries.map((entry) => renderLinkedEntryRow(entry)).join("")}</div>
+    </div>
+  `;
+}
+
+function renderLinkedEntryRow(entry) {
+  const content = getLocalizedEntry(entry);
+  const asset = getEntryDisplayAsset(entry);
+  const subtitle = String(content.subtitle ?? "").trim();
+  const summary = String(content.summary ?? content.overview ?? "").trim();
+
+  return `
+    <a class="entry-inline-row entry-inline-row--detail" href="${buildPageUrl("entry", { entry: entry.id })}">
+      <img class="entry-inline-row__image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
+      <div class="entry-inline-row__body">
+        <strong>${escapeHtml(content.title ?? entry.id)}</strong>
+        ${subtitle ? `<small class="entry-inline-row__subtitle">${escapeHtml(subtitle)}</small>` : ""}
+        ${summary ? `<small class="entry-inline-row__summary">${escapeHtml(summary)}</small>` : ""}
+      </div>
+    </a>
+  `;
+}
+
+function getEntryProgressionStage(entry, relatedEntries = [], summonEntry = null) {
+  const groupKey = resolveProgressionGroupKey(entry)
+    || resolveProgressionGroupKey(summonEntry)
+    || relatedEntries.map((candidate) => resolveProgressionGroupKey(candidate)).find(Boolean);
+
+  if (!groupKey) {
+    return "";
+  }
+
+  const progressionCopy = getCopy().progression.groups[groupKey];
+  return progressionCopy?.title ?? humanizeCategory(groupKey);
+}
+
+function resolveProgressionGroupKey(entry) {
+  if (!entry) {
+    return "";
+  }
+
+  const meta = getEntryMeta(entry);
+  if (meta.progressionGroup) {
+    return meta.progressionGroup;
+  }
+
+  if (entry.id === "crystaline-devourer") {
+    return "post_moonlord";
+  }
+
+  if ((entry.related ?? []).includes("crystaline-devourer")) {
+    return "post_moonlord";
+  }
+
+  return "";
+}
+
+function formatEntryTitleList(entries, limit = 3) {
+  const titles = entries
+    .slice(0, limit)
+    .map((entry) => getLocalizedEntry(entry).title ?? entry.id)
+    .filter(Boolean);
+
+  return joinLocalizedList(titles);
+}
+
+function formatIngredientLabelList(ingredients, limit = 4) {
+  return joinLocalizedList(
+    ingredients
+      .slice(0, limit)
+      .map((ingredient) => ingredient.label)
+      .filter(Boolean)
+  );
+}
+
+function formatStationLabelList(stations, limit = 2) {
+  return joinLocalizedList(
+    stations
+      .slice(0, limit)
+      .map((station) => station.label)
+      .filter(Boolean)
+  );
+}
+
+function joinLocalizedList(values) {
+  const clean = values.filter(Boolean);
+  if (clean.length === 0) {
+    return "";
+  }
+
+  if (clean.length === 1) {
+    return clean[0];
+  }
+
+  const joiner = state.language === "pt-BR"
+    ? " e "
+    : state.language === "es"
+      ? " y "
+      : state.language === "ru"
+        ? " и "
+        : " and ";
+
+  if (clean.length === 2) {
+    return `${clean[0]}${joiner}${clean[1]}`;
+  }
+
+  return `${clean.slice(0, -1).join(", ")}${joiner}${clean.at(-1)}`;
+}
+
+function dedupeLines(lines) {
+  const seen = new Set();
+  const output = [];
+
+  lines
+    .flat()
+    .map((item) => String(item ?? "").trim())
+    .filter(Boolean)
+    .forEach((item) => {
+      const key = normalize(item);
+      if (seen.has(key)) {
+        return;
+      }
+
+      seen.add(key);
+      output.push(item);
+    });
+
+  return output;
+}
+
+function isEncounterCategory(category) {
+  return ["bosses", "superbosses", "minibosses", "mobs"].includes(category);
 }
 
 function renderCraftingPage() {
