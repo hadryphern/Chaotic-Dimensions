@@ -29,8 +29,8 @@
 html {
   scroll-behavior: smooth;
   background:
-    radial-gradient(circle at 20% 16%, rgba(150, 118, 255, 0.18), transparent 14%),
-    radial-gradient(circle at 78% 18%, rgba(101, 162, 255, 0.14), transparent 12%),
+    linear-gradient(180deg, rgba(7, 5, 15, 0.5), rgba(10, 7, 20, 0.72)),
+    url("./assets/images/backgrounds/cosmic-night-sky.png") center top / cover no-repeat fixed,
     linear-gradient(180deg, #080511, #0d0918 40%, #120b21 100%);
 }
 
@@ -43,8 +43,8 @@ body {
     radial-gradient(circle at 82% 14%, rgba(110, 161, 255, 0.16), transparent 18%),
     radial-gradient(circle at 35% 24%, rgba(255, 239, 188, 0.08), transparent 1.5%),
     radial-gradient(circle at 72% 34%, rgba(255, 239, 188, 0.06), transparent 1.1%),
-    linear-gradient(180deg, rgba(14, 10, 26, 0.96), rgba(10, 8, 20, 0.98)),
-    linear-gradient(180deg, #090713, #120b20 42%, #171026 100%);
+    linear-gradient(180deg, rgba(14, 10, 26, 0.84), rgba(10, 8, 20, 0.92)),
+    linear-gradient(180deg, rgba(9, 7, 19, 0.88), rgba(18, 11, 32, 0.92) 42%, rgba(23, 16, 38, 0.94) 100%);
   color: var(--text);
   font-family: "Plus Jakarta Sans", sans-serif;
 }
@@ -520,19 +520,20 @@ h3 {
 .summary-sprite-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
 }
 
 .summary-sprite {
-  width: 34px;
-  height: 34px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   image-rendering: pixelated;
-  padding: 4px;
-  border: 1px solid rgba(203, 169, 109, 0.28);
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: 0 0 0 1px rgba(125, 94, 185, 0.12) inset;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: drop-shadow(0 0 4px rgba(172, 133, 255, 0.16));
 }
 
 .summary-sprite--empty {
