@@ -110,18 +110,18 @@ const pageCopy = {
       static: "Static"
     },
     home: {
-      title: "Uma wiki mais profissional, organizada por paginas e feita para crescer.",
-      lead: "A base agora trabalha como uma wiki de referencia: cada area tem sua propria pagina, a navegacao fica limpa no topo e as informacoes deixam de competir no mesmo lugar.",
-      introTitle: "Comece pelo que voce precisa",
-      introBody: "Use a Biblioteca para descobrir entradas, abra paginas dedicadas para cada item ou boss, consulte receitas em Crafting e acompanhe a Progressao sem a poluicao de uma pagina unica.",
+      title: "A principal wiki do Chaotic Dimensions.",
+      lead: "Um arquivo vivo para acompanhar itens, criaturas, receitas, progressao e sistemas do mod em um visual cosmico com leitura de wiki classica.",
+      introTitle: "O que voce encontra aqui",
+      introBody: "Cada area da wiki existe para documentar uma parte diferente do mod com clareza: consultar entradas, entender crafting, acompanhar a progressao e centralizar feedback da comunidade.",
       links: [
-        { page: "library", title: "Biblioteca", body: "Lista limpa de itens, mobs, bosses e sistemas." },
-        { page: "crafting", title: "Crafting", body: "Receitas separadas da listagem principal." },
-        { page: "progression", title: "Progressao", body: "Ordem sugerida de encounters e gates." },
-        { page: "feedback", title: "Feedback", body: "Login, comentarios e retorno da comunidade." }
+        { page: "library", title: "Biblioteca", body: "A Biblioteca reune as paginas principais da wiki em um catalogo pesquisavel, com filtros por categoria e acesso rapido para itens, mobs, bosses, materiais e sistemas." },
+        { page: "crafting", title: "Crafting", body: "A area de Crafting foi separada para mostrar receitas com mais clareza, destacando estacoes de trabalho, ingredientes, sprites e relacoes entre os itens usados." },
+        { page: "progression", title: "Progressao", body: "A pagina de Progressao organiza a rota do mod por etapas, encontros e marcos importantes, facilitando entender quando cada boss, mob ou sistema entra em cena." },
+        { page: "feedback", title: "Feedback", body: "Feedback concentra comentarios, contas e retorno da comunidade sem poluir a parte enciclopedica da wiki, deixando o restante do site mais limpo e focado." }
       ],
       categoryTitle: "Categorias ativas",
-      categoryBody: "Cada categoria vira um filtro real na Biblioteca e pode continuar crescendo sem quebrar o layout.",
+      categoryBody: "As categorias agora funcionam como vitrines visuais da wiki, usando sprites e silhuetas do proprio conteudo para dar identidade a cada grupo.",
       featuredTitle: "Destaques atuais",
       featuredBody: "Entradas importantes para iniciar a documentacao do mod."
     },
@@ -306,18 +306,18 @@ const pageCopy = {
       static: "Static"
     },
     home: {
-      title: "A cleaner, more professional wiki with dedicated pages.",
-      lead: "The new structure behaves like a real reference wiki: focused pages, top navigation and content that no longer competes inside one oversized layout.",
-      introTitle: "Start from the page you need",
-      introBody: "Use the Library to browse entries, open dedicated pages for items and bosses, check recipes in Crafting and follow Progression without a noisy all-in-one screen.",
+      title: "The main Chaotic Dimensions wiki.",
+      lead: "A living archive for items, creatures, recipes, progression and systems, built with a cosmic atmosphere and a cleaner classic-wiki reading flow.",
+      introTitle: "What lives here",
+      introBody: "Each section of the wiki documents a different layer of the mod with more clarity: browse entries, inspect crafting, follow progression and centralize community feedback.",
       links: [
-        { page: "library", title: "Library", body: "Clean list of items, mobs, bosses and systems." },
-        { page: "crafting", title: "Crafting", body: "Recipes separated from the main listing." },
-        { page: "progression", title: "Progression", body: "Suggested encounters and gates." },
-        { page: "feedback", title: "Feedback", body: "Login, comments and community input." }
+        { page: "library", title: "Library", body: "The Library gathers the main wiki pages in a searchable catalogue with category filters and cleaner access to items, mobs, bosses, materials and systems." },
+        { page: "crafting", title: "Crafting", body: "Crafting has its own space so recipes can breathe, with workstations, ingredients, sprites and item relationships displayed more clearly." },
+        { page: "progression", title: "Progression", body: "The Progression page arranges the mod by stages, encounters and milestones so it is easier to understand when each boss, mob or system enters the journey." },
+        { page: "feedback", title: "Feedback", body: "Feedback centralizes comments, accounts and community notes without cluttering the encyclopedic side of the wiki." }
       ],
       categoryTitle: "Active categories",
-      categoryBody: "Each category becomes a real library filter and can keep expanding without breaking the layout.",
+      categoryBody: "Categories now act like visual showcases, using sprites and silhouettes from the content itself to give each group more identity.",
       featuredTitle: "Current highlights",
       featuredBody: "Important entries to anchor the mod documentation."
     },
@@ -654,21 +654,31 @@ function renderPage() {
 function renderHomePage() {
   const copy = getCopy();
   const featuredEntries = getHomeFeaturedEntries().map((entry) => renderEntryCard(entry, true)).join("");
-  const categoryMarkup = orderedCategories.map((category) => `
-    <article class="summary-tile">
-      <div>
-        <strong>${getCategoryLabel(category)}</strong>
-        <p>${getEntriesByCategory(category).length}</p>
-      </div>
-      <a class="inline-link" href="${buildPageUrl("library", { category })}">${copy.common.openPage}</a>
-    </article>
-  `).join("");
+  const categoryMarkup = orderedCategories.map((category) => {
+    const previewEntries = getHomeCategoryPreviewEntries(category);
+    const previewMarkup = previewEntries.length > 0
+      ? previewEntries.map((entry) => {
+        const content = getLocalizedEntry(entry);
+        const asset = getEntryDisplayAsset(entry, { ensure: false });
+        return `<img class="summary-sprite" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}" loading="lazy">`;
+      }).join("")
+      : `<span class="summary-sprite summary-sprite--empty">?</span>`;
+
+    return `
+      <article class="summary-tile">
+        <div class="summary-text">
+          <strong>${getCategoryLabel(category)}</strong>
+          <p>${getHomeCategoryBlurb(category)}</p>
+        </div>
+        <div class="summary-sprite-row" aria-hidden="true">${previewMarkup}</div>
+      </article>
+    `;
+  }).join("");
 
   const pageLinks = copy.home.links.map((item) => `
     <article class="feature-tile">
       <h3>${item.title}</h3>
       <p>${item.body}</p>
-      <a class="inline-link" href="${buildPageUrl(item.page)}">${copy.common.openPage}</a>
     </article>
   `).join("");
 
@@ -714,6 +724,55 @@ function renderHomePage() {
       <div class="entry-grid">${featuredEntries}</div>
     </section>
   `;
+}
+
+function getHomeCategoryPreviewEntries(category, limit = 4) {
+  return getEntriesByCategory(category)
+    .filter((entry) => entry?.isPublished !== false)
+    .slice(0, limit);
+}
+
+function getHomeCategoryBlurb(category) {
+  const labels = {
+    bosses: {
+      "pt-BR": "Chefes, encontros centrais e lutas que definem o ritmo da progressao.",
+      en: "Boss encounters and major fights that define the pace of progression."
+    },
+    superbosses: {
+      "pt-BR": "Encontros de pico para o endgame e desafios de alto impacto.",
+      en: "Peak endgame encounters built for the heaviest challenges."
+    },
+    minibosses: {
+      "pt-BR": "Mini-bosses que reforcam biomas, rotas e recompensas intermediarias.",
+      en: "Mini-bosses that reinforce biomes, routes and mid-tier rewards."
+    },
+    mobs: {
+      "pt-BR": "Criaturas e spawns do mundo que ajudam a contar o ecossistema do mod.",
+      en: "Creatures and world spawns that shape the mod's ecosystem."
+    },
+    summons: {
+      "pt-BR": "Itens de invocacao, chamadas de encounter e gatilhos especiais.",
+      en: "Summoning items, encounter triggers and ritual-like calls."
+    },
+    weapons: {
+      "pt-BR": "Armas, variantes e poderes que formam o arsenal do Chaotic Dimensions.",
+      en: "Weapons, variants and powers that build the Chaotic Dimensions arsenal."
+    },
+    armor: {
+      "pt-BR": "Sets, pecas defensivas e armaduras voltadas para cada estilo de jogo.",
+      en: "Armor sets, defensive pieces and class-focused equipment."
+    },
+    materials: {
+      "pt-BR": "Materiais-base usados em crafts, invocacoes, upgrades e sistemas.",
+      en: "Core materials used across crafts, summons, upgrades and systems."
+    }
+  };
+
+  return labels[category]?.[state.language]
+    ?? labels[category]?.en
+    ?? ((state.language === "pt-BR")
+      ? `Uma vitrine visual para acompanhar ${getCategoryLabel(category).toLowerCase()} dentro da wiki.`
+      : `A visual showcase for tracking ${getCategoryLabel(category).toLowerCase()} across the wiki.`);
 }
 
 function renderLibraryPage() {
