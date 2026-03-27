@@ -1,25 +1,49 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600&display=swap");
 
 :root {
-  --bg: #090713;
-  --surface: #171123;
-  --surface-soft: #201630;
-  --surface-muted: #281d3b;
-  --line: #6d549a;
-  --line-strong: #cba96d;
-  --text: #f6f0ff;
-  --text-soft: #d7caef;
-  --text-dim: #9f90be;
-  --accent: #f0c98b;
-  --accent-soft: rgba(240, 201, 139, 0.14);
-  --cosmic-violet: rgba(98, 72, 184, 0.18);
-  --cosmic-violet-strong: rgba(86, 58, 160, 0.28);
-  --cosmic-blue: rgba(91, 130, 194, 0.14);
+  --bg: #06040f;
+  --surface: #120d22;
+  --surface-soft: #1a1430;
+  --surface-muted: #241b3e;
+  --line: #7c63aa;
+  --line-strong: #d9b97d;
+  --text: #f7f1ff;
+  --text-soft: #ddd2f3;
+  --text-dim: #a998cc;
+  --accent: #f1d7a2;
+  --accent-soft: rgba(241, 215, 162, 0.14);
+  --cosmic-violet: rgba(122, 90, 214, 0.18);
+  --cosmic-violet-strong: rgba(110, 73, 200, 0.32);
+  --cosmic-blue: rgba(95, 138, 224, 0.15);
   --danger: #ff7a8f;
   --success: #89d4a1;
   --radius: 4px;
   --radius-small: 2px;
   --content-width: 1320px;
+  --theme-header:
+    linear-gradient(180deg, rgba(8, 6, 16, 0.72), rgba(11, 8, 20, 0.9)),
+    radial-gradient(circle at 18% 0%, rgba(241, 215, 162, 0.1), transparent 26%),
+    radial-gradient(circle at 84% 18%, rgba(144, 118, 255, 0.18), transparent 32%),
+    linear-gradient(135deg, rgba(39, 26, 59, 0.82), rgba(14, 10, 24, 0.88));
+  --theme-panel:
+    radial-gradient(circle at top right, rgba(126, 98, 226, 0.16), transparent 34%),
+    radial-gradient(circle at left center, rgba(87, 136, 214, 0.1), transparent 28%),
+    linear-gradient(145deg, rgba(30, 21, 47, 0.98), rgba(16, 12, 29, 0.98));
+  --theme-panel-soft:
+    radial-gradient(circle at top right, rgba(130, 96, 232, 0.14), transparent 36%),
+    linear-gradient(145deg, rgba(25, 18, 42, 0.98), rgba(15, 11, 27, 0.98));
+  --theme-panel-strong:
+    radial-gradient(circle at top right, rgba(154, 118, 255, 0.2), transparent 34%),
+    linear-gradient(145deg, rgba(38, 27, 61, 0.99), rgba(20, 15, 35, 0.99));
+  --theme-button:
+    radial-gradient(circle at top center, rgba(241, 215, 162, 0.09), transparent 60%),
+    linear-gradient(180deg, rgba(38, 28, 59, 0.96), rgba(21, 16, 35, 0.96));
+  --theme-button-hover:
+    radial-gradient(circle at top center, rgba(241, 215, 162, 0.14), transparent 58%),
+    linear-gradient(180deg, rgba(56, 39, 87, 0.98), rgba(29, 21, 49, 0.98));
+  --theme-chip:
+    radial-gradient(circle at top right, rgba(126, 98, 226, 0.12), transparent 42%),
+    linear-gradient(180deg, rgba(44, 31, 68, 0.94), rgba(28, 21, 45, 0.94));
 }
 
 * {
@@ -30,7 +54,7 @@ html {
   scroll-behavior: smooth;
   background:
     linear-gradient(180deg, rgba(7, 5, 15, 0.5), rgba(10, 7, 20, 0.72)),
-    url("./assets/images/backgrounds/cosmic-night-sky.png") center top / cover no-repeat fixed,
+    url("./assets/images/backgrounds/cosmic-medieval-galaxy.png") center top / cover no-repeat fixed,
     linear-gradient(180deg, #080511, #0d0918 40%, #120b21 100%);
 }
 
@@ -39,12 +63,11 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 18% 12%, rgba(164, 124, 255, 0.18), transparent 20%),
-    radial-gradient(circle at 82% 14%, rgba(110, 161, 255, 0.16), transparent 18%),
-    radial-gradient(circle at 35% 24%, rgba(255, 239, 188, 0.08), transparent 1.5%),
-    radial-gradient(circle at 72% 34%, rgba(255, 239, 188, 0.06), transparent 1.1%),
-    linear-gradient(180deg, rgba(14, 10, 26, 0.84), rgba(10, 8, 20, 0.92)),
-    linear-gradient(180deg, rgba(9, 7, 19, 0.88), rgba(18, 11, 32, 0.92) 42%, rgba(23, 16, 38, 0.94) 100%);
+    radial-gradient(circle at 18% 10%, rgba(170, 136, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 82% 12%, rgba(117, 168, 255, 0.12), transparent 18%),
+    radial-gradient(circle at 52% 0%, rgba(241, 215, 162, 0.07), transparent 16%),
+    linear-gradient(180deg, rgba(9, 6, 17, 0.68), rgba(9, 7, 18, 0.9)),
+    linear-gradient(180deg, rgba(8, 6, 17, 0.9), rgba(14, 9, 27, 0.94) 42%, rgba(18, 11, 31, 0.96) 100%);
   color: var(--text);
   font-family: "Plus Jakarta Sans", sans-serif;
 }
@@ -62,22 +85,25 @@ body::before {
   background:
     radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.4px),
     radial-gradient(circle at 18% 72%, rgba(255, 255, 255, 0.72) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 28% 36%, rgba(203, 169, 109, 0.7) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 28% 36%, rgba(241, 215, 162, 0.72) 0 1px, transparent 1.4px),
     radial-gradient(circle at 36% 58%, rgba(255, 255, 255, 0.8) 0 1px, transparent 1.4px),
     radial-gradient(circle at 48% 12%, rgba(255, 255, 255, 0.74) 0 1px, transparent 1.4px),
     radial-gradient(circle at 58% 46%, rgba(145, 183, 255, 0.72) 0 1px, transparent 1.4px),
     radial-gradient(circle at 66% 26%, rgba(255, 255, 255, 0.78) 0 1px, transparent 1.4px),
     radial-gradient(circle at 74% 68%, rgba(255, 255, 255, 0.82) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 84% 38%, rgba(203, 169, 109, 0.72) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 92% 20%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.4px);
-  opacity: 0.7;
+    radial-gradient(circle at 84% 38%, rgba(241, 215, 162, 0.72) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 92% 20%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 62% 82%, rgba(241, 215, 162, 0.62) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 24% 88%, rgba(191, 161, 255, 0.62) 0 1px, transparent 1.4px);
+  opacity: 0.78;
 }
 
 body::after {
   background:
-    radial-gradient(circle at 50% -10%, rgba(128, 88, 255, 0.22), transparent 34%),
-    radial-gradient(circle at 8% 88%, rgba(101, 162, 255, 0.12), transparent 20%),
-    radial-gradient(circle at 88% 86%, rgba(186, 140, 255, 0.16), transparent 18%);
+    radial-gradient(circle at 50% -10%, rgba(128, 88, 255, 0.2), transparent 34%),
+    radial-gradient(circle at 8% 88%, rgba(101, 162, 255, 0.1), transparent 20%),
+    radial-gradient(circle at 88% 86%, rgba(186, 140, 255, 0.16), transparent 18%),
+    radial-gradient(circle at 50% 100%, rgba(241, 215, 162, 0.08), transparent 28%);
   opacity: 0.95;
 }
 
@@ -117,15 +143,12 @@ textarea {
   align-items: center;
   padding: 16px 20px;
   margin-bottom: 18px;
-  border: 1px solid rgba(55, 30, 12, 0.65);
+  border: 1px solid rgba(108, 83, 42, 0.44);
   border-bottom-width: 2px;
-  background-image:
-    linear-gradient(180deg, rgba(12, 8, 19, 0.72), rgba(12, 8, 19, 0.9)),
-    radial-gradient(circle at top right, rgba(156, 129, 255, 0.16), transparent 28%),
-    url("./assets/images/orespawn-legacy-theme/top-bar-bg.jpg");
-  background-repeat: no-repeat, no-repeat, repeat;
-  background-size: auto, auto, auto;
-  box-shadow: 0 14px 32px rgba(52, 33, 13, 0.15);
+  background-image: var(--theme-header);
+  background-repeat: no-repeat;
+  background-size: auto;
+  box-shadow: 0 18px 38px rgba(8, 5, 17, 0.42);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -257,11 +280,7 @@ h2 {
 
 .header-link {
   border-color: var(--line);
-  background-image:
-    linear-gradient(180deg, rgba(39, 28, 59, 0.96), rgba(23, 16, 37, 0.96)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-button);
   color: var(--text-soft);
   font-size: 0.95rem;
   font-weight: 600;
@@ -273,22 +292,14 @@ h2 {
 .main-nav .header-link.is-active {
   color: var(--text);
   border-color: var(--line-strong);
-  background-image:
-    linear-gradient(180deg, rgba(54, 37, 82, 0.98), rgba(30, 22, 48, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-button-hover);
 }
 
 .header-link--button,
 .action-button,
 .language-pill {
   border-color: var(--line);
-  background-image:
-    linear-gradient(180deg, rgba(39, 28, 59, 0.96), rgba(23, 16, 37, 0.96)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-button);
   font-weight: 600;
 }
 
@@ -297,11 +308,7 @@ h2 {
 .language-pill:hover,
 .language-pill.is-active {
   border-color: var(--line-strong);
-  background-image:
-    linear-gradient(180deg, rgba(54, 37, 82, 0.98), rgba(30, 22, 48, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-button-hover);
   color: var(--text);
 }
 
@@ -321,11 +328,7 @@ h2 {
   max-width: 100%;
   padding: 0 12px;
   border: 1px solid var(--line);
-  background-image:
-    linear-gradient(180deg, rgba(44, 31, 68, 0.94), rgba(28, 21, 45, 0.94)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-chip);
   color: var(--text-soft);
   font-size: 0.76rem;
   font-weight: 700;
@@ -349,14 +352,10 @@ h2 {
   overflow: hidden;
   padding: 20px 24px 18px;
   border: 1px solid var(--line);
-  background-image:
-    radial-gradient(circle at top right, rgba(115, 89, 204, 0.22), transparent 36%),
-    radial-gradient(circle at left center, rgba(91, 130, 194, 0.14), transparent 30%),
-    linear-gradient(180deg, rgba(28, 20, 43, 0.96), rgba(15, 11, 27, 0.96)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
-  background-size: auto, auto, auto, 48px 48px;
-  box-shadow: 0 14px 30px rgba(96, 72, 34, 0.1);
+  background-image: var(--theme-panel-strong);
+  background-repeat: no-repeat;
+  background-size: auto;
+  box-shadow: 0 16px 34px rgba(8, 5, 16, 0.24);
 }
 
 .page-hero--compact {
@@ -404,14 +403,10 @@ h3 {
   gap: 18px;
   padding: 22px 24px;
   border: 1px solid var(--line);
-  background-image:
-    radial-gradient(circle at top right, rgba(115, 89, 204, 0.18), transparent 34%),
-    radial-gradient(circle at left center, rgba(91, 130, 194, 0.1), transparent 26%),
-    linear-gradient(180deg, rgba(24, 17, 37, 0.98), rgba(16, 12, 28, 0.96)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
-  background-size: auto, auto, auto, 48px 48px;
-  box-shadow: 0 10px 24px rgba(96, 72, 34, 0.08);
+  background-image: var(--theme-panel);
+  background-repeat: no-repeat;
+  background-size: auto;
+  box-shadow: 0 16px 32px rgba(8, 5, 16, 0.22);
 }
 
 .page-section--portal {
@@ -480,13 +475,12 @@ h3 {
 .comment-card,
 .empty-card {
   padding: 20px;
-  background-image:
-    linear-gradient(180deg, rgba(28, 21, 43, 0.98), rgba(19, 14, 31, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-soft);
+  background-repeat: no-repeat;
+  background-size: auto;
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  box-shadow: inset 0 1px 0 rgba(241, 215, 162, 0.05);
 }
 
 .summary-tile,
@@ -565,11 +559,7 @@ h3 {
 .recipe-card:hover,
 .progress-card:hover {
   border-color: var(--line-strong);
-  background-image:
-    linear-gradient(180deg, rgba(40, 30, 61, 0.98), rgba(24, 18, 39, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-strong);
 }
 
 .panel-card--nested {
@@ -777,11 +767,7 @@ h3 {
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
-  background-image:
-    linear-gradient(180deg, rgba(32, 23, 50, 0.98), rgba(20, 14, 33, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-soft);
   color: var(--text-soft);
   text-align: left;
 }
@@ -793,11 +779,7 @@ h3 {
 .catalog-chip:hover,
 .catalog-chip.is-active {
   border-color: var(--line-strong);
-  background-image:
-    linear-gradient(180deg, rgba(45, 33, 69, 0.98), rgba(24, 18, 39, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-strong);
 }
 
 .field-group {
@@ -989,11 +971,7 @@ h3 {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
-  background-image:
-    linear-gradient(180deg, rgba(34, 25, 52, 0.98), rgba(21, 16, 34, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-soft);
 }
 
 .workstation-pill__icon,
@@ -1026,11 +1004,7 @@ h3 {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
-  background-image:
-    linear-gradient(180deg, rgba(34, 25, 52, 0.98), rgba(21, 16, 34, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-soft);
   min-height: 64px;
 }
 
@@ -1084,11 +1058,7 @@ h3 {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
-  background-image:
-    linear-gradient(180deg, rgba(34, 25, 52, 0.98), rgba(21, 16, 34, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-soft);
 }
 
 .admin-entry-list {
@@ -1101,11 +1071,7 @@ h3 {
   padding: 14px 16px;
   text-align: left;
   color: var(--text-soft);
-  background-image:
-    linear-gradient(180deg, rgba(30, 22, 47, 0.98), rgba(19, 14, 31, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-soft);
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
   display: grid;
@@ -1118,11 +1084,7 @@ h3 {
 .admin-entry-button.is-active {
   color: var(--text);
   border-color: var(--line-strong);
-  background-image:
-    linear-gradient(180deg, rgba(44, 32, 67, 0.98), rgba(24, 18, 39, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png");
-  background-repeat: no-repeat, repeat;
-  background-size: auto, 48px 48px;
+  background-image: var(--theme-panel-strong);
 }
 
 .admin-entry-button__thumb {
