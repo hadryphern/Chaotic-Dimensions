@@ -673,21 +673,22 @@ function renderHomePage() {
   `).join("");
 
   elements.main.innerHTML = `
-    <section class="page-hero">
-      <p class="eyebrow">${copy.siteLabel}</p>
-      <h1>${copy.home.title}</h1>
-      <p class="hero-lead">${copy.home.lead}</p>
-    </section>
-
-    <section class="page-section">
+    <section class="page-section page-section--portal">
       <div class="section-head">
         <div>
-          <h2>${copy.home.introTitle}</h2>
-          <p>${copy.home.introBody}</p>
+          <p class="eyebrow">${copy.siteLabel}</p>
+          <h1>${copy.home.title}</h1>
+          <p>${copy.home.lead}</p>
         </div>
         <div class="section-actions">
           <a class="header-link header-link--button" href="${siteConfig.pagesUrl}" target="_blank" rel="noreferrer">${copy.common.liveSite}</a>
           <a class="header-link header-link--button" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">${copy.common.github}</a>
+        </div>
+      </div>
+      <div class="section-head">
+        <div>
+          <h2>${copy.home.introTitle}</h2>
+          <p>${copy.home.introBody}</p>
         </div>
       </div>
       <div class="feature-grid">${pageLinks}</div>
@@ -1606,7 +1607,7 @@ function renderEntryCard(entry, includeFacts = false) {
         <a class="entry-card-thumb" href="${buildPageUrl("entry", { entry: entry.id })}">
           <img class="entry-card-image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
         </a>
-        <div>
+        <div class="entry-card-copy">
           <div class="tag-row">
             <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
             <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
@@ -1634,7 +1635,7 @@ function renderRecipeCard(entry) {
         <a class="entry-card-thumb" href="${buildPageUrl("entry", { entry: entry.id })}">
           <img class="entry-card-image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
         </a>
-        <div>
+        <div class="entry-card-copy">
           <div class="tag-row">
             <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
             <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
@@ -2104,17 +2105,6 @@ function getCopy() {
 function isDefaultEntryImage(imageUrl) {
   const clean = String(imageUrl ?? "").trim();
   return !clean || clean === DEFAULT_ENTRY_IMAGE;
-}
-
-function normalizeLegacyKey(value) {
-  return String(value ?? "")
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/&/g, " and ")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 function getEntryExternalLookup(entry) {
