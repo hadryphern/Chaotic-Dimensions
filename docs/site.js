@@ -1,5 +1,7 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
 import { frontierEntries, frontierUiCopy } from "./orespawn-data.js";
+import { generatedOreSpawnEntries } from "./generated-orespawn-data.js";
+import { generatedTerrariaAssets } from "./generated-terraria-assets.js";
 import {
   backendState,
   initBackend,
@@ -63,26 +65,27 @@ const ENTRY_TAGS = {
 };
 
 const PROGRESSION_GROUPS = [
-  {
-    key: "pre_hardmode",
-    entryIds: ["water-dragon", "mantis", "caterkiller", "emperor-scorpion", "hercules"]
-  },
-  {
-    key: "pre_moonlord",
-    entryIds: ["cephadrome"]
-  },
-  {
-    key: "post_moonlord",
-    entryIds: ["crystaline-devourer"]
-  }
+  { key: "pre_hardmode" },
+  { key: "pre_moonlord" },
+  { key: "post_moonlord" }
 ];
 
 const WORKSTATIONS = [
   { id: "lunar-crafting-station", label: "Lunar Crafting Station", short: "LC", keywords: ["lunar crafting station"] },
   { id: "ancient-manipulator", label: "Ancient Manipulator", short: "AM", keywords: ["ancient manipulator"] },
   { id: "mythril-anvil", label: "Mythril Anvil", short: "MY", keywords: ["mythril anvil", "orichalcum anvil"] },
+  { id: "adamantite-forge", label: "Adamantite Forge", short: "AF", keywords: ["adamantite forge"] },
   { id: "anvil", label: "Anvil", short: "AN", keywords: [" anvil", "anvil "] },
-  { id: "forge", label: "Forge", short: "FG", keywords: ["hellforge", "forge", "furnace"] }
+  { id: "furnace", label: "Furnace", short: "FU", keywords: ["hellforge", "forge", "furnace"] }
+];
+
+const HOME_FEATURED_IDS = [
+  "crystaline-devourer",
+  "water-dragon",
+  "mantis",
+  "caterkiller",
+  "mobzilla",
+  "kraken"
 ];
 
 const DEFAULT_ENTRY_IMAGE = "./assets/images/favicon.png";
@@ -91,7 +94,9 @@ const TERRARIA_WIKI = {
   pageBaseUrl: "https://terraria.wiki.gg/wiki/"
 };
 
-const staticEntries = [...entries, ...frontierEntries];
+const RUNTIME_TERRARIA_LOOKUP_ENABLED = false;
+
+const staticEntries = mergeStaticSources(entries, generatedOreSpawnEntries, frontierEntries);
 const pageId = document.body.dataset.page ?? "home";
 
 const elements = {
@@ -503,7 +508,7 @@ let allEntries = [];
 let orderedCategories = [];
 let craftableEntries = [];
 const externalAssetState = {
-  cache: loadExternalAssetCache()
+  cache: buildInitialExternalAssetCache()
 };
 
 const state = {
@@ -661,7 +666,7 @@ function renderPage() {
 
 function renderHomePage() {
   const copy = getCopy();
-  const featuredEntries = allEntries.slice(0, 6).map((entry) => renderEntryCard(entry, true)).join("");
+  const featuredEntries = getHomeFeaturedEntries().map((entry) => renderEntryCard(entry, true)).join("");
   const categoryMarkup = orderedCategories.map((category) => `
     <article class="summary-tile">
       <div>
@@ -967,7 +972,7 @@ function renderCraftingPage() {
 function renderProgressionPage() {
   const copy = getCopy();
   const groupMarkup = PROGRESSION_GROUPS.map((group) => {
-    const entriesForGroup = group.entryIds.map((entryId) => getEntryById(entryId)).filter(Boolean);
+    const entriesForGroup = getProgressionEntries(group.key);
     if (entriesForGroup.length === 0) {
       return "";
     }
@@ -1903,6 +1908,20 @@ function getVisibleRecipes() {
   });
 }
 
+function getHomeFeaturedEntries() {
+  const curated = HOME_FEATURED_IDS
+    .map((entryId) => getEntryById(entryId))
+    .filter(Boolean);
+
+  if (curated.length >= 4) {
+    return curated;
+  }
+
+  return allEntries
+    .filter((entry) => entry.category !== "blocks" && entry.category !== "events" && entry.category !== "systems")
+    .slice(0, 6);
+}
+
 function getAdminBrowserEntries() {
   const term = normalize(state.adminSearch);
   const category = state.adminCategory;
@@ -1920,6 +1939,17 @@ function getAdminBrowserEntries() {
 
 function getEntriesByCategory(category) {
   return allEntries.filter((entry) => entry.category === category);
+}
+
+function getProgressionEntries(groupKey) {
+  return allEntries.filter((entry) => {
+    const meta = getEntryMeta(entry);
+    if (entry.id === "crystaline-devourer") {
+      return groupKey === "post_moonlord";
+    }
+
+    return Boolean(meta.featureInProgression) && meta.progressionGroup === groupKey;
+  }).sort(compareEntries);
 }
 
 function getEntryById(entryId) {
@@ -2058,11 +2088,66 @@ function getEntryDisplayAsset(entry, options = {}) {
 }
 
 function getTagLabel(entry) {
+  const categoryTagMap = {
+    bosses: "boss",
+    superbosses: "superboss",
+    minibosses: "miniboss",
+    mobs: "mob",
+    summons: "summon",
+    weapons: "weapon",
+    armor: "armor",
+    accessories: "accessory",
+    consumables: "consumable",
+    materials: "material",
+    blocks: "block",
+    tools: "tool",
+    npcs: "npc",
+    dimensions: "dimension",
+    events: "event",
+    systems: "system"
+  };
   const tagKey = ENTRY_TAGS[entry.id]
-    ?? (entry.category === "bosses" || entry.category === "superbosses" ? "boss" : entry.category === "minibosses" ? "miniboss" : "mob");
+    ?? categoryTagMap[entry.category]
+    ?? "entry";
   const labels = {
-    "pt-BR": { boss: "Boss", miniboss: "Mini-Boss", mob: "Mob" },
-    en: { boss: "Boss", miniboss: "Mini-Boss", mob: "Mob" }
+    "pt-BR": {
+      boss: "Boss",
+      superboss: "Superboss",
+      miniboss: "Mini-Boss",
+      mob: "Mob",
+      summon: "Invocacao",
+      weapon: "Arma",
+      armor: "Armadura",
+      accessory: "Acessorio",
+      consumable: "Consumivel",
+      material: "Material",
+      block: "Bloco",
+      tool: "Ferramenta",
+      npc: "NPC",
+      dimension: "Dimensao",
+      event: "Evento",
+      system: "Sistema",
+      entry: "Entrada"
+    },
+    en: {
+      boss: "Boss",
+      superboss: "Superboss",
+      miniboss: "Mini-Boss",
+      mob: "Mob",
+      summon: "Summon",
+      weapon: "Weapon",
+      armor: "Armor",
+      accessory: "Accessory",
+      consumable: "Consumable",
+      material: "Material",
+      block: "Block",
+      tool: "Tool",
+      npc: "NPC",
+      dimension: "Dimension",
+      event: "Event",
+      system: "System",
+      entry: "Entry"
+    }
   };
   return (labels[state.language] ?? labels.en)[tagKey] ?? tagKey;
 }
@@ -2081,12 +2166,16 @@ function buildSearchText(entry) {
     ...(content.obtain ?? []),
     ...(content.crafting ?? []),
     ...(content.drops ?? []),
-    ...(content.notes ?? []),
-    ...(content.tactics ?? []),
-    ...(content.pieces ?? []),
-    meta.vanillaAlias,
-    meta.wikiSource
-  ].filter(Boolean).join(" ");
+      ...(content.notes ?? []),
+      ...(content.tactics ?? []),
+      ...(content.pieces ?? []),
+      meta.vanillaAlias,
+      meta.wikiSource,
+      meta.progressionGate,
+      meta.spawnKind,
+      meta.oreSpawnKey,
+      meta.eventKey
+    ].filter(Boolean).join(" ");
 }
 
 function mergeEntries(baseEntries, publishedEntries) {
@@ -2107,6 +2196,40 @@ function mergeEntries(baseEntries, publishedEntries) {
       sortOrder: Number(entry.sortOrder ?? existing?.sortOrder ?? 0),
       isPublished: entry.isPublished ?? existing?.isPublished ?? true,
       content: mergeContentObjects(existing?.content ?? {}, entry.content ?? {})
+    });
+  });
+
+  return [...merged.values()].sort(compareEntries);
+}
+
+function mergeStaticSources(...sourceLists) {
+  const merged = new Map();
+
+  sourceLists.flat().forEach((entry) => {
+    if (!entry) {
+      return;
+    }
+
+    const existing = merged.get(entry.id);
+    if (!existing) {
+      merged.set(entry.id, cloneEntry(entry));
+      return;
+    }
+
+    const nextImage = !isDefaultEntryImage(entry.image) ? entry.image : existing.image;
+    const nextSortOrder = Number(entry.sortOrder ?? 0) !== 0 || Number(existing.sortOrder ?? 0) === 0
+      ? Number(entry.sortOrder ?? existing.sortOrder ?? 0)
+      : Number(existing.sortOrder ?? 0);
+
+    merged.set(entry.id, {
+      id: entry.id,
+      category: entry.category ?? existing.category,
+      image: nextImage,
+      banner: entry.banner || existing.banner || "",
+      related: [...new Set([...(existing.related ?? []), ...(entry.related ?? [])])],
+      sortOrder: nextSortOrder,
+      isPublished: entry.isPublished ?? existing.isPublished ?? true,
+      content: mergeContentObjects(existing.content, entry.content ?? {})
     });
   });
 
@@ -2433,6 +2556,17 @@ function loadExternalAssetCache() {
   }
 }
 
+function buildInitialExternalAssetCache() {
+  const generatedCache = Object.fromEntries(
+    Object.entries(generatedTerrariaAssets ?? {}).map(([key, data]) => [key, { status: "ready", data }])
+  );
+
+  return {
+    ...loadExternalAssetCache(),
+    ...generatedCache
+  };
+}
+
 function saveExternalAssetCache() {
   try {
     window.localStorage?.setItem("cd_external_asset_cache_v1", JSON.stringify(externalAssetState.cache));
@@ -2449,7 +2583,7 @@ function getExternalAsset(label) {
 
 function ensureExternalAsset(label) {
   const key = getExternalAssetKey(label);
-  if (!key || !shouldResolveExternalAsset(label)) {
+  if (!key || !shouldResolveExternalAsset(label) || !RUNTIME_TERRARIA_LOOKUP_ENABLED) {
     return;
   }
 

@@ -28,13 +28,22 @@ export const uiCopy = {
     categories: {
       all: "Tudo",
       bosses: "Bosses",
+      superbosses: "Superbosses",
+      minibosses: "Mini-Bosses",
+      mobs: "Mobs",
       summons: "Invocações",
       weapons: "Armas",
       armor: "Armaduras",
       accessories: "Acessórios",
       consumables: "Consumíveis",
       materials: "Materiais",
-      buffs: "Buffs"
+      buffs: "Buffs",
+      blocks: "Blocos",
+      tools: "Ferramentas",
+      npcs: "NPCs",
+      dimensions: "Dimensões",
+      events: "Eventos",
+      systems: "Sistemas"
     },
     actions: {
       github: "GitHub",
@@ -190,13 +199,22 @@ export const uiCopy = {
     categories: {
       all: "All",
       bosses: "Bosses",
+      superbosses: "Superbosses",
+      minibosses: "Mini-Bosses",
+      mobs: "Mobs",
       summons: "Summons",
       weapons: "Weapons",
       armor: "Armor",
       accessories: "Accessories",
       consumables: "Consumables",
       materials: "Materials",
-      buffs: "Buffs"
+      buffs: "Buffs",
+      blocks: "Blocks",
+      tools: "Tools",
+      npcs: "NPCs",
+      dimensions: "Dimensions",
+      events: "Events",
+      systems: "Systems"
     },
     actions: {
       github: "GitHub",
@@ -352,13 +370,22 @@ export const uiCopy = {
     categories: {
       all: "Todo",
       bosses: "Jefes",
+      superbosses: "Superjefes",
+      minibosses: "Mini-Jefes",
+      mobs: "Mobs",
       summons: "Invocaciones",
       weapons: "Armas",
       armor: "Armaduras",
       accessories: "Accesorios",
       consumables: "Consumibles",
       materials: "Materiales",
-      buffs: "Buffs"
+      buffs: "Buffs",
+      blocks: "Bloques",
+      tools: "Herramientas",
+      npcs: "NPCs",
+      dimensions: "Dimensiones",
+      events: "Eventos",
+      systems: "Sistemas"
     },
     actions: {
       github: "GitHub",
@@ -514,13 +541,22 @@ export const uiCopy = {
     categories: {
       all: "Все",
       bosses: "Боссы",
+      superbosses: "Супербоссы",
+      minibosses: "Мини-боссы",
+      mobs: "Мобы",
       summons: "Призывы",
       weapons: "Оружие",
       armor: "Броня",
       accessories: "Аксессуары",
       consumables: "Расходники",
       materials: "Материалы",
-      buffs: "Баффы"
+      buffs: "Баффы",
+      blocks: "Блоки",
+      tools: "Инструменты",
+      npcs: "NPC",
+      dimensions: "Измерения",
+      events: "События",
+      systems: "Системы"
     },
     actions: {
       github: "GitHub",
