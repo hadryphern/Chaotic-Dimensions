@@ -1,13 +1,31 @@
-# OreSpawn Dimension Rebuild
+# OreSpawn Dimension Design Notes
 
-This document replaces the old "dimension regions inside one large world" prototype as the long-term direction for OreSpawn inside Chaotic Dimensions.
+This file is now a source-analysis and design-target document.
 
-## Current conclusion
+It is not a live implementation guide anymore.
 
-- The current in-world-region prototype is useful only as a throwaway test bed.
-- It is not faithful enough for `Utopia`, `Danger`, `Mining`, or `Crystal`.
-- The correct long-term solution is to move those dimensions into real subworlds.
-- `Village` and `Chaos` are postponed and do not need to block the first rebuild pass.
+## Current project status
+
+As of `2026-03-27`:
+
+- the old "dimension as world region" prototype is removed
+- the temporary `SubworldLibrary` attempt is removed
+- OreSpawn dimensions are currently disabled in runtime
+- this document should be used only to preserve source behavior and design goals until the next architecture is chosen
+
+## Scope that still matters
+
+The four core dimensions we still care about are:
+
+- `Utopia`
+- `Danger`
+- `Mining`
+- `Crystal`
+
+These two are postponed:
+
+- `Village`
+- `Chaos`
 
 ## Sources reviewed
 
@@ -20,8 +38,6 @@ This document replaces the old "dimension regions inside one large world" protot
 - [Ants](https://shrekleaker.github.io/orespawn.com/ants.html)
 - [Materials](https://shrekleaker.github.io/orespawn.com/materials.html)
 - [Plants and Trees](https://shrekleaker.github.io/orespawn.com/plants-and-trees.html)
-- [Subworld Library README](https://github.com/jjohnsnaill/SubworldLibrary)
-- [Subworld Library Repository](https://github.com/jjohnsnaill/SubworldLibrary)
 
 ## Source behavior by dimension
 
@@ -29,43 +45,41 @@ This document replaces the old "dimension regions inside one large world" protot
 
 Source-aligned notes:
 
-- Utopia is a peaceful late-game dimension.
-- It is strongly tied to gigantic trees and the royal content path.
-- `The King` is the main apex presence there.
-- The important landmarks are the `Goodness Tree`, `Queen's Tree`, and `OMG Magic Apple Tree`.
+- peaceful late-game dimension
+- strongly tied to gigantic trees
+- tied to `The King`
+- important trees include the `Goodness Tree`, `Queen's Tree`, and `OMG Magic Apple Tree`
 
-Terraria adaptation:
+Design target for Terraria:
 
-- Make Utopia a dedicated surface-heavy subworld.
-- Use vanilla `Living Wood` and `Leaf Block` for the actual tree mass, exactly as requested.
-- The world should be mostly open surface with only a handful of absurdly large trees.
-- Every major tree needs thick lateral branch systems with chest pads built into branches.
-- Rich chest loot should focus on high-tier OreSpawn materials, ore bundles, royal progression materials, and rare utility items.
-
-Inference:
-
-- The wiki does not define exact Terraria-style chest placement rules, so branch chest clusters are a Terraria adaptation chosen to preserve the "mega-tree treasure world" identity.
+- mostly open surface
+- very few trees, but each tree is absurdly huge
+- giant lateral branches with chest routes built into the branches
+- vanilla `Living Wood` and `Leaf Block` are acceptable for the tree mass
+- chest rewards should focus on royal materials, rare OreSpawn loot, and rich mining bundles
 
 ### Danger
 
 Source-aligned notes:
 
-- Danger is a challenge dimension.
-- The wiki highlights nightmare-family threats and dungeon-heavy danger content.
-- Named dungeon groups include mini dungeons, challenge dungeons, and cloud-shark dungeons.
-- The dimension is associated with dangerous falls, open exposure, and concentrated hostile content.
-- The page lists dangerous mobs such as `Nightmares`, `Terrible Terror`, `Creeping Horror`, `Triffid`, `Lurking Terror`, and `Cloud Shark`.
+- challenge-heavy dimension
+- dungeon-heavy identity
+- dangerous exposure and hostile density
+- associated with nightmare-family enemies and high-risk exploration
 
-Terraria adaptation:
+Design target for Terraria:
 
-- Make Danger a dedicated flat subworld, not a sky strip inside the main world.
-- Keep the ground mostly plain and open.
-- Use vanilla wood and leaves for the sparse trees, with low density so structures dominate the map.
-- Push dungeon spawn density extremely high.
-- Mix surface structures, elevated structures, and underground inserts.
-- Treat this as the main natural miniboss farming dimension.
+- broad flat world feel
+- sparse vanilla-style trees
+- structures should dominate the map instead of foliage
+- very high dungeon density
+- use mixed structure heights:
+  - surface
+  - elevated
+  - buried
+- this should be the main natural miniboss farming dimension
 
-Recommended hostile pool:
+Recommended mob pressure:
 
 - `Creeping Horror`
 - `Terrible Terror`
@@ -76,38 +90,23 @@ Recommended hostile pool:
 - later `Spider Robot`
 - later `Robo Jeffery`
 
-Recommended structure pool:
-
-- mini dungeons
-- challenge dungeons
-- cloud-shark towers or cloud-shark nests
-- basilisc-style lairs
-- miniboss arenas
-- chest bunkers
-
-Inference:
-
-- The original page emphasizes dangerous sky-style geography and challenge density.
-- Your requested flat version is an adaptation choice, not a direct one-to-one copy.
-- That adaptation still fits OreSpawn better than the current "one shared large world" prototype.
-
 ### Mining
 
 Source-aligned notes:
 
-- Mining is the ore-heavy farming dimension.
-- It is close to a normal survival world structurally, but overpacked with resources.
-- The wiki associates it with dinos, underground threat mobs, and a large number of resource opportunities.
-- Dungeon groups mentioned there include alien/WTF content, basilisc lairs, bee hives, ender knight outposts, and other specialty structures.
+- ore farming dimension
+- structurally close to a normal world
+- overloaded with resources
+- linked to dinos and underground danger content
 
-Terraria adaptation:
+Design target for Terraria:
 
-- Make Mining a vanilla-shaped subworld with normal surface, underground, cavern, and underworld layers.
-- Spawn only OreSpawn fauna there, plus vanilla critters only if absolutely needed for gameplay stability.
-- Increase ore generation hard compared to vanilla.
-- Keep the terrain readable so it still feels like a "mining world", not a chaos world.
+- vanilla-like layer structure
+- heavy ore generation
+- only OreSpawn fauna by default
+- keep the terrain readable and practical to farm
 
-Recommended mob pool:
+Recommended mob lane:
 
 - `Alien`
 - `Cave Fisher`
@@ -121,42 +120,29 @@ Recommended mob pool:
 - `T-Rex`
 - `Baby Dragon`
 - `Velocity Raptor`
-- `Mothra`
-- `WTF?`
-
-Recommended structure pool:
-
-- alien/WTF dungeon
-- basilisc lair
-- bee hive cluster
-- ender knight outpost
-- shadow dungeon
-- kyuubi arena
 
 ### Crystal
 
 Source-aligned notes:
 
-- Crystal is one of the most visually distinct OreSpawn dimensions.
-- The wiki presents it as a crystal-heavy world with dungeon depth and specific crystal-themed mobs.
-- It also ties it to strong materials and late exploration value.
-- The page lists mobs such as `Vortex`, `Skate`, `Irukandji`, `Rotator`, `Dungeon Beast`, `Crystal Urchin`, `Rat`, and `Mantis`.
+- one of the most visually distinct dimensions
+- crystal-heavy terrain identity
+- crystal materials and crystal-adjacent mobs
 
-Terraria adaptation:
+Design target for Terraria:
 
-- Make Crystal a vanilla-structured subworld, but with a full crystal tileset.
-- Replace normal-looking terrain families with crystal variants:
+- vanilla-like world structure
+- full crystal tileset
+- replace normal terrain families with crystal variants:
   - crystal grass
   - crystal dirt
   - crystal stone
   - crystal sand
-  - crystal ice if needed
   - crystal wood
   - crystal leaves
-- Keep the world readable like vanilla, but make every major material visually crystal-themed.
-- Restrict enemy pool hard so the dimension feels clean and authored.
+- restrict enemy pool hard so the dimension feels authored
 
-Recommended hostile pool:
+Recommended mob lane:
 
 - `Vortex`
 - `Rotator`
@@ -167,144 +153,40 @@ Recommended hostile pool:
 - `Irukandji`
 - `Skate`
 
-Recommended friendly/ambient pool:
+## Multiplayer requirements
 
-- `Fairy`
-- `Whale`
-- `Peacock`
-- `Flounder`
-- `Termite`
+Any future dimension architecture must respect these rules:
 
-Recommended structure pool:
+- server-owned travel, not client-only teleport gimmicks
+- safe multiplayer syncing from day one
+- shared progression flags must stay consistent
+- travel items must work the same in singleplayer and multiplayer
 
-- crystal dungeon maze
-- rotator charging station
-- crystal cave halls
-- crystal chest pockets
+## World size rule
 
-Inference:
+The project still assumes `Large World` as the supported base size for the main world.
 
-- The wiki does not literally define every Terraria block family replacement.
-- The "vanilla world but every terrain family is crystal-styled" direction is a faithful Terraria adaptation of the source theme and your requested art direction.
+Target warning text:
 
-## Dimensions postponed for now
+- `Chaotic Dimensions dimension content is designed for Large worlds only. Tiny and Medium worlds are unsupported.`
 
-- `Village Dimension`
-- `Chaos Dimension`
+## Travel item identity
 
-They can return later, but they should not block the rebuild of the four core dimensions above.
+The source fantasy still stays the same:
 
-## Recommended subworld sizes
+- ants are the main dimension travel lane
+- termites connect to crystal-themed travel
+- travel should remain item-driven, not menu-driven
 
-These are Terraria-facing design recommendations, not source facts.
+## Next implementation rule
 
-- `Utopia`: `5200x1600`
-- `Danger`: `5600x1400`
-- `Mining`: `4200x2000`
-- `Crystal`: `4200x1900`
+Do not treat anything in this file as a dependency instruction anymore.
 
-Reasoning:
+The next architecture should be chosen from scratch with these priorities:
 
-- `Utopia` needs horizontal room for branch spread and chest routing.
-- `Danger` needs a long dungeon belt.
-- `Mining` and `Crystal` need enough depth to feel like full worlds without wasting generation budget.
+1. stable multiplayer
+2. faithful visual identity
+3. clean save behavior
+4. predictable world generation
+5. easy content expansion later
 
-## Multiplayer rules
-
-- Keep dimension travel item-driven.
-- Never use client-only teleports for real subworld travel.
-- Server should own the transfer request.
-- Shared progression flags must be copied between worlds.
-- Downed boss state, unlock state, and event unlocks should be copied from main world into the subworld before generation/load.
-
-## Subworld Library setup
-
-Confirmed from the library source:
-
-- The base class is `Subworld`.
-- Entry is handled by `SubworldSystem.Enter<T>()`.
-- Exit is handled by `SubworldSystem.Exit()`.
-- Shared world state can be passed with `SubworldSystem.CopyWorldData(...)` and `SubworldSystem.ReadCopiedWorldData<T>(...)`.
-- The library handles multiplayer by spinning up subservers for occupied subworlds.
-
-### Dependency steps
-
-1. Install `Subworld Library` in tModLoader.
-2. Add a hard dependency to `build.txt`:
-
-```txt
-modReferences = SubworldLibrary
-```
-
-3. In code, add:
-
-```cs
-using SubworldLibrary;
-```
-
-4. Create one class per real OreSpawn dimension:
-
-```cs
-using System.Collections.Generic;
-using Terraria.WorldBuilding;
-using SubworldLibrary;
-
-public sealed class DangerSubworld : Subworld
-{
-	public override int Width => 5600;
-	public override int Height => 1400;
-	public override bool ShouldSave => true;
-	public override List<GenPass> Tasks => new()
-	{
-		// worldgen passes here
-	};
-}
-```
-
-5. Travel item usage should call:
-
-```cs
-SubworldSystem.Enter<DangerSubworld>();
-```
-
-6. Returning should call:
-
-```cs
-SubworldSystem.Exit();
-```
-
-### Important note
-
-- I did not wire `SubworldLibrary` into the mod yet in this pass because that would force a live dependency before we convert the current architecture.
-- The next safe step is to install the library first, then migrate one dimension at a time starting with `Danger`.
-
-## World size warning
-
-The existing runtime warning when entering a non-large world can stay until subworld migration is complete.
-
-For the exact "show warning while selecting world size" behavior:
-
-- that should be implemented as a menu/UI hook, not as a worldgen rule.
-- I have not finished that hook yet in this pass.
-- once subworld migration starts, the warning text should become:
-  - `Chaotic Dimensions dimension content is designed for Large worlds only. Tiny and Medium worlds are unsupported.`
-
-## Recommended migration order
-
-1. `Danger`
-2. `Utopia`
-3. `Mining`
-4. `Crystal`
-5. travel item rewrite
-6. shared progression state copy
-7. structure and loot polish
-
-## Final direction
-
-The faithful route is:
-
-- real subworlds
-- item-driven entry with ants and termites
-- authored mob pools per dimension
-- authored structure pools per dimension
-- no more "shared main world regions" for final OreSpawn content

@@ -7,6 +7,7 @@ Legenda:
 - Esta checklist agora representa o estado de codigo, nao o estado final de sprites.
 - Esta checklist segue as paginas de gameplay descobertas na wiki espelhada em `2026-03-26`.
 - Para nomes internos/codes, usar junto de [OreSpawnMasterContentCodes.md](./OreSpawnMasterContentCodes.md).
+- Dimensoes e travel entries abaixo nao significam que elas estao ativas em runtime hoje; no estado atual do projeto, a arquitetura de dimensoes esta desativada e em redesenho.
 
 ## Bosses Oficiais
 
@@ -190,6 +191,9 @@ Legenda:
 
 ## Dimensoes Originais do OreSpawn
 
+Observacao:
+estas linhas valem como alvo de design e mapeamento de conteudo, nao como confirmacao de funcionamento jogavel no momento.
+
 - [x] Utopia Dimension
 - [x] Village Dimension
 - [x] Crystal Dimension
@@ -198,6 +202,9 @@ Legenda:
 - [x] Chaos Dimension
 
 ## Sistemas e Eventos Originais Que Valem Check Separado
+
+Observacao:
+alguns desses sistemas existem so como base de codigo, catalogo, ou plano de implementacao. Dimension travel especificamente nao esta ativo em gameplay neste momento.
 
 - [x] Ant Dimension Travel
 - [x] Termite Crystal Travel

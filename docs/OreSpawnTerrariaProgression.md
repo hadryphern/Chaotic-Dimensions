@@ -5,8 +5,9 @@ This document is the first practical blueprint for folding OreSpawn content into
 Dimension architecture note:
 
 - The old "OreSpawn dimensions as regions inside one large Terraria world" prototype should now be treated as deprecated.
-- For the dimension rebuild plan, use [OreSpawnDimensionsRebuild.md](OreSpawnDimensionsRebuild.md).
-- `Utopia`, `Danger`, `Mining`, and `Crystal` should move toward real subworlds.
+- The temporary `SubworldLibrary` pass was also removed.
+- For current design targets, use [OreSpawnDimensionsRebuild.md](OreSpawnDimensionsRebuild.md).
+- `Utopia`, `Danger`, `Mining`, and `Crystal` are still the core dimensions, but their runtime implementation is currently disabled and under redesign.
 - `Village` and `Chaos` are no longer first-pass priorities.
 
 The main idea is simple:
@@ -14,7 +15,7 @@ The main idea is simple:
 - Chaotic Dimensions keeps its own endgame identity.
 - Most OreSpawn boss pages become elite mobs or natural minibosses in Terraria.
 - Only the biggest Apex OreSpawn encounters stay as full bosses with music, presentation, and progression weight.
-- Ant, termite, and butterfly travel should now move toward literal dimension travel via subworlds rather than temporary expedition regions.
+- Ant, termite, and butterfly travel should eventually return as real dimension travel, but the final architecture is still undecided.
 
 ## Core adaptation rules
 
@@ -290,7 +291,7 @@ Event framing:
 
 - `Village Catastrophe`
 - huge robot packs
-- one major Rainbow Rift arena or subworld
+- one major Rainbow Rift arena or dedicated dimension arena
 
 Progression notes:
 
@@ -405,10 +406,10 @@ Progression notes:
 Implementation priority should be:
 
 1. Overworld fauna and early minibosses
-2. Danger subworld
-3. Mining subworld
-4. Crystal subworld
-5. Utopia subworld
+2. Danger dimension lane
+3. Mining dimension lane
+4. Crystal dimension lane
+5. Utopia dimension lane
 6. Kraken lane
 7. the future Chaotic post-Devour trio
 8. Kraken

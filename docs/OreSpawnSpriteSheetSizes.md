@@ -1,267 +1,387 @@
-# OreSpawn Sprite and Texture Size Guide
+# OreSpawn Sprite Sheet, File Name, and Asset ID Guide
 
-This is the current production guide for OreSpawn art inside Chaotic Dimensions.
+This is the current art production guide for OreSpawn and related Chaotic Dimensions assets.
 
-Use it as the default unless a specific class later overrides the size.
+Use this file when deciding:
 
-## General rules
+- what the `.png` file must be called
+- which folder it belongs in
+- what pixel size it should use
+- which armor suffixes are required
 
-- NPCs and bosses currently use vertical sprite sheets.
-- Default NPC sheet format:
-  - `frame width x frame height`
-  - `4 frames total`
-  - total sheet size = `frame width x (frame height * 4)`
-- Standard item icon:
+## Naming rule that matters most
+
+For almost every asset in this mod:
+
+- the file name must match the class name exactly
+- use `PascalCase`
+- do not use spaces
+- do not use snake_case
+- do not invent custom IDs like `crystaline_taltal`
+
+Correct examples:
+
+- `WaterDragon.png`
+- `Kraken.png`
+- `BigBerthaSword.png`
+- `CrystalineDevourBreastplate_Body.png`
+
+Wrong examples:
+
+- `water_dragon.png`
+- `kraken_sheet.png`
+- `big bertha sword.png`
+- `crystaline_taltal.png`
+
+## Default asset path rules
+
+- OreSpawn bosses: `Content/Bosses/OreSpawn/`
+- OreSpawn mobs and critters: `Content/NPCs/OreSpawn/`
+- OreSpawn unique items and transport items: `Content/Items/OreSpawn/`
+- OreSpawn summon items: `Content/Items/Summons/OreSpawn/`
+- OreSpawn materials and placeable item icons: `Content/Items/Materials/OreSpawn/`
+- OreSpawn world tiles: `Content/Tiles/OreSpawn/`
+
+## General size rules
+
+- NPCs and bosses use vertical sheets
+- default NPC sheet format:
+  - frame size = `width x height`
+  - total size = `width x (height * 4)`
+- normal item icon:
   - usually `32x32`
-- Small material icon:
+- small material icon:
   - usually `24x24`
-- Standard placeable block tile:
+- normal tile texture:
   - `16x16`
-- Standard armor inventory icon:
-  - `32x32`
 
-## Real working armor texture sizes in this mod
+## Armor naming and required files
 
-These sizes are already proven by the current Crystaline armor assets and are the safest reference for future equipped armor art.
+For armor, the item icon and the equipped sheets are separate files.
 
-- Head equip sheet: `40x1120`
-- Legs equip sheet: `40x1120`
-- Body equip sheet: `360x224`
-- Arms equip sheet: `360x224`
-- Female body equip sheet: `360x224`
-- Armor item icon: `32x32`
+Helmet:
 
-Use these exact sizes for OreSpawn wearable armor unless we later decide to make a custom equipment pipeline.
+- item icon: `YourHelmet.png`
+- equipped sheet: `YourHelmet_Head.png`
 
-## Bosses
+Chestplate:
 
-- `Kraken`: frame `120x120`, total `120x480`
-- `Mobzilla`: frame `154x154`, total `154x616`
-- `Mothra`: frame `144x104`, total `144x416`
-- `The King`: frame `160x128`, total `160x512`
-- `The Queen`: frame `170x140`, total `170x560`
-- `WTF?`: frame `132x132`, total `132x528`
+- item icon: `YourChestplate.png`
+- body sheet: `YourChestplate_Body.png`
+- arms sheet: `YourChestplate_Arms.png`
+- female body sheet: `YourChestplate_FemaleBody.png`
 
-## Mobs
+Legs:
+
+- item icon: `YourGreaves.png`
+- leg sheet: `YourGreaves_Legs.png`
+
+## Real working armor sizes already proven in this mod
+
+- head equip sheet: `40x1120`
+- legs equip sheet: `40x1120`
+- body equip sheet: `360x224`
+- arms equip sheet: `360x224`
+- female body equip sheet: `360x224`
+- armor item icon: `32x32`
+
+## OreSpawn Bosses
+
+Folder:
+
+- `Content/Bosses/OreSpawn/`
+
+| Display name | File / asset ID | Frame size | Total sheet |
+| --- | --- | --- | --- |
+| Kraken | `Kraken.png` | `120x120` | `120x480` |
+| Mobzilla | `Mobzilla.png` | `154x154` | `154x616` |
+| Mothra | `Mothra.png` | `144x104` | `144x416` |
+| The King | `TheKing.png` | `160x128` | `160x512` |
+| The Queen | `TheQueen.png` | `170x140` | `170x560` |
+| WTF? | `Wtf.png` | `132x132` | `132x528` |
+
+## OreSpawn Mobs
+
+Folder:
+
+- `Content/NPCs/OreSpawn/`
 
 ### Hostile and elite mobs
 
-- `Water Dragon`: frame `56x56`, total `56x224`
-- `Mantis`: frame `48x48`, total `48x192`
-- `Emperor Scorpion`: frame `64x64`, total `64x256`
-- `Hercules`: frame `56x56`, total `56x224`
-- `Caterkiller`: frame `64x48`, total `64x192`
-- `Cephadrome`: frame `56x56`, total `56x224`
-- `Alien`: frame `54x60`, total `54x240`
-- `Attack Squid`: frame `46x46`, total `46x184`
-- `Basilisc`: frame `52x40`, total `52x160`
-- `Bomb-omb`: frame `32x32`, total `32x128`
-- `Brutalfly`: frame `44x44`, total `44x176`
-- `Cave Fisher`: frame `40x36`, total `40x144`
-- `Creeping Horror`: frame `48x40`, total `48x160`
-- `Crystal Urchin`: frame `36x34`, total `36x136`
-- `Dragon`: frame `72x64`, total `72x256`
-- `Dungeon Beast`: frame `60x52`, total `60x208`
-- `Ender Knight`: frame `44x52`, total `44x208`
-- `Ender Reaper`: frame `46x54`, total `46x216`
-- `Ghost`: frame `34x42`, total `34x168`
-- `Ghost Skeleton`: frame `38x48`, total `38x192`
-- `Hydrolisc`: frame `54x42`, total `54x168`
-- `Jumpy Bug`: frame `30x28`, total `30x112`
-- `Kyuubi`: frame `64x56`, total `64x224`
-- `Leaf Monster`: frame `40x44`, total `40x176`
-- `Lurking Terror`: frame `48x40`, total `48x160`
-- `Molenoid`: frame `36x32`, total `36x128`
-- `Mosquito`: frame `28x28`, total `28x112`
-- `Red Ant Robot`: frame `50x56`, total `50x224`
-- `Robo Gunner`: frame `44x52`, total `44x208`
-- `Robo Jeffery`: frame `44x52`, total `44x208`
-- `Robo Pounder`: frame `54x58`, total `54x232`
-- `Robo Sniper`: frame `42x50`, total `42x200`
-- `Robo Warrior`: frame `56x60`, total `56x240`
-- `Rotator`: frame `42x42`, total `42x168`
-- `Scorpion`: frame `38x30`, total `38x120`
-- `Sea Monster`: frame `60x52`, total `60x208`
-- `Sea Viper`: frame `54x48`, total `54x192`
-- `Spider Driver`: frame `44x48`, total `44x192`
-- `Spider Robot`: frame `50x44`, total `50x176`
-- `Spit Bug`: frame `30x28`, total `30x112`
-- `Stink Bug`: frame `30x28`, total `30x112`
-- `Terrible Terror`: frame `48x44`, total `48x176`
-- `Triffid`: frame `46x54`, total `46x216`
-- `Vortex`: frame `52x52`, total `52x208`
+| Display name | File / asset ID | Frame size | Total sheet |
+| --- | --- | --- | --- |
+| Water Dragon | `WaterDragon.png` | `56x56` | `56x224` |
+| Mantis | `Mantis.png` | `48x48` | `48x192` |
+| Emperor Scorpion | `EmperorScorpion.png` | `64x64` | `64x256` |
+| Hercules | `Hercules.png` | `56x56` | `56x224` |
+| Caterkiller | `Caterkiller.png` | `64x48` | `64x192` |
+| Cephadrome | `Cephadrome.png` | `56x56` | `56x224` |
+| Alien | `Alien.png` | `54x60` | `54x240` |
+| Attack Squid | `AttackSquid.png` | `46x46` | `46x184` |
+| Basilisc | `Basilisc.png` | `52x40` | `52x160` |
+| Bomb-omb | `BombOmb.png` | `32x32` | `32x128` |
+| Brutalfly | `Brutalfly.png` | `44x44` | `44x176` |
+| Cave Fisher | `CaveFisher.png` | `40x36` | `40x144` |
+| Creeping Horror | `CreepingHorror.png` | `48x40` | `48x160` |
+| Crystal Urchin | `CrystalUrchin.png` | `36x34` | `36x136` |
+| Dragon | `Dragon.png` | `72x64` | `72x256` |
+| Dungeon Beast | `DungeonBeast.png` | `60x52` | `60x208` |
+| Ender Knight | `EnderKnight.png` | `44x52` | `44x208` |
+| Ender Reaper | `EnderReaper.png` | `46x54` | `46x216` |
+| Ghost | `Ghost.png` | `34x42` | `34x168` |
+| Ghost Skeleton | `GhostSkeleton.png` | `38x48` | `38x192` |
+| Hydrolisc | `Hydrolisc.png` | `54x42` | `54x168` |
+| Jumpy Bug | `JumpyBug.png` | `30x28` | `30x112` |
+| Kyuubi | `Kyuubi.png` | `64x56` | `64x224` |
+| Leaf Monster | `LeafMonster.png` | `40x44` | `40x176` |
+| Lurking Terror | `LurkingTerror.png` | `48x40` | `48x160` |
+| Molenoid | `Molenoid.png` | `36x32` | `36x128` |
+| Mosquito | `Mosquito.png` | `28x28` | `28x112` |
+| Red Ant Robot | `RedAntRobot.png` | `50x56` | `50x224` |
+| Robo Gunner | `RoboGunner.png` | `44x52` | `44x208` |
+| Robo Jeffery | `RoboJeffery.png` | `44x52` | `44x208` |
+| Robo Pounder | `RoboPounder.png` | `54x58` | `54x232` |
+| Robo Sniper | `RoboSniper.png` | `42x50` | `42x200` |
+| Robo Warrior | `RoboWarrior.png` | `56x60` | `56x240` |
+| Rotator | `Rotator.png` | `42x42` | `42x168` |
+| Scorpion | `Scorpion.png` | `38x30` | `38x120` |
+| Sea Monster | `SeaMonster.png` | `60x52` | `60x208` |
+| Sea Viper | `SeaViper.png` | `54x48` | `54x192` |
+| Spider Driver | `SpiderDriver.png` | `44x48` | `44x192` |
+| Spider Robot | `SpiderRobot.png` | `50x44` | `50x176` |
+| Spit Bug | `SpitBug.png` | `30x28` | `30x112` |
+| Stink Bug | `StinkBug.png` | `30x28` | `30x112` |
+| Terrible Terror | `TerribleTerror.png` | `48x44` | `48x176` |
+| Triffid | `Triffid.png` | `46x54` | `46x216` |
+| Vortex | `Vortex.png` | `52x52` | `52x208` |
 
 ### Dinosaurs and large beasts
 
-- `Alosaurus`: frame `60x42`, total `60x168`
-- `Baby Dragon`: frame `40x40`, total `40x160`
-- `Baryonyx`: frame `56x40`, total `56x160`
-- `Camarasaurus`: frame `70x54`, total `70x216`
-- `Cryolophosaurus`: frame `60x44`, total `60x176`
-- `Leonopteryx`: frame `64x56`, total `64x224`
-- `Nastysaurus`: frame `64x48`, total `64x192`
-- `Pointysaurus`: frame `60x44`, total `60x176`
-- `T-Rex`: frame `74x58`, total `74x232`
+| Display name | File / asset ID | Frame size | Total sheet |
+| --- | --- | --- | --- |
+| Alosaurus | `Alosaurus.png` | `60x42` | `60x168` |
+| Baby Dragon | `BabyDragon.png` | `40x40` | `40x160` |
+| Baryonyx | `Baryonyx.png` | `56x40` | `56x160` |
+| Camarasaurus | `Camarasaurus.png` | `70x54` | `70x216` |
+| Cryolophosaurus | `Cryolophosaurus.png` | `60x44` | `60x176` |
+| Leonopteryx | `Leonopteryx.png` | `64x56` | `64x224` |
+| Nastysaurus | `Nastysaurus.png` | `64x48` | `64x192` |
+| Pointysaurus | `Pointysaurus.png` | `60x44` | `60x176` |
+| T-Rex | `TRex.png` | `74x58` | `74x232` |
 
-### Ambient, utility, and social mobs
+### Ambient, social, and utility mobs
 
-- `Beaver`: frame `28x24`, total `28x96`
-- `Bee`: frame `24x22`, total `24x88`
-- `Cassowary`: frame `30x34`, total `30x136`
-- `Chipmunk`: frame `22x20`, total `22x80`
-- `Cliff Racer`: frame `30x26`, total `30x104`
-- `Cloud Shark`: frame `44x32`, total `44x128`
-- `Crab`: frame `24x18`, total `24x72`
-- `Cricket`: frame `22x18`, total `22x72`
-- `Easter Bunny`: frame `24x24`, total `24x96`
-- `Fairy`: frame `28x30`, total `28x120`
-- `Firefly`: frame `20x20`, total `20x80`
-- `Flounder`: frame `28x18`, total `28x72`
-- `Frog`: frame `22x18`, total `22x72`
-- `Gazelle`: frame `30x24`, total `30x96`
-- `Gold Fish`: frame `20x16`, total `20x64`
-- `Hammerhead`: frame `40x24`, total `40x96`
-- `Irukandji`: frame `22x22`, total `22x88`
-- `Lizard`: frame `26x18`, total `26x72`
-- `Ostrich`: frame `34x42`, total `34x168`
-- `Peacock`: frame `28x34`, total `28x136`
-- `Rat`: frame `20x14`, total `20x56`
-- `Rubber Ducky`: frame `20x18`, total `20x72`
-- `Skate`: frame `28x16`, total `28x64`
-- `Stinky`: frame `20x20`, total `20x80`
-- `Termite`: frame `16x16`, total `16x64`
-- `Velocity Raptor`: frame `34x30`, total `34x120`
-- `Whale`: frame `72x34`, total `72x136`
-- `Girlfriend`: frame `28x48`, total `28x192`
-- `Boyfriend`: frame `28x48`, total `28x192`
-- `The Prince`: frame `64x56`, total `64x224`
-- `Young Prince`: frame `72x64`, total `72x256`
-- `Young Adult Prince`: frame `96x80`, total `96x320`
-- `The Princess`: frame `72x64`, total `72x256`
+| Display name | File / asset ID | Frame size | Total sheet |
+| --- | --- | --- | --- |
+| Beaver | `Beaver.png` | `28x24` | `28x96` |
+| Bee | `Bee.png` | `24x22` | `24x88` |
+| Cassowary | `Cassowary.png` | `30x34` | `30x136` |
+| Chipmunk | `Chipmunk.png` | `22x20` | `22x80` |
+| Cliff Racer | `CliffRacer.png` | `30x26` | `30x104` |
+| Cloud Shark | `CloudShark.png` | `44x32` | `44x128` |
+| Crab | `Crab.png` | `24x18` | `24x72` |
+| Cricket | `Cricket.png` | `22x18` | `22x72` |
+| Easter Bunny | `EasterBunny.png` | `24x24` | `24x96` |
+| Fairy | `Fairy.png` | `28x30` | `28x120` |
+| Firefly | `Firefly.png` | `20x20` | `20x80` |
+| Flounder | `Flounder.png` | `28x18` | `28x72` |
+| Frog | `Frog.png` | `22x18` | `22x72` |
+| Gazelle | `Gazelle.png` | `30x24` | `30x96` |
+| Gold Fish | `GoldFish.png` | `20x16` | `20x64` |
+| Hammerhead | `Hammerhead.png` | `40x24` | `40x96` |
+| Irukandji | `Irukandji.png` | `22x22` | `22x88` |
+| Lizard | `Lizard.png` | `26x18` | `26x72` |
+| Ostrich | `Ostrich.png` | `34x42` | `34x168` |
+| Peacock | `Peacock.png` | `28x34` | `28x136` |
+| Rat | `Rat.png` | `20x14` | `20x56` |
+| Rubber Ducky | `RubberDucky.png` | `20x18` | `20x72` |
+| Skate | `Skate.png` | `28x16` | `28x64` |
+| Stinky | `Stinky.png` | `20x20` | `20x80` |
+| Termite | `Termite.png` | `16x16` | `16x64` |
+| Velocity Raptor | `VelocityRaptor.png` | `34x30` | `34x120` |
+| Whale | `Whale.png` | `72x34` | `72x136` |
+| Girlfriend | `Girlfriend.png` | `28x48` | `28x192` |
+| Boyfriend | `Boyfriend.png` | `28x48` | `28x192` |
+| The Prince | `ThePrince.png` | `64x56` | `64x224` |
+| Young Prince | `YoungPrince.png` | `72x64` | `72x256` |
+| Young Adult Prince | `YoungAdultPrince.png` | `96x80` | `96x320` |
+| The Princess | `ThePrincess.png` | `72x64` | `72x256` |
 
 ### Transport critters
 
-- `Brown Ant Critter`: frame `18x18`, total `18x72`
-- `Rainbow Ant Critter`: frame `18x18`, total `18x72`
-- `Red Ant Critter`: frame `18x18`, total `18x72`
-- `Unstable Ant Critter`: frame `18x18`, total `18x72`
-- `Termite Critter`: frame `18x18`, total `18x72`
-- `Butterfly Critter`: frame `20x20`, total `20x80`
+| Display name | File / asset ID | Frame size | Total sheet |
+| --- | --- | --- | --- |
+| Brown Ant Critter | `BrownAntCritter.png` | `18x18` | `18x72` |
+| Rainbow Ant Critter | `RainbowAntCritter.png` | `18x18` | `18x72` |
+| Red Ant Critter | `RedAntCritter.png` | `18x18` | `18x72` |
+| Unstable Ant Critter | `UnstableAntCritter.png` | `18x18` | `18x72` |
+| Termite Critter | `TermiteCritter.png` | `18x18` | `18x72` |
+| Butterfly Critter | `ButterflyCritter.png` | `20x20` | `20x80` |
 
-## Unique item icons
+## Unique OreSpawn item icons
 
-- `Attitude Adjuster`: `40x40`
-- `Battle Axe`: `42x42`
-- `Big Bertha Sword`: `54x54`
-- `Big Hammer`: `40x40`
-- `Chainsaw`: `44x44`
-- `Experience Sword`: `40x40`
-- `Fairy Sword`: `34x34`
-- `Mantis Claw`: `34x34`
-- `Nightmare Sword`: `46x46`
-- `Poison Sword`: `38x38`
-- `Queen Scale Battle Axe`: `50x50`
-- `Rat Sword`: `32x32`
-- `Ray Gun`: `38x38`
-- `Royal Guardian Sword`: `54x54`
-- `Skate Bow & Irukandji Arrows`: `42x42`
-- `Slice Sword`: `40x40`
-- `Squidzooka`: `44x44`
-- `Thunder Staff`: `42x42`
+Folder:
+
+- `Content/Items/OreSpawn/`
+
+| Display name | File / asset ID | Target size |
+| --- | --- | --- |
+| Attitude Adjuster | `AttitudeAdjuster.png` | `40x40` |
+| Battle Axe | `BattleAxe.png` | `42x42` |
+| Big Bertha Sword | `BigBerthaSword.png` | `54x54` |
+| Chainsaw | `Chainsaw.png` | `44x44` |
+| Experience Sword | `ExperienceSword.png` | `40x40` |
+| Fairy Sword | `FairySword.png` | `34x34` |
+| Nightmare Sword | `NightmareSword.png` | `46x46` |
+| Poison Sword | `PoisonSword.png` | `38x38` |
+| Queen Scale Battle Axe | `QueenScaleBattleAxe.png` | `50x50` |
+| Rat Sword | `RatSword.png` | `32x32` |
+| Ray Gun | `RayGun.png` | `38x38` |
+| Royal Guardian Sword | `RoyalGuardianSword.png` | `54x54` |
+| Skate Bow and Irukandji Arrows | `SkateBowAndIrukandjiArrows.png` | `42x42` |
+| Slice Sword | `SliceSword.png` | `40x40` |
+| Squidzooka | `Squidzooka.png` | `44x44` |
+| Thunder Staff | `ThunderStaff.png` | `42x42` |
+
+## Existing non-OreSpawn weapon file in this mod
+
+This one is not in `Content/Items/OreSpawn/`, but it matters for naming examples:
+
+| Display name | File / asset ID | Folder | Target size |
+| --- | --- | --- | --- |
+| Big Hammer | `BigHammer.png` | `Content/Items/Weapons/Melee/` | `40x40` |
 
 ## Summon and transport item icons
 
-- miniboss summon items: `32x32`
-- boss summon items: `32x32`
-- captured ant, termite, and butterfly transport items: `24x24`
+### OreSpawn summon items
 
-## Material and resource item icons
+Folder:
 
-Use these defaults unless a specific icon needs more room.
+- `Content/Items/Summons/OreSpawn/`
 
-- mob drop materials: `24x24`
-- gems and ore chunks: `24x24`
-- ingots and nuggets: `24x24`
-- special crystals: `24x24`
-- log items: `24x24`
-- nest block items: `24x24`
-- placeable block items with complex silhouette: `32x32`
+All of these should use `32x32` unless a future redesign needs more room.
 
-Current OreSpawn resource item sizes to follow:
+| Display name | File / asset ID | Target size |
+| --- | --- | --- |
+| Caterkiller Bait | `CaterkillerBait.png` | `32x32` |
+| Cephadrome Caller | `CephadromeCaller.png` | `32x32` |
+| Emperor Scorpion Idol | `EmperorScorpionIdol.png` | `32x32` |
+| Hercules Totem | `HerculesTotem.png` | `32x32` |
+| Kings Emblem | `KingsEmblem.png` | `32x32` |
+| Kraken Beacon | `KrakenBeacon.png` | `32x32` |
+| Mobzilla Signal | `MobzillaSignal.png` | `32x32` |
+| Mothra Totem | `MothraTotem.png` | `32x32` |
+| Queens Bloom | `QueensBloom.png` | `32x32` |
+| Wtf Signal | `WtfSignal.png` | `32x32` |
 
-- `Amethyst`, `Ruby`, `PinkTourmaline`, `TigersEye`, `Kyanite`, `Salt`: `24x24`
-- `TitaniumOre`, `UraniumOre`: `24x24`
-- `TitaniumNugget`, `TitaniumIngot`, `UraniumNugget`, `UraniumIngot`: `24x24`
-- `FairyCrystal`, `RatCrystal`, `LavaFoam`, `MobzillaScale`: `24x24`
-- `WaterDragonScale`, `EmperorScorpionScale`, `CaterkillerJaw`, `CephadromeHorn`: `24x24`
+### OreSpawn transport items
 
-## Armor item icons
+Folder:
 
-Use:
+- `Content/Items/OreSpawn/`
 
-- helmet item icon: `32x32`
-- chestplate item icon: `32x32`
-- greaves item icon: `32x32`
+All of these should use `24x24`.
 
-For oversized endgame sets, `40x40` is acceptable, but keep all three pieces of the same set consistent.
+| Display name | File / asset ID | Target size |
+| --- | --- | --- |
+| Brown Ant Item | `BrownAntItem.png` | `24x24` |
+| Rainbow Ant Item | `RainbowAntItem.png` | `24x24` |
+| Red Ant Item | `RedAntItem.png` | `24x24` |
+| Unstable Ant Item | `UnstableAntItem.png` | `24x24` |
+| Termite Item | `TermiteItem.png` | `24x24` |
+| Butterfly Transport Item | `ButterflyTransportItem.png` | `24x24` |
 
-## Accessory item icons
+## Materials, drops, and placeable item icons
 
-Use:
+Folder:
 
-- normal accessory icon: `32x32`
-- oversized relic-like accessory: `36x36`
+- `Content/Items/Materials/OreSpawn/`
 
-If the accessory does not visibly render on the player, no extra wearable sheet is needed.
+Normal rule:
 
-## Block, tile, and world texture sizes
+- small material icon: `24x24`
+- more complex placeable block icon: `32x32`
 
-These are the most important additions for the dimension rebuild.
+| Display name | File / asset ID | Target size |
+| --- | --- | --- |
+| Amethyst | `Amethyst.png` | `24x24` |
+| Ruby | `Ruby.png` | `24x24` |
+| Pink Tourmaline | `PinkTourmaline.png` | `24x24` |
+| Tigers Eye | `TigersEye.png` | `24x24` |
+| Kyanite | `Kyanite.png` | `24x24` |
+| Salt | `Salt.png` | `24x24` |
+| Titanium Ore | `TitaniumOre.png` | `24x24` |
+| Uranium Ore | `UraniumOre.png` | `24x24` |
+| Titanium Nugget | `TitaniumNugget.png` | `24x24` |
+| Titanium Ingot | `TitaniumIngot.png` | `24x24` |
+| Uranium Nugget | `UraniumNugget.png` | `24x24` |
+| Uranium Ingot | `UraniumIngot.png` | `24x24` |
+| Fairy Crystal | `FairyCrystal.png` | `24x24` |
+| Rat Crystal | `RatCrystal.png` | `24x24` |
+| Lava Foam | `LavaFoam.png` | `24x24` |
+| Mobzilla Scale | `MobzillaScale.png` | `24x24` |
+| Water Dragon Scale | `WaterDragonScale.png` | `24x24` |
+| Emperor Scorpion Scale | `EmperorScorpionScale.png` | `24x24` |
+| Caterkiller Jaw | `CaterkillerJaw.png` | `24x24` |
+| Cephadrome Horn | `CephadromeHorn.png` | `24x24` |
+| Mantis Claw | `MantisClaw.png` | `24x24` |
+| Amethyst Block item | `AmethystBlock.png` | `32x32` |
+| Ruby Block item | `RubyBlock.png` | `32x32` |
+| Pink Tourmaline Block item | `PinkTourmalineBlock.png` | `32x32` |
+| Tigers Eye Block item | `TigersEyeBlock.png` | `32x32` |
+| Kyanite Block item | `KyaniteBlock.png` | `32x32` |
+| Salt Block item | `SaltBlock.png` | `32x32` |
+| Titanium Block item | `TitaniumBlock.png` | `32x32` |
+| Uranium Block item | `UraniumBlock.png` | `32x32` |
+| Molenoid Dirt item | `MolenoidDirt.png` | `24x24` |
+| Red Ant Nest item | `RedAntNest.png` | `24x24` |
+| Termite Nest item | `TermiteNest.png` | `24x24` |
+| Crystal Tree Log item | `CrystalTreeLog.png` | `24x24` |
+| Sky Tree Log item | `SkyTreeLog.png` | `24x24` |
+| Duplicator Log item | `DuplicatorLog.png` | `24x24` |
+| Teleport Block item | `TeleportBlock.png` | `32x32` |
+| Ender Pearl Block item | `EnderPearlBlock.png` | `32x32` |
+| Eye of Ender Block item | `EyeOfEnderBlock.png` | `32x32` |
 
-### Single-tile world blocks
+## World tiles and block textures
 
-Each block texture should be drawn as:
+Folder:
 
-- `16x16`
+- `Content/Tiles/OreSpawn/`
 
-This applies to:
+All single-tile block textures should use `16x16`.
 
-- crystal dirt
-- crystal grass
-- crystal stone
-- crystal sand
-- crystal hardened sand
-- crystal ice
-- crystal wood
-- crystal leaves
-- crystal ore blocks
-- ore blocks for `Ruby`, `Pink Tourmaline`, `Tigers Eye`, `Kyanite`, `Titanium`, `Uranium`, `Salt`
-- `Molenoid Dirt`
-- `Red Ant Nest`
-- `Termite Nest`
-- `Teleport Block`
-- `Ender Pearl Block`
-- `Eye of Ender Block`
+| Display name | File / asset ID | Target size |
+| --- | --- | --- |
+| Amethyst Block Tile | `AmethystBlockTile.png` | `16x16` |
+| Amethyst Ore Tile | `AmethystOreTile.png` | `16x16` |
+| Crystal Tree Log Tile | `CrystalTreeLogTile.png` | `16x16` |
+| Duplicator Log Tile | `DuplicatorLogTile.png` | `16x16` |
+| Ender Pearl Block Tile | `EnderPearlBlockTile.png` | `16x16` |
+| Eye of Ender Block Tile | `EyeOfEnderBlockTile.png` | `16x16` |
+| Kyanite Block Tile | `KyaniteBlockTile.png` | `16x16` |
+| Kyanite Ore Tile | `KyaniteOreTile.png` | `16x16` |
+| Molenoid Dirt Tile | `MolenoidDirtTile.png` | `16x16` |
+| Pink Tourmaline Block Tile | `PinkTourmalineBlockTile.png` | `16x16` |
+| Pink Tourmaline Ore Tile | `PinkTourmalineOreTile.png` | `16x16` |
+| Red Ant Nest Tile | `RedAntNestTile.png` | `16x16` |
+| Ruby Block Tile | `RubyBlockTile.png` | `16x16` |
+| Ruby Ore Tile | `RubyOreTile.png` | `16x16` |
+| Salt Block Tile | `SaltBlockTile.png` | `16x16` |
+| Salt Ore Tile | `SaltOreTile.png` | `16x16` |
+| Sky Tree Log Tile | `SkyTreeLogTile.png` | `16x16` |
+| Teleport Block Tile | `TeleportBlockTile.png` | `16x16` |
+| Termite Nest Tile | `TermiteNestTile.png` | `16x16` |
+| Tigers Eye Block Tile | `TigersEyeBlockTile.png` | `16x16` |
+| Tigers Eye Ore Tile | `TigersEyeOreTile.png` | `16x16` |
+| Titanium Block Tile | `TitaniumBlockTile.png` | `16x16` |
+| Titanium Ore Tile | `TitaniumOreTile.png` | `16x16` |
+| Uranium Block Tile | `UraniumBlockTile.png` | `16x16` |
+| Uranium Ore Tile | `UraniumOreTile.png` | `16x16` |
 
-### Trees using vanilla materials
+## Future armor production defaults
 
-For `Utopia`, `Danger`, and `Mining`:
-
-- no custom tree tile sprites are required if we stay on vanilla `Living Wood` and `Leaf Block`
-- the important work there is structure generation, not new tile art
-
-### Crystal tree family
-
-If we replace vanilla tree visuals in the Crystal dimension with custom crystal tiles:
-
-- crystal trunk tile: `16x16`
-- crystal leaf tile: `16x16`
-- crystal branch tile variants: `16x16` each
-- optional glow overlays: `16x16`
-
-## Armor family production defaults
-
-Use these as the starting sizes for the OreSpawn armor lanes that still need art.
+For future OreSpawn armor sets:
 
 - early and midgame armor item icons: `32x32`
 - late and endgame armor item icons: `40x40`
@@ -288,43 +408,72 @@ Suggested icon scale by set:
 - `Royal Guardian Armor`: `40x40`
 - `Ultimate Armor`: `40x40`
 
-## Tool and weapon family production defaults
+## Tools and weapon family defaults
 
 - small tool icons: `36x36`
 - standard weapon icons: `40x40`
 - large late-game weapon icons: `42x42` to `54x54`
-- giant endgame swords and axes: up to `64x64` if needed
+- giant endgame swords and axes: up to `64x64`
 
-Apply this to:
+Use the same naming rule:
 
-- `Amethyst Tools and Weapons`
-- `Emerald Tools and Weapons`
-- `Ruby Tools and Weapons`
-- `Pink Tourmaline Tools and Weapons`
-- `Tigers Eye Tools and Weapons`
-- `Kyanite Tools and Weapons`
-- `Wood Crystal Tools and Weapons`
-- `Ultimate Tools and Weapons`
+- class name = file name
+- example:
+  - `RubyPickaxe` -> `RubyPickaxe.png`
+  - `UltimateSword` -> `UltimateSword.png`
 
-## Food, plants, and eggs
+## Food, plants, eggs, and accessories
 
 - food icons: `26x26` to `32x32`
 - seeds and small plants: `24x24`
 - fruit icons: `32x32`
 - special saplings: `32x32` to `40x40`
 - ancient dried eggs: `32x32`
+- normal accessory icon: `32x32`
+- oversized relic-like accessory: `36x36`
 
-## Dimension production summary
+## Existing Chaotic Dimensions special file names
 
-If you only need the short version:
+These are not OreSpawn, but they are useful naming references because they show how special cases are named in this mod.
 
-- NPC frame art: use the exact sizes listed above
-- item icons: `24x24`, `32x32`, or `40x40` depending on class
-- block textures: `16x16`
-- armor item icons: `32x32`
-- armor wearable sheets:
-  - head `40x1120`
-  - legs `40x1120`
-  - body `360x224`
-  - arms `360x224`
-  - female body `360x224`
+| Purpose | File name | Recommended size |
+| --- | --- | --- |
+| Crystaline boss head icon | `CrystalineDevourerHead_Head_Boss.png` | `80x80` |
+| Crystaline helmet equip sheet | `CrystalineDevourMagicHelm_Head.png` | `40x1120` |
+| Crystaline chest body sheet | `CrystalineDevourBreastplate_Body.png` | `360x224` |
+| Crystaline chest arms sheet | `CrystalineDevourBreastplate_Arms.png` | `360x224` |
+| Crystaline chest female body sheet | `CrystalineDevourBreastplate_FemaleBody.png` | `360x224` |
+| Crystaline leg sheet | `CrystalineDevourGreaves_Legs.png` | `40x1120` |
+
+## Current optional custom art that still uses vanilla or shared textures
+
+These are not missing files required for the mod to run, but if you want bespoke art, these are the recommended sizes.
+
+| Visual | Current status | Recommended custom size |
+| --- | --- | --- |
+| `CrystalineDevourAegisBuff` | uses vanilla buff texture | `32x32` |
+| `CrystalinePotionFortitudeBuff` | uses vanilla buff texture | `32x32` |
+| `CrystalinePotionRegenerationBuff` | uses vanilla buff texture | `32x32` |
+| `CrystalineRushBuff` | uses vanilla buff texture | `32x32` |
+| `CrystalineSword` | item currently points at vanilla art | `64x64` |
+| `CrystalineShard` | uses vanilla projectile art | `40x40` |
+| `CrystalineBoltProjectile` | uses vanilla projectile art | `20x20` |
+| `CrystalineDevourerPortal` | uses vanilla projectile art | `96x96` |
+| `CrystalineDevourerBeam` | beam drawn mostly by code | optional core `32x32` or strip `16x64` |
+| `CrystalineDevourerSkyBeam` | beam drawn mostly by code | optional core `32x32` or strip `16x64` |
+| `CrystalineSwordProjectile` | reuses `CrystalineSword` texture | same as sword item |
+
+## Short version
+
+If you only need the fastest answer:
+
+- file name = class name
+- use `PascalCase`
+- mobs and bosses = vertical sheets with `4` frames
+- normal items = `32x32`
+- materials = `24x24`
+- tiles = `16x16`
+- helmets use `_Head`
+- chestpieces use `_Body`, `_Arms`, `_FemaleBody`
+- legs use `_Legs`
+
