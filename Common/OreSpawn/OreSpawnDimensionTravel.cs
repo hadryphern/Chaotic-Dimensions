@@ -1,6 +1,4 @@
 using Microsoft.Xna.Framework;
-using ChaoticDimensions.Content.Subworlds.OreSpawn;
-using SubworldLibrary;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -11,15 +9,13 @@ namespace ChaoticDimensions.Common.OreSpawn
 	internal static class OreSpawnDimensionTravel
 	{
 		public static bool TryUseTransport(Player player, OreSpawnDimensionId targetDimension) {
-			if (targetDimension != OreSpawnDimensionId.Danger && !OreSpawnDimensionLayout.SupportsOreSpawnDimensions()) {
+			if (!OreSpawnDimensionLayout.SupportsOreSpawnDimensions()) {
 				return false;
 			}
 
 			OreSpawnDimensionPlayer dimensionPlayer = player.GetModPlayer<OreSpawnDimensionPlayer>();
 			return dimensionPlayer.TryUseTransport(targetDimension);
 		}
-
-		public static bool IsDangerSubworldActive() => SubworldSystem.IsActive<DangerDimensionSubworld>();
 
 		public static bool TryTeleportPlayerToDimension(Player player, OreSpawnDimensionId targetDimension) {
 			if (!OreSpawnDimensionLayout.TryGetRegion(targetDimension, out OreSpawnDimensionRegion region)) {

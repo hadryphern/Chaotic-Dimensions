@@ -14,16 +14,7 @@ namespace ChaoticDimensions.Common.Systems
 	public sealed class OreSpawnDimensionWorldSystem : ModSystem
 	{
 		public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight) {
-			int insertIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Final Cleanup"));
-			if (insertIndex < 0) {
-				insertIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Shinies"));
-			}
-
-			if (insertIndex < 0) {
-				insertIndex = tasks.Count - 1;
-			}
-
-			tasks.Insert(insertIndex + 1, new PassLegacy("Chaotic Dimensions OreSpawn", GenerateOreSpawnWorld));
+			return;
 		}
 
 		private static void GenerateOreSpawnWorld(GenerationProgress progress, GameConfiguration configuration) {
@@ -37,7 +28,6 @@ namespace ChaoticDimensions.Common.Systems
 			GenerateVillage(progress);
 			GenerateMining(progress);
 			GenerateCrystal(progress);
-			GenerateDanger(progress);
 			GenerateChaos(progress);
 			GenerateTransportNests(progress);
 		}

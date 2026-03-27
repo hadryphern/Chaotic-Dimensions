@@ -10,7 +10,7 @@ namespace ChaoticDimensions.Common.OreSpawn
 		public const int LargeWorldHeightTiles = 2400;
 
 		public static bool SupportsOreSpawnDimensions() {
-			return Main.maxTilesX >= LargeWorldWidthTiles && Main.maxTilesY >= LargeWorldHeightTiles;
+			return false;
 		}
 
 		public static OreSpawnDimensionRegion GetRegion(OreSpawnDimensionId dimensionId) {
@@ -60,7 +60,6 @@ namespace ChaoticDimensions.Common.OreSpawn
 
 			Point tile = worldPosition.ToTileCoordinates();
 			OreSpawnDimensionId[] orderedDimensions = [
-				OreSpawnDimensionId.Danger,
 				OreSpawnDimensionId.Chaos,
 				OreSpawnDimensionId.Crystal,
 				OreSpawnDimensionId.Mining,

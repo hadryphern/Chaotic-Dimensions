@@ -29,10 +29,6 @@ namespace ChaoticDimensions.Content.Items.OreSpawn
 		}
 
 		public override bool CanUseItem(Player player) {
-			if (TargetDimension == OreSpawnDimensionId.Danger) {
-				return player.whoAmI == Main.myPlayer;
-			}
-
 			return OreSpawnDimensionLayout.SupportsOreSpawnDimensions() && player.whoAmI == Main.myPlayer;
 		}
 	}
