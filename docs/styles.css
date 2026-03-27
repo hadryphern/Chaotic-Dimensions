@@ -33,7 +33,7 @@ body {
   min-height: 100vh;
   background:
     linear-gradient(180deg, rgba(227, 238, 244, 0.92), rgba(199, 220, 230, 0.9)),
-    url("./assets/images/orespawn-legacy-theme/clouds.jpg") center top / cover fixed no-repeat,
+    none,
     linear-gradient(180deg, #b9d0dc, #d9e8ee 32%, #e7f0f3 100%);
   color: var(--text);
   font-family: "Plus Jakarta Sans", sans-serif;
@@ -76,7 +76,7 @@ textarea {
   border: 1px solid rgba(55, 30, 12, 0.65);
   background:
     linear-gradient(180deg, rgba(22, 14, 10, 0.08), rgba(22, 14, 10, 0.18)),
-    url("./assets/images/orespawn-legacy-theme/top-bar-bg.jpg") center / auto repeat;
+    none;
   box-shadow: 0 10px 28px rgba(52, 33, 13, 0.12);
 }
 
@@ -198,7 +198,7 @@ h2 {
   border-color: var(--line);
   background:
     linear-gradient(180deg, rgba(251, 243, 224, 0.98), rgba(233, 214, 181, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
 }
 
 .header-link--button:hover,
@@ -208,7 +208,7 @@ h2 {
   border-color: var(--line-strong);
   background:
     linear-gradient(180deg, rgba(254, 247, 232, 1), rgba(239, 223, 191, 1)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   color: var(--text);
 }
 
@@ -229,7 +229,7 @@ h2 {
   border: 1px solid var(--line);
   background:
     linear-gradient(180deg, rgba(245, 233, 205, 0.96), rgba(228, 208, 170, 0.96)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   color: var(--text-soft);
   font-size: 0.86rem;
 }
@@ -250,7 +250,7 @@ h2 {
   border: 1px solid var(--line);
   background:
     linear-gradient(180deg, rgba(248, 240, 219, 0.98), rgba(231, 211, 174, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   box-shadow: 0 14px 30px rgba(96, 72, 34, 0.08);
 }
 
@@ -297,7 +297,7 @@ h2 {
   border: 1px solid var(--line);
   background:
     linear-gradient(180deg, rgba(251, 243, 224, 0.98), rgba(233, 214, 181, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   color: var(--text-soft);
 }
 
@@ -348,7 +348,7 @@ h3 {
   border: 1px solid var(--line);
   background:
     linear-gradient(180deg, rgba(246, 236, 212, 0.98), rgba(231, 211, 174, 0.96)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   box-shadow: 0 10px 24px rgba(96, 72, 34, 0.07);
 }
 
@@ -416,7 +416,7 @@ h3 {
   padding: 20px;
   background:
     linear-gradient(180deg, rgba(250, 243, 226, 0.98), rgba(237, 223, 193, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   border: 1px solid var(--line);
   border-radius: var(--radius);
 }
@@ -462,7 +462,7 @@ h3 {
   border-color: var(--line-strong);
   background:
     linear-gradient(180deg, rgba(255, 248, 233, 1), rgba(242, 226, 194, 1)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
 }
 
 .panel-card--nested {
@@ -641,7 +641,7 @@ h3 {
   border-radius: var(--radius-small);
   background:
     linear-gradient(180deg, rgba(252, 246, 232, 0.98), rgba(238, 223, 193, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   color: var(--text-soft);
   text-align: left;
 }
@@ -655,7 +655,7 @@ h3 {
   border-color: var(--line-strong);
   background:
     linear-gradient(180deg, rgba(255, 249, 238, 1), rgba(245, 232, 205, 1)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
 }
 
 .field-group {
@@ -840,7 +840,7 @@ h3 {
   border-radius: var(--radius-small);
   background:
     linear-gradient(180deg, rgba(250, 243, 226, 0.98), rgba(235, 220, 190, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
 }
 
 .workstation-pill__icon,
@@ -875,7 +875,7 @@ h3 {
   border-radius: var(--radius-small);
   background:
     linear-gradient(180deg, rgba(250, 243, 226, 0.98), rgba(235, 220, 190, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
 }
 
 .recipe-entry--plain {
@@ -930,7 +930,7 @@ h3 {
   border-radius: var(--radius-small);
   background:
     linear-gradient(180deg, rgba(250, 243, 226, 0.98), rgba(235, 220, 190, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
 }
 
 .admin-entry-list {
@@ -945,7 +945,7 @@ h3 {
   color: var(--text-soft);
   background:
     linear-gradient(180deg, rgba(247, 238, 217, 0.98), rgba(230, 214, 184, 0.98)),
-    url("./assets/images/orespawn-legacy-theme/main-bg.png") left top / 48px 48px repeat;
+    none;
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
   display: grid;

@@ -1,10 +1,7 @@
 using ChaoticDimensions.Common.Graphics;
-using ChaoticDimensions.Common.OreSpawn;
-using System.IO;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ChaoticDimensions
@@ -37,20 +34,6 @@ namespace ChaoticDimensions
 				SkyManager.Instance?.Deactivate(CrystalineDevourerSkyKey);
 			}
 			catch {
-			}
-		}
-
-		public override void HandlePacket(BinaryReader reader, int whoAmI) {
-			switch ((OreSpawnNetMessageType)reader.ReadByte()) {
-				case OreSpawnNetMessageType.RequestDimensionTeleport:
-					if (Main.netMode != NetmodeID.Server) {
-						return;
-					}
-
-					Player player = Main.player[whoAmI];
-					OreSpawnDimensionId targetDimension = (OreSpawnDimensionId)reader.ReadByte();
-					OreSpawnDimensionTravel.TryUseTransport(player, targetDimension);
-					break;
 			}
 		}
 	}

@@ -1,5 +1,4 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
-import { frontierEntries, frontierUiCopy } from "./orespawn-data.js";
 import {
   backendState,
   initBackend,
@@ -42,28 +41,16 @@ const defaultCategories = [
   "lore",
   "systems"
 ];
-const staticEntries = [...entries, ...frontierEntries];
+const staticEntries = [...entries];
 let allEntries = mergeEntries(staticEntries, []);
 let orderedCategories = buildCategoryList(allEntries);
 let craftableEntries = allEntries.filter((entry) => hasContentList(entry, "crafting"));
 
 const entryTags = {
-  "crystaline-devourer": "boss",
-  "water-dragon": "mob",
-  mantis: "mob",
-  caterkiller: "miniboss",
-  "emperor-scorpion": "miniboss",
-  hercules: "miniboss",
-  cephadrome: "miniboss"
+  "crystaline-devourer": "boss"
 };
 
 const progressionFlow = [
-  { id: "water-dragon", stage: "early" },
-  { id: "mantis", stage: "early" },
-  { id: "caterkiller", stage: "post_evil" },
-  { id: "emperor-scorpion", stage: "post_evil" },
-  { id: "hercules", stage: "post_evil" },
-  { id: "cephadrome", stage: "hardmode" },
   { id: "crystaline-devourer", stage: "endgame" }
 ];
 
@@ -1440,8 +1427,7 @@ function getEntryById(entryId) {
 
 function getCategoryLabel(category) {
   const baseCopy = uiCopy[state.language] ?? uiCopy[siteConfig.defaultLanguage];
-  const frontierCopy = frontierUiCopy[state.language] ?? frontierUiCopy[siteConfig.defaultLanguage] ?? frontierUiCopy.en;
-  return escapeHtml(baseCopy.categories?.[category] ?? frontierCopy.categories?.[category] ?? humanizeCategory(category));
+  return escapeHtml(baseCopy.categories?.[category] ?? humanizeCategory(category));
 }
 
 function getPageCopy() {

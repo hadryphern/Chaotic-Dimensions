@@ -1,42 +1,37 @@
 Items: {
 	CrystalineSigil: {
 		DisplayName: Crystaline Sigil
-		Tooltip: ""
+		Tooltip: Summons the Crystaline Devourer
 	}
 
 	CrystalineEye: {
 		DisplayName: Crystaline Eye
-		Tooltip: ""
+		Tooltip: Grants overwhelming mobility and defense
 	}
 
 	CrystalinePotion: {
 		DisplayName: Crystaline Potion
-		Tooltip: ""
+		Tooltip: Pulses with restorative crystal power
 	}
 
 	CrystalineTear: {
 		DisplayName: Crystaline Tear
-		Tooltip: ""
+		Tooltip: A fragment shed by the Crystaline Devourer
 	}
 
 	CrystalineStaff: {
 		DisplayName: Crystaline Staff
-		Tooltip: ""
+		Tooltip: Channels refined crystal energy
 	}
 
 	CrystalineSword: {
 		DisplayName: Absolute Crystal
-		Tooltip: ""
+		Tooltip: A blade forged from impossible crystal pressure
 	}
 
 	CrystalineGun: {
 		DisplayName: Crystaline Gun
-		Tooltip: ""
-	}
-
-	CrystalineEnvoured: {
-		DisplayName: Crystaline Envoured
-		Tooltip: ""
+		Tooltip: Fires crystal rounds at blinding speed
 	}
 
 	CrystalineDevourBreastplate: {
@@ -68,534 +63,45 @@ Items: {
 		DisplayName: Crystaline Devour Summoner Helm
 		Tooltip: ""
 	}
-
-	WaterDragonScale: {
-		DisplayName: Water Dragon Scale
-		Tooltip: Prototype OreSpawn material
-	}
-
-	MantisClaw: {
-		DisplayName: Mantis Claw
-		Tooltip: Prototype OreSpawn material
-	}
-
-	EmperorScorpionScale: {
-		DisplayName: Emperor Scorpion Scale
-		Tooltip: Prototype OreSpawn material
-	}
-
-	CaterkillerJaw: {
-		DisplayName: Caterkiller Jaw
-		Tooltip: Prototype OreSpawn material
-	}
-
-	CephadromeHorn: {
-		DisplayName: Cephadrome Horn
-		Tooltip: Prototype OreSpawn material
-	}
-
-	BigHammer: {
-		DisplayName: Big Hammer
-		Tooltip: Prototype Hercules drop
-	}
-
-	EmperorScorpionIdol: {
-		DisplayName: Emperor Scorpion Idol
-		Tooltip: Summons the prototype Emperor Scorpion
-	}
-
-	HerculesTotem: {
-		DisplayName: Hercules Totem
-		Tooltip: Summons the prototype Hercules
-	}
-
-	CaterkillerBait: {
-		DisplayName: Caterkiller Bait
-		Tooltip: Summons the prototype Caterkiller
-	}
-
-	CephadromeCaller: {
-		DisplayName: Cephadrome Caller
-		Tooltip: Summons the prototype Cephadrome
-	}
-
-	AttitudeAdjuster: {
-		DisplayName: Attitude Adjuster
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	BattleAxe: {
-		DisplayName: Battle Axe
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	BigBerthaSword: {
-		DisplayName: Big Bertha Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	Chainsaw: {
-		DisplayName: Chainsaw
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	ExperienceSword: {
-		DisplayName: Experience Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	FairySword: {
-		DisplayName: Fairy Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	NightmareSword: {
-		DisplayName: Nightmare Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	PoisonSword: {
-		DisplayName: Poison Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	QueenScaleBattleAxe: {
-		DisplayName: Queen Scale Battle Axe
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	RatSword: {
-		DisplayName: Rat Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	RayGun: {
-		DisplayName: Ray Gun
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	RoyalGuardianSword: {
-		DisplayName: Royal Guardian Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	SkateBowAndIrukandjiArrows: {
-		DisplayName: Skate Bow & Irukandji Arrows
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	SliceSword: {
-		DisplayName: Slice Sword
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	Squidzooka: {
-		DisplayName: Squidzooka
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	ThunderStaff: {
-		DisplayName: Thunder Staff
-		Tooltip: OreSpawn catalog item placeholder
-	}
-
-	KingsEmblem: {
-		DisplayName: King's Emblem
-		Tooltip: Summons an OreSpawn beta boss
-	}
-
-	KrakenBeacon: {
-		DisplayName: Kraken Beacon
-		Tooltip: Summons an OreSpawn beta boss
-	}
-
-	MobzillaSignal: {
-		DisplayName: Mobzilla Signal
-		Tooltip: Summons an OreSpawn beta boss
-	}
-
-	MothraTotem: {
-		DisplayName: Mothra Totem
-		Tooltip: Summons an OreSpawn beta boss
-	}
-
-	QueensBloom: {
-		DisplayName: Queen's Bloom
-		Tooltip: Summons an OreSpawn beta boss
-	}
-
-	WtfSignal: {
-		DisplayName: WTF Signal
-		Tooltip: Summons an OreSpawn beta boss
-	}
-
-	Amethyst: {
-		DisplayName: Amethyst
-		Tooltip: ""
-	}
-
-	AmethystBlock: {
-		DisplayName: Amethyst Block
-		Tooltip: ""
-	}
-
-	CrystalTreeLog: {
-		DisplayName: Crystal Tree Log
-		Tooltip: ""
-	}
-
-	DuplicatorLog: {
-		DisplayName: Duplicator Log
-		Tooltip: ""
-	}
-
-	EnderPearlBlock: {
-		DisplayName: Ender Pearl Block
-		Tooltip: ""
-	}
-
-	EyeOfEnderBlock: {
-		DisplayName: Eye Of Ender Block
-		Tooltip: ""
-	}
-
-	FairyCrystal: {
-		DisplayName: Fairy Crystal
-		Tooltip: ""
-	}
-
-	Kyanite: {
-		DisplayName: Kyanite
-		Tooltip: ""
-	}
-
-	KyaniteBlock: {
-		DisplayName: Kyanite Block
-		Tooltip: ""
-	}
-
-	LavaFoam: {
-		DisplayName: Lava Foam
-		Tooltip: ""
-	}
-
-	MobzillaScale: {
-		DisplayName: Mobzilla Scale
-		Tooltip: ""
-	}
-
-	MolenoidDirt: {
-		DisplayName: Molenoid Dirt
-		Tooltip: ""
-	}
-
-	PinkTourmaline: {
-		DisplayName: Pink Tourmaline
-		Tooltip: ""
-	}
-
-	PinkTourmalineBlock: {
-		DisplayName: Pink Tourmaline Block
-		Tooltip: ""
-	}
-
-	RatCrystal: {
-		DisplayName: Rat Crystal
-		Tooltip: ""
-	}
-
-	RedAntNest: {
-		DisplayName: Red Ant Nest
-		Tooltip: ""
-	}
-
-	Ruby: {
-		DisplayName: Ruby
-		Tooltip: ""
-	}
-
-	RubyBlock: {
-		DisplayName: Ruby Block
-		Tooltip: ""
-	}
-
-	Salt: {
-		DisplayName: Salt
-		Tooltip: ""
-	}
-
-	SaltBlock: {
-		DisplayName: Salt Block
-		Tooltip: ""
-	}
-
-	SkyTreeLog: {
-		DisplayName: Sky Tree Log
-		Tooltip: ""
-	}
-
-	TeleportBlock: {
-		DisplayName: Teleport Block
-		Tooltip: ""
-	}
-
-	TermiteNest: {
-		DisplayName: Termite Nest
-		Tooltip: ""
-	}
-
-	TigersEye: {
-		DisplayName: Tigers Eye
-		Tooltip: ""
-	}
-
-	TigersEyeBlock: {
-		DisplayName: Tigers Eye Block
-		Tooltip: ""
-	}
-
-	TitaniumBlock: {
-		DisplayName: Titanium Block
-		Tooltip: ""
-	}
-
-	TitaniumIngot: {
-		DisplayName: Titanium Ingot
-		Tooltip: ""
-	}
-
-	TitaniumNugget: {
-		DisplayName: Titanium Nugget
-		Tooltip: ""
-	}
-
-	TitaniumOre: {
-		DisplayName: Titanium Ore
-		Tooltip: ""
-	}
-
-	UraniumBlock: {
-		DisplayName: Uranium Block
-		Tooltip: ""
-	}
-
-	UraniumIngot: {
-		DisplayName: Uranium Ingot
-		Tooltip: ""
-	}
-
-	UraniumNugget: {
-		DisplayName: Uranium Nugget
-		Tooltip: ""
-	}
-
-	UraniumOre: {
-		DisplayName: Uranium Ore
-		Tooltip: ""
-	}
-
-	BrownAntItem: {
-		DisplayName: Brown Ant Item
-		Tooltip: ""
-	}
-
-	ButterflyTransportItem: {
-		DisplayName: Butterfly Transport Item
-		Tooltip: ""
-	}
-
-	RainbowAntItem: {
-		DisplayName: Rainbow Ant Item
-		Tooltip: ""
-	}
-
-	RedAntItem: {
-		DisplayName: Red Ant Item
-		Tooltip: ""
-	}
-
-	TermiteItem: {
-		DisplayName: Termite Item
-		Tooltip: ""
-	}
-
-	UnstableAntItem: {
-		DisplayName: Unstable Ant Item
-		Tooltip: ""
-	}
 }
 
 NPCs: {
 	CrystalineDevourerBody.DisplayName: Crystaline Devourer Body
-	CrystalineDevourerHead.DisplayName: Crystaline Devourer Head
+	CrystalineDevourerHead.DisplayName: Crystaline Devourer
 	CrystalineDevourerTail.DisplayName: Crystaline Devourer Tail
 	CrystalineShard.DisplayName: Crystaline Shard
-	WaterDragon.DisplayName: Water Dragon
-	Mantis.DisplayName: Mantis
-	EmperorScorpion.DisplayName: Emperor Scorpion
-	Hercules.DisplayName: Hercules
-	Caterkiller.DisplayName: Caterkiller
-	Cephadrome.DisplayName: Cephadrome
-	Alien.DisplayName: Alien
-	Alosaurus.DisplayName: Alosaurus
-	AttackSquid.DisplayName: Attack Squid
-	BabyDragon.DisplayName: Baby Dragon
-	Baryonyx.DisplayName: Baryonyx
-	Basilisc.DisplayName: Basilisc
-	Beaver.DisplayName: Beaver
-	Bee.DisplayName: Bee
-	BombOmb.DisplayName: Bomb-omb
-	Boyfriend.DisplayName: Boyfriend
-	Brutalfly.DisplayName: Brutalfly
-	Camarasaurus.DisplayName: Camarasaurus
-	Cassowary.DisplayName: Cassowary
-	CaveFisher.DisplayName: Cave Fisher
-	Chipmunk.DisplayName: Chipmunk
-	CliffRacer.DisplayName: Cliff Racer
-	CloudShark.DisplayName: Cloud Shark
-	Crab.DisplayName: Crab
-	CreepingHorror.DisplayName: Creeping Horror
-	Cricket.DisplayName: Cricket
-	Cryolophosaurus.DisplayName: Cryolophosaurus
-	CrystalUrchin.DisplayName: Crystal Urchin
-	Dragon.DisplayName: Dragon
-	DungeonBeast.DisplayName: Dungeon Beast
-	EasterBunny.DisplayName: Easter Bunny
-	EnderKnight.DisplayName: Ender Knight
-	EnderReaper.DisplayName: Ender Reaper
-	Fairy.DisplayName: Fairy
-	Firefly.DisplayName: Firefly
-	Flounder.DisplayName: Flounder
-	Frog.DisplayName: Frog
-	Gazelle.DisplayName: Gazelle
-	Ghost.DisplayName: Ghost
-	GhostSkeleton.DisplayName: Ghost Skeleton
-	Girlfriend.DisplayName: Girlfriend
-	GoldFish.DisplayName: Gold Fish
-	Hammerhead.DisplayName: Hammerhead
-	Hydrolisc.DisplayName: Hydrolisc
-	Irukandji.DisplayName: Irukandji
-	JumpyBug.DisplayName: Jumpy Bug
-	Kraken.DisplayName: Kraken
-	Kyuubi.DisplayName: Kyuubi
-	LeafMonster.DisplayName: Leaf Monster
-	Leonopteryx.DisplayName: Leonopteryx
-	Lizard.DisplayName: Lizard
-	LurkingTerror.DisplayName: Lurking Terror
-	Mobzilla.DisplayName: Mobzilla
-	Molenoid.DisplayName: Molenoid
-	Mosquito.DisplayName: Mosquito
-	Mothra.DisplayName: Mothra
-	Nastysaurus.DisplayName: Nastysaurus
-	Ostrich.DisplayName: Ostrich
-	Peacock.DisplayName: Peacock
-	Pointysaurus.DisplayName: Pointysaurus
-	Rat.DisplayName: Rat
-	RedAntRobot.DisplayName: Red Ant Robot
-	RoboGunner.DisplayName: Robo Gunner
-	RoboJeffery.DisplayName: Robo Jeffery
-	RoboPounder.DisplayName: Robo Pounder
-	RoboSniper.DisplayName: Robo Sniper
-	RoboWarrior.DisplayName: Robo Warrior
-	Rotator.DisplayName: Rotator
-	RubberDucky.DisplayName: Rubber Ducky
-	Scorpion.DisplayName: Scorpion
-	SeaMonster.DisplayName: Sea Monster
-	SeaViper.DisplayName: Sea Viper
-	Skate.DisplayName: Skate
-	SpiderDriver.DisplayName: Spider Driver
-	SpiderRobot.DisplayName: Spider Robot
-	SpitBug.DisplayName: Spit Bug
-	StinkBug.DisplayName: Stink Bug
-	Stinky.DisplayName: Stinky
-	Termite.DisplayName: Termite
-	TerribleTerror.DisplayName: Terrible Terror
-	TheKing.DisplayName: The King
-	ThePrince.DisplayName: The Prince
-	ThePrincess.DisplayName: The Princess
-	TheQueen.DisplayName: The Queen
-	TRex.DisplayName: T-Rex
-	Triffid.DisplayName: Triffid
-	VelocityRaptor.DisplayName: Velocity Raptor
-	Vortex.DisplayName: Vortex
-	Whale.DisplayName: Whale
-	Wtf.DisplayName: WTF?
-	YoungAdultPrince.DisplayName: Young Adult Prince
-	YoungPrince.DisplayName: Young Prince
-	BrownAntCritter.DisplayName: Brown Ant Critter
-	ButterflyCritter.DisplayName: Butterfly Critter
-	RainbowAntCritter.DisplayName: Rainbow Ant Critter
-	RedAntCritter.DisplayName: Red Ant Critter
-	TermiteCritter.DisplayName: Termite Critter
-	UnstableAntCritter.DisplayName: Unstable Ant Critter
 }
 
 Projectiles: {
 	CrystalineDevourerBeam.DisplayName: Crystaline Devourer Beam
 	CrystalineDevourerPortal.DisplayName: Crystaline Devourer Portal
-	CrystalineBoltProjectile.DisplayName: Crystaline Bolt Projectile
-	CrystalineSwordProjectile.DisplayName: Crystaline Sword Projectile
-	CrystalineEnvouredMinion.DisplayName: Crystaline Envoured Minion
-	CrystalineEnvouredBody.DisplayName: Crystaline Envoured Body
-	CrystalineEnvouredTail.DisplayName: Crystaline Envoured Tail
-	CrystalineGunLaser.DisplayName: Crystaline Gun Laser
-	CrystalineStarMinion.DisplayName: Crystaline Star Minion
-	CrystalineStarShot.DisplayName: Crystaline Star Shot
-	CrystalineDevourerSkyBeam.DisplayName: Crystaline Devourer Sky Beam
-	CrystalineDevourerArenaWall.DisplayName: Crystaline Devourer Arena Wall
+	CrystalineBoltProjectile.DisplayName: Crystaline Bolt
+	CrystalineSwordProjectile.DisplayName: Absolute Crystal
+	CrystalineDevourerSkyBeam.DisplayName: Crystaline Sky Beam
 }
 
 Buffs: {
 	CrystalinePotionFortitudeBuff: {
-		DisplayName: Crystaline Potion Fortitude Buff
-		Description: Mods.ChaoticDimensions.Buffs.CrystalinePotionFortitudeBuff.Description
+		DisplayName: Crystaline Fortitude
+		Description: Hardened by crystal energy
 	}
 
 	CrystalinePotionRegenerationBuff: {
-		DisplayName: Crystaline Potion Regeneration Buff
-		Description: Mods.ChaoticDimensions.Buffs.CrystalinePotionRegenerationBuff.Description
+		DisplayName: Crystaline Regeneration
+		Description: Crystal energy rapidly restores life
 	}
 
 	CrystalineRushBuff: {
-		DisplayName: Crystaline Rush Buff
-		Description: Mods.ChaoticDimensions.Buffs.CrystalineRushBuff.Description
-	}
-
-	CrystalineEnvouredBuff: {
-		DisplayName: Crystaline Envoured Buff
-		Description: Mods.ChaoticDimensions.Buffs.CrystalineEnvouredBuff.Description
+		DisplayName: Crystaline Rush
+		Description: Movement surges with crystal momentum
 	}
 
 	CrystalineDevourAegisBuff: {
-		DisplayName: Crystaline Devour Aegis Buff
-		Description: Mods.ChaoticDimensions.Buffs.CrystalineDevourAegisBuff.Description
+		DisplayName: Crystaline Devour Aegis
+		Description: Protected by the Devourer's crystal ward
 	}
 }
 
 Tiles: {
-	AmethystBlockTile.MapEntry: Amethyst Block Tile
-	AmethystOreTile.MapEntry: Amethyst Ore Tile
-	CrystalTreeLogTile.MapEntry: Crystal Tree Log Tile
-	DuplicatorLogTile.MapEntry: Duplicator Log Tile
-	EnderPearlBlockTile.MapEntry: Ender Pearl Block Tile
-	EyeOfEnderBlockTile.MapEntry: Eye Of Ender Block Tile
-	KyaniteBlockTile.MapEntry: Kyanite Block Tile
-	KyaniteOreTile.MapEntry: Kyanite Ore Tile
-	MolenoidDirtTile.MapEntry: Molenoid Dirt Tile
-	PinkTourmalineBlockTile.MapEntry: Pink Tourmaline Block Tile
-	PinkTourmalineOreTile.MapEntry: Pink Tourmaline Ore Tile
-	RedAntNestTile.MapEntry: Red Ant Nest Tile
-	RubyBlockTile.MapEntry: Ruby Block Tile
-	RubyOreTile.MapEntry: Ruby Ore Tile
-	SaltBlockTile.MapEntry: Salt Block Tile
-	SaltOreTile.MapEntry: Salt Ore Tile
-	SkyTreeLogTile.MapEntry: Sky Tree Log Tile
-	TeleportBlockTile.MapEntry: Teleport Block Tile
-	TermiteNestTile.MapEntry: Termite Nest Tile
-	TigersEyeBlockTile.MapEntry: Tigers Eye Block Tile
-	TigersEyeOreTile.MapEntry: Tigers Eye Ore Tile
-	TitaniumBlockTile.MapEntry: Titanium Block Tile
-	TitaniumOreTile.MapEntry: Titanium Ore Tile
-	UraniumBlockTile.MapEntry: Uranium Block Tile
-	UraniumOreTile.MapEntry: Uranium Ore Tile
+	CrystalineBarrierBlock.MapEntry: Crystaline Barrier
 }
