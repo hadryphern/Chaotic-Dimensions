@@ -726,7 +726,7 @@ function renderHomePage() {
   `;
 }
 
-function getHomeCategoryPreviewEntries(category, limit = 4) {
+function getHomeCategoryPreviewEntries(category, limit = 6) {
   return getEntriesByCategory(category)
     .filter((entry) => entry?.isPublished !== false)
     .slice(0, limit);
