@@ -21,7 +21,9 @@ const siteRoot = path.resolve(sourceRoot);
 const pageLimit = 3;
 const themeFiles = [
   "clouds.jpg",
-  "nav-top-logo.png"
+  "nav-top-logo.png",
+  "main-bg.png",
+  "top-bar-bg.jpg"
 ];
 
 ensureDirectory(legacyAssetRoot);

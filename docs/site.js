@@ -745,6 +745,23 @@ function renderHomePage() {
 function renderLibraryPage() {
   const copy = getCopy();
   const visibleEntries = getVisibleEntries();
+  const categoryButtons = [
+    {
+      key: "all",
+      label: copy.library.all,
+      count: allEntries.length
+    },
+    ...orderedCategories.map((category) => ({
+      key: category,
+      label: getCategoryLabel(category),
+      count: getEntriesByCategory(category).length
+    }))
+  ].map((item) => `
+    <button class="catalog-chip ${state.category === item.key || (item.key === "all" && state.category === "all") ? "is-active" : ""}" type="button" data-library-quick-category="${item.key}">
+      <span>${item.label}</span>
+      <strong>${item.count}</strong>
+    </button>
+  `).join("");
 
   elements.main.innerHTML = `
     <section class="page-hero page-hero--compact">
@@ -754,21 +771,41 @@ function renderLibraryPage() {
     </section>
 
     <section class="page-section">
-      <div class="filter-bar">
-        <input class="field-input" id="library-search" type="search" value="${escapeHtml(state.search)}" placeholder="${copy.library.search}">
-        <select class="field-input" id="library-category">
-          <option value="all">${copy.library.all}</option>
-          ${orderedCategories.map((category) => `
-            <option value="${category}" ${state.category === category ? "selected" : ""}>${getCategoryLabel(category)}</option>
-          `).join("")}
-        </select>
-      </div>
-      <div class="section-head section-head--inline">
-        <h2>${copy.library.results}</h2>
-        <span class="subtle-label">${visibleEntries.length}</span>
-      </div>
-      <div class="entry-grid">
-        ${visibleEntries.length > 0 ? visibleEntries.map((entry) => renderEntryCard(entry, true)).join("") : `<div class="empty-card">${copy.library.empty}</div>`}
+      <div class="catalog-layout">
+        <aside class="catalog-sidebar">
+          <div class="content-block content-block--compact">
+            <h3>${copy.library.title}</h3>
+            <p>${copy.library.body}</p>
+          </div>
+          <div class="content-block content-block--compact">
+            <label class="field-group">
+              <span>${copy.library.search}</span>
+              <input class="field-input" id="library-search" type="search" value="${escapeHtml(state.search)}" placeholder="${copy.library.search}">
+            </label>
+            <label class="field-group">
+              <span>${copy.library.category}</span>
+              <select class="field-input" id="library-category">
+                <option value="all">${copy.library.all}</option>
+                ${orderedCategories.map((category) => `
+                  <option value="${category}" ${state.category === category ? "selected" : ""}>${getCategoryLabel(category)}</option>
+                `).join("")}
+              </select>
+            </label>
+          </div>
+          <div class="content-block content-block--compact">
+            <h3>${copy.library.category}</h3>
+            <div class="catalog-chip-list">${categoryButtons}</div>
+          </div>
+        </aside>
+        <div class="catalog-results">
+          <div class="section-head section-head--inline">
+            <h2>${copy.library.results}</h2>
+            <span class="subtle-label">${visibleEntries.length}</span>
+          </div>
+          <div class="entry-grid">
+            ${visibleEntries.length > 0 ? visibleEntries.map((entry) => renderEntryCard(entry, true)).join("") : `<div class="empty-card">${copy.library.empty}</div>`}
+          </div>
+        </div>
       </div>
     </section>
   `;
@@ -783,6 +820,14 @@ function renderLibraryPage() {
     state.category = event.target.value;
     renderLibraryPage();
     syncUrl();
+  });
+
+  elements.main.querySelectorAll("[data-library-quick-category]")?.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.category = button.dataset.libraryQuickCategory ?? "all";
+      renderLibraryPage();
+      syncUrl();
+    });
   });
 }
 
@@ -957,6 +1002,23 @@ function renderCraftingPage() {
   const copy = getCopy();
   const visibleRecipes = getVisibleRecipes();
   const recipeCategories = [...new Set(craftableEntries.map((entry) => entry.category))];
+  const categoryButtons = [
+    {
+      key: "all",
+      label: copy.crafting.allTags,
+      count: craftableEntries.length
+    },
+    ...recipeCategories.map((category) => ({
+      key: category,
+      label: getCategoryLabel(category),
+      count: craftableEntries.filter((entry) => entry.category === category).length
+    }))
+  ].map((item) => `
+    <button class="catalog-chip ${state.category === item.key || (item.key === "all" && state.category === "all") ? "is-active" : ""}" type="button" data-crafting-quick-category="${item.key}">
+      <span>${item.label}</span>
+      <strong>${item.count}</strong>
+    </button>
+  `).join("");
 
   elements.main.innerHTML = `
     <section class="page-hero page-hero--compact">
@@ -966,21 +1028,41 @@ function renderCraftingPage() {
     </section>
 
     <section class="page-section">
-      <div class="filter-bar">
-        <input class="field-input" id="crafting-search" type="search" value="${escapeHtml(state.search)}" placeholder="${copy.crafting.search}">
-        <select class="field-input" id="crafting-category">
-          <option value="all">${copy.crafting.allTags}</option>
-          ${recipeCategories.map((category) => `
-            <option value="${category}" ${state.category === category ? "selected" : ""}>${getCategoryLabel(category)}</option>
-          `).join("")}
-        </select>
-      </div>
-      <div class="section-head section-head--inline">
-        <h2>${copy.library.results}</h2>
-        <span class="subtle-label">${visibleRecipes.length}</span>
-      </div>
-      <div class="recipe-list">
-        ${visibleRecipes.length > 0 ? visibleRecipes.map((entry) => renderRecipeCard(entry)).join("") : `<div class="empty-card">${copy.crafting.empty}</div>`}
+      <div class="catalog-layout">
+        <aside class="catalog-sidebar">
+          <div class="content-block content-block--compact">
+            <h3>${copy.crafting.title}</h3>
+            <p>${copy.crafting.body}</p>
+          </div>
+          <div class="content-block content-block--compact">
+            <label class="field-group">
+              <span>${copy.crafting.search}</span>
+              <input class="field-input" id="crafting-search" type="search" value="${escapeHtml(state.search)}" placeholder="${copy.crafting.search}">
+            </label>
+            <label class="field-group">
+              <span>${copy.library.category}</span>
+              <select class="field-input" id="crafting-category">
+                <option value="all">${copy.crafting.allTags}</option>
+                ${recipeCategories.map((category) => `
+                  <option value="${category}" ${state.category === category ? "selected" : ""}>${getCategoryLabel(category)}</option>
+                `).join("")}
+              </select>
+            </label>
+          </div>
+          <div class="content-block content-block--compact">
+            <h3>${copy.crafting.allTags}</h3>
+            <div class="catalog-chip-list">${categoryButtons}</div>
+          </div>
+        </aside>
+        <div class="catalog-results">
+          <div class="section-head section-head--inline">
+            <h2>${copy.library.results}</h2>
+            <span class="subtle-label">${visibleRecipes.length}</span>
+          </div>
+          <div class="recipe-list">
+            ${visibleRecipes.length > 0 ? visibleRecipes.map((entry) => renderRecipeCard(entry)).join("") : `<div class="empty-card">${copy.crafting.empty}</div>`}
+          </div>
+        </div>
       </div>
     </section>
   `;
@@ -995,6 +1077,14 @@ function renderCraftingPage() {
     state.category = event.target.value;
     renderCraftingPage();
     syncUrl();
+  });
+
+  elements.main.querySelectorAll("[data-crafting-quick-category]")?.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.category = button.dataset.craftingQuickCategory ?? "all";
+      renderCraftingPage();
+      syncUrl();
+    });
   });
 }
 
