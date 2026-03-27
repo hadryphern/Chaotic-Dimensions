@@ -1,6 +1,7 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
 import { frontierEntries, frontierUiCopy } from "./orespawn-data.js";
 import { generatedOreSpawnEntries } from "./generated-orespawn-data.js";
+import { generatedOreSpawnLegacy } from "./generated-orespawn-legacy.js";
 import { generatedTerrariaAssets } from "./generated-terraria-assets.js";
 import {
   backendState,
@@ -89,6 +90,10 @@ const HOME_FEATURED_IDS = [
 ];
 
 const DEFAULT_ENTRY_IMAGE = "./assets/images/favicon.png";
+const ORESPAWN_LEGACY_THEME = {
+  clouds: "./assets/images/orespawn-legacy-theme/clouds.jpg",
+  crest: "./assets/images/orespawn-legacy-theme/nav-top-logo.png"
+};
 const TERRARIA_WIKI = {
   apiUrl: "https://terraria.wiki.gg/api.php",
   pageBaseUrl: "https://terraria.wiki.gg/wiki/"
@@ -97,6 +102,7 @@ const TERRARIA_WIKI = {
 const RUNTIME_TERRARIA_LOOKUP_ENABLED = false;
 
 const staticEntries = mergeStaticSources(entries, generatedOreSpawnEntries, frontierEntries);
+const legacyOreSpawnMap = buildLegacyOreSpawnMap(generatedOreSpawnLegacy);
 const pageId = document.body.dataset.page ?? "home";
 
 const elements = {
@@ -667,6 +673,7 @@ function renderPage() {
 function renderHomePage() {
   const copy = getCopy();
   const featuredEntries = getHomeFeaturedEntries().map((entry) => renderEntryCard(entry, true)).join("");
+  const legacyCount = generatedOreSpawnLegacy.length;
   const categoryMarkup = orderedCategories.map((category) => `
     <article class="summary-tile">
       <div>
@@ -686,10 +693,17 @@ function renderHomePage() {
   `).join("");
 
   elements.main.innerHTML = `
-    <section class="page-hero">
+    <section class="page-hero page-hero--legacy" style="--legacy-clouds:url('${escapeHtml(ORESPAWN_LEGACY_THEME.clouds)}')">
+      <div class="legacy-hero-crest">
+        <img src="${escapeHtml(ORESPAWN_LEGACY_THEME.crest)}" alt="OreSpawn legacy crest">
+      </div>
       <p class="eyebrow">${copy.siteLabel}</p>
       <h1>${copy.home.title}</h1>
       <p class="hero-lead">${copy.home.lead}</p>
+      <div class="legacy-note">
+        <strong>${state.language === "pt-BR" ? "Arquivo OreSpawn restaurado" : "Restored OreSpawn archive"}</strong>
+        <span>${state.language === "pt-BR" ? `${legacyCount} paginas classicas com arte original conectadas a wiki atual.` : `${legacyCount} classic pages with original artwork connected to the current wiki.`}</span>
+      </div>
     </section>
 
     <section class="page-section">
@@ -783,6 +797,8 @@ function renderEntryPage() {
 
   const content = getLocalizedEntry(entry);
   const entryAsset = getEntryDisplayAsset(entry);
+  const legacyMedia = getLegacyOreSpawnPage(entry);
+  const bannerImage = entry.banner || legacyMedia?.heroImage || "";
   const recipeUrl = hasContentList(entry, "crafting") ? buildPageUrl("crafting", { q: content.title }) : "";
   const summonEntry = findSummonEntry(entry);
   const summonContent = getLocalizedEntry(summonEntry);
@@ -826,9 +842,9 @@ function renderEntryPage() {
       <a class="inline-link" href="${buildPageUrl("library")}">${copy.entry.back}</a>
       <div class="entry-hero">
         <div class="entry-main">
-          ${entry.banner ? `
+          ${bannerImage ? `
             <div class="entry-banner-art">
-              <img src="${escapeHtml(entry.banner)}" alt="${escapeHtml(content.title ?? entry.id)}">
+              <img src="${escapeHtml(bannerImage)}" alt="${escapeHtml(content.title ?? entry.id)}">
             </div>
           ` : ""}
           <p class="eyebrow">${getCategoryLabel(entry.category)}</p>
@@ -878,6 +894,19 @@ function renderEntryPage() {
         <div class="content-block">
           <h3>${copy.entry.usedIn}</h3>
           <div class="entry-inline-list">${usedInMarkup}</div>
+        </div>
+      ` : ""}
+      ${legacyMedia?.galleryImages?.length ? `
+        <div class="content-block">
+          <h3>${copy.entry.legacyGallery ?? (state.language === "pt-BR" ? "Galeria OreSpawn original" : "Classic OreSpawn gallery")}</h3>
+          <p>${copy.entry.legacyBody ?? (state.language === "pt-BR" ? "Imagens reaproveitadas do site original do OreSpawn para preservar a identidade visual classica da criatura, item ou sistema." : "Images reused from the original OreSpawn site to preserve the classic visual identity of the creature, item or system.")}</p>
+          <div class="legacy-gallery">
+            ${legacyMedia.galleryImages.map((imageUrl, index) => `
+              <figure class="legacy-gallery-card">
+                <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)} legacy image ${index + 1}">
+              </figure>
+            `).join("")}
+          </div>
         </div>
       ` : ""}
       ${relatedMarkup ? `
@@ -2029,6 +2058,55 @@ function isDefaultEntryImage(imageUrl) {
   return !clean || clean === DEFAULT_ENTRY_IMAGE;
 }
 
+function buildLegacyOreSpawnMap(items) {
+  const map = new Map();
+
+  for (const item of items) {
+    for (const candidate of [item.id, item.title]) {
+      const key = normalizeLegacyKey(candidate);
+      if (key && !map.has(key)) {
+        map.set(key, item);
+      }
+    }
+  }
+
+  return map;
+}
+
+function normalizeLegacyKey(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function getLegacyOreSpawnPage(entry) {
+  if (!entry) {
+    return null;
+  }
+
+  const meta = getEntryMeta(entry);
+  const content = getLocalizedEntry(entry);
+  const candidates = [
+    entry.id,
+    meta.oreSpawnKey,
+    content.title
+  ];
+
+  for (const candidate of candidates) {
+    const key = normalizeLegacyKey(candidate);
+    if (key && legacyOreSpawnMap.has(key)) {
+      return legacyOreSpawnMap.get(key);
+    }
+  }
+
+  return null;
+}
+
 function getEntryExternalLookup(entry) {
   const meta = getEntryMeta(entry);
   const content = getLocalizedEntry(entry);
@@ -2063,6 +2141,15 @@ function getEntryDisplayAsset(entry, options = {}) {
       imageUrl: fallbackImage,
       externalPageUrl: buildTerrariaWikiPageUrl(meta.wikiSource),
       sourceType: "fallback"
+    };
+  }
+
+  const legacyAsset = getLegacyOreSpawnPage(entry);
+  if (legacyAsset?.heroImage) {
+    return {
+      imageUrl: legacyAsset.heroImage,
+      externalPageUrl: "",
+      sourceType: "legacy"
     };
   }
 
