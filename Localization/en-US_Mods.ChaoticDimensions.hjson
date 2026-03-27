@@ -88,6 +88,151 @@ Items: {
 		DisplayName: Crystaline Devour Summoner Helm
 		Tooltip: ""
 	}
+
+	Alexandrite: {
+		DisplayName: Alexandrite
+		Tooltip: ""
+	}
+
+	AlexandriteBlock: {
+		DisplayName: Alexandrite Block
+		Tooltip: ""
+	}
+
+	AlexandriteDeepslateOre: {
+		DisplayName: Alexandrite Deepslate Ore
+		Tooltip: ""
+	}
+
+	AlexandriteOre: {
+		DisplayName: Alexandrite Ore
+		Tooltip: ""
+	}
+
+	BedrockStick: {
+		DisplayName: Bedrock Stick
+		Tooltip: ""
+	}
+
+	BlueBerryPlant: {
+		DisplayName: Blue Berry Plant
+		Tooltip: ""
+	}
+
+	ChaosCrystal: {
+		DisplayName: Chaos Crystal
+		Tooltip: ""
+	}
+
+	GlassStick: {
+		DisplayName: Glass Stick
+		Tooltip: ""
+	}
+
+	GreystedWood: {
+		DisplayName: Greysted Wood
+		Tooltip: ""
+	}
+
+	IronStick: {
+		DisplayName: Iron Stick
+		Tooltip: ""
+	}
+
+	RawAlexandrite: {
+		DisplayName: Raw Alexandrite
+		Tooltip: ""
+	}
+
+	RawAlexandriteBlock: {
+		DisplayName: Raw Alexandrite Block
+		Tooltip: ""
+	}
+
+	RosalitaGem: {
+		DisplayName: Rosalita Gem
+		Tooltip: ""
+	}
+
+	RosalitaOre: {
+		DisplayName: Rosalita Ore
+		Tooltip: ""
+	}
+
+	RosalitaShield: {
+		DisplayName: Rosalita Shield
+		Tooltip: ""
+	}
+
+	RubyAxe: {
+		DisplayName: Ruby Axe
+		Tooltip: ""
+	}
+
+	RubyGem: {
+		DisplayName: Ruby Gem
+		Tooltip: ""
+	}
+
+	RubyNugget: {
+		DisplayName: Ruby Nugget
+		Tooltip: ""
+	}
+
+	RubyOre: {
+		DisplayName: Ruby Ore
+		Tooltip: ""
+	}
+
+	RubyPickaxe: {
+		DisplayName: Ruby Pickaxe
+		Tooltip: ""
+	}
+
+	RubySword: {
+		DisplayName: Ruby Sword
+		Tooltip: ""
+	}
+
+	ShadowBlock: {
+		DisplayName: Shadow Block
+		Tooltip: ""
+	}
+
+	ShadowGem: {
+		DisplayName: Shadow Gem
+		Tooltip: ""
+	}
+
+	ShadowNugget: {
+		DisplayName: Shadow Nugget
+		Tooltip: ""
+	}
+
+	ShadowOre: {
+		DisplayName: Shadow Ore
+		Tooltip: ""
+	}
+
+	ShadowPickaxe: {
+		DisplayName: Shadow Pickaxe
+		Tooltip: ""
+	}
+
+	ShadowSword: {
+		DisplayName: Shadow Sword
+		Tooltip: ""
+	}
+
+	VortexBlade: {
+		DisplayName: Vortex Blade
+		Tooltip: ""
+	}
+
+	VortexGem: {
+		DisplayName: Vortex Gem
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -97,6 +242,33 @@ NPCs: {
 	CrystalineDevourerHead.DisplayName: Crystaline Devourer
 	CrystalineDevourerTail.DisplayName: Crystaline Devourer Tail
 	CrystalineShard.DisplayName: Crystaline Shard
+	AlessandraNpc.DisplayName: Alessandra Npc
+	AppleCow.DisplayName: Apple Cow
+	BigButterfly.DisplayName: Big Butterfly
+	BlueButterfly.DisplayName: Blue Butterfly
+	ChaoticMimic.DisplayName: Chaotic Mimic
+	CrystalAppleCow.DisplayName: Crystal Apple Cow
+	CrystalCreeper.DisplayName: Crystal Creeper
+	CrystalGoldenAppleCow.DisplayName: Crystal Golden Apple Cow
+	DimensionPig.DisplayName: Dimension Pig
+	Endernmon.DisplayName: Endernmon
+	Fantasm.DisplayName: Fantasm
+	FireflyCritter.DisplayName: Firefly Critter
+	FlyZombieSquid.DisplayName: Fly Zombie Squid
+	Formiga.DisplayName: Formiga
+	GiantZombie.DisplayName: Giant Zombie
+	GoldenAppleCow.DisplayName: Golden Apple Cow
+	GreenButterfly.DisplayName: Green Butterfly
+	HappyCreeper.DisplayName: Happy Creeper
+	RatMonster.DisplayName: Rat Monster
+	RedButterfly.DisplayName: Red Butterfly
+	RedGiantSpider.DisplayName: Red Giant Spider
+	ShadowCreeper.DisplayName: Shadow Creeper
+	SnowBlaze.DisplayName: Snow Blaze
+	WhiteCreeper.DisplayName: White Creeper
+	WhiteZombie.DisplayName: White Zombie
+	YellowButterfly.DisplayName: Yellow Butterfly
+	ZombieSombra.DisplayName: Zombie Sombra
 }
 
 Projectiles: {
