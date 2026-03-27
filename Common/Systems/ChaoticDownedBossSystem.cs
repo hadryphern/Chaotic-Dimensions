@@ -7,12 +7,14 @@ namespace ChaoticDimensions.Common.Systems
 {
 	public sealed class ChaoticDownedBossSystem : ModSystem
 	{
+		public static bool downedMonthra;
 		public static bool downedChaoticApexOne;
 		public static bool downedChaoticApexTwo;
 		public static bool downedChaoticApexThree;
 		public static bool downedCrystalineDevourer;
 
 		public override void ClearWorld() {
+			downedMonthra = false;
 			downedChaoticApexOne = false;
 			downedChaoticApexTwo = false;
 			downedChaoticApexThree = false;
@@ -20,6 +22,10 @@ namespace ChaoticDimensions.Common.Systems
 		}
 
 		public override void SaveWorldData(TagCompound tag) {
+			if (downedMonthra) {
+				tag["downedMonthra"] = true;
+			}
+
 			if (downedChaoticApexOne) {
 				tag["downedChaoticApexOne"] = true;
 			}
@@ -38,6 +44,7 @@ namespace ChaoticDimensions.Common.Systems
 		}
 
 		public override void LoadWorldData(TagCompound tag) {
+			downedMonthra = tag.ContainsKey("downedMonthra");
 			downedChaoticApexOne = tag.ContainsKey("downedChaoticApexOne");
 			downedChaoticApexTwo = tag.ContainsKey("downedChaoticApexTwo");
 			downedChaoticApexThree = tag.ContainsKey("downedChaoticApexThree");
@@ -46,6 +53,7 @@ namespace ChaoticDimensions.Common.Systems
 
 		public override void NetSend(BinaryWriter writer) {
 			writer.WriteFlags(
+				downedMonthra,
 				downedChaoticApexOne,
 				downedChaoticApexTwo,
 				downedChaoticApexThree,
@@ -54,6 +62,7 @@ namespace ChaoticDimensions.Common.Systems
 
 		public override void NetReceive(BinaryReader reader) {
 			reader.ReadFlags(
+				out downedMonthra,
 				out downedChaoticApexOne,
 				out downedChaoticApexTwo,
 				out downedChaoticApexThree,

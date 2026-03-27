@@ -4,6 +4,31 @@ Items: {
 		Tooltip: Summons the Crystaline Devourer
 	}
 
+	MonthraScale: {
+		DisplayName: Monthra Scale
+		Tooltip: Warm scales shed by a wandering omen
+	}
+
+	MonthraBlade: {
+		DisplayName: Monthra Blade
+		Tooltip: Spins in a wide arc around the wielder
+	}
+
+	MonthraWand: {
+		DisplayName: Monthra Wand
+		Tooltip: Fires seeking embers blessed by Monthra
+	}
+
+	MonthraBow: {
+		DisplayName: Monthra Bow
+		Tooltip: Looses a paired shot with every pull
+	}
+
+	MonthraButterflyStaff: {
+		DisplayName: Monthra Butterfly Staff
+		Tooltip: Summons loyal dusk butterflies to fight for you
+	}
+
 	CrystalineEye: {
 		DisplayName: Crystaline Eye
 		Tooltip: Grants overwhelming mobility and defense
@@ -66,6 +91,8 @@ Items: {
 }
 
 NPCs: {
+	MonthraBoss.DisplayName: Monthra
+	MonthraButterfly.DisplayName: Month
 	CrystalineDevourerBody.DisplayName: Crystaline Devourer Body
 	CrystalineDevourerHead.DisplayName: Crystaline Devourer
 	CrystalineDevourerTail.DisplayName: Crystaline Devourer Tail
@@ -73,6 +100,11 @@ NPCs: {
 }
 
 Projectiles: {
+	MonthraFireball.DisplayName: Monthra Fireball
+	MonthraFireballHoming.DisplayName: Homing Monthra Fireball
+	MonthraMagicFireball.DisplayName: Monthra Ember
+	MonthraBladeProjectile.DisplayName: Monthra Blade
+	MonthraButterflyMinion.DisplayName: Monthra Butterfly
 	CrystalineDevourerBeam.DisplayName: Crystaline Devourer Beam
 	CrystalineDevourerPortal.DisplayName: Crystaline Devourer Portal
 	CrystalineBoltProjectile.DisplayName: Crystaline Bolt
@@ -100,8 +132,11 @@ Buffs: {
 		DisplayName: Crystaline Devour Aegis
 		Description: Protected by the Devourer's crystal ward
 	}
+
+	MonthraButterflyBuff: {
+		DisplayName: Monthra Butterflies
+		Description: Dusk butterflies circle nearby and harass foes
+	}
 }
 
-Tiles: {
-	CrystalineBarrierBlock.MapEntry: Crystaline Barrier
-}
+Tiles.CrystalineBarrierBlock.MapEntry: Crystaline Barrier
