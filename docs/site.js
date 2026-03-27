@@ -75,7 +75,10 @@ const HOME_FEATURED_IDS = [
   "crystaline-devourer"
 ];
 
-const DEFAULT_ENTRY_IMAGE = "./assets/images/favicon.png";
+const ASSET_VERSION = "20260327c";
+const SITE_ICON_IMAGE = `./assets/images/icon.png?v=${ASSET_VERSION}`;
+const SITE_FAVICON_IMAGE = `./assets/images/favicon.png?v=${ASSET_VERSION}`;
+const DEFAULT_ENTRY_IMAGE = SITE_FAVICON_IMAGE;
 const TERRARIA_WIKI = {
   apiUrl: "https://terraria.wiki.gg/api.php",
   pageBaseUrl: "https://terraria.wiki.gg/wiki/"
@@ -596,7 +599,7 @@ function renderHeader() {
   elements.header.innerHTML = `
     <div class="header-brand">
       <a class="brand-link" href="${buildPageUrl("home")}">
-        <img src="./assets/images/icon.png" alt="Chaotic Dimensions icon">
+        <img src="${SITE_ICON_IMAGE}" alt="Chaotic Dimensions icon">
         <div>
           <strong>${escapeHtml(getSiteName())}</strong>
           <span>${copy.siteLabel}</span>

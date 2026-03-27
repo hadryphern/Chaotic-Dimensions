@@ -1,5 +1,7 @@
 import { isSupabaseConfigured, supabaseConfig } from "./supabase.config.js";
 
+const SITE_FAVICON_IMAGE = "./assets/images/favicon.png?v=20260327c";
+
 export const backendState = {
   configured: false,
   enabled: false,
@@ -202,7 +204,7 @@ export async function loadPublishedEntries() {
   backendState.publishedEntries = (result.data ?? []).map((row) => ({
     id: row.id,
     category: row.category,
-    image: row.image_url || "./assets/images/favicon.png",
+    image: row.image_url || SITE_FAVICON_IMAGE,
     related: row.related_ids ?? [],
     sortOrder: row.sort_order ?? 0,
     isPublished: row.is_published ?? false,

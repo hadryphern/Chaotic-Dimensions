@@ -1599,7 +1599,7 @@ export const entries = [
   {
     id: "crystaline-rush",
     category: "buffs",
-    image: "./assets/images/favicon.png",
+    image: "./assets/images/favicon.png?v=20260327c",
     related: ["crystaline-eye"],
     content: {
       "pt-BR": {
@@ -1655,7 +1655,7 @@ export const entries = [
   {
     id: "crystaline-devour-aegis",
     category: "buffs",
-    image: "./assets/images/favicon.png",
+    image: "./assets/images/favicon.png?v=20260327c",
     related: ["crystaline-devour-armor"],
     content: {
       "pt-BR": {
@@ -1715,7 +1715,7 @@ export const entries = [
   {
     id: "crystaline-potion-regeneration",
     category: "buffs",
-    image: "./assets/images/favicon.png",
+    image: "./assets/images/favicon.png?v=20260327c",
     related: ["crystaline-potion"],
     content: {
       "pt-BR": {
@@ -1767,7 +1767,7 @@ export const entries = [
   {
     id: "crystaline-potion-fortitude",
     category: "buffs",
-    image: "./assets/images/favicon.png",
+    image: "./assets/images/favicon.png?v=20260327c",
     related: ["crystaline-potion"],
     content: {
       "pt-BR": {
