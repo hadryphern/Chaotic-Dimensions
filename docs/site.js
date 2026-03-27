@@ -1,4 +1,5 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
+import { generatedMinecraftLegacyEntries } from "./generated-minecraft-legacy-data.js";
 import { generatedTerrariaAssets } from "./generated-terraria-assets.js";
 import {
   backendState,
@@ -86,7 +87,7 @@ const TERRARIA_WIKI = {
 
 const RUNTIME_TERRARIA_LOOKUP_ENABLED = false;
 
-const staticEntries = mergeStaticSources(entries);
+const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries);
 const pageId = document.body.dataset.page ?? "home";
 
 const elements = {
