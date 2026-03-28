@@ -1,5 +1,6 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
 import { generatedMinecraftLegacyEntries } from "./generated-minecraft-legacy-data.js";
+import { generatedReferenceEntries } from "./generated-reference-overrides.js";
 import { generatedTerrariaAssets } from "./generated-terraria-assets.js";
 import { entryOverrides } from "./wiki-overrides.js";
 import {
@@ -108,7 +109,7 @@ const supportedLanguageOptions = languageOptions
     label: option.code === "en" ? "EN-US" : option.label
   }));
 
-const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, entryOverrides);
+const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, entryOverrides, generatedReferenceEntries);
 const pageId = document.body.dataset.page ?? "home";
 
 const elements = {
