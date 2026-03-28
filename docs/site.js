@@ -1,6 +1,7 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
 import { generatedMinecraftLegacyEntries } from "./generated-minecraft-legacy-data.js";
 import { generatedTerrariaAssets } from "./generated-terraria-assets.js";
+import { entryOverrides } from "./wiki-overrides.js";
 import {
   backendState,
   initBackend,
@@ -101,7 +102,7 @@ const TERRARIA_WIKI = {
 
 const RUNTIME_TERRARIA_LOOKUP_ENABLED = false;
 
-const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries);
+const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, entryOverrides);
 const pageId = document.body.dataset.page ?? "home";
 
 const elements = {
@@ -1161,7 +1162,7 @@ function buildEntryNarrativeParagraphs(detailContext) {
         }
         if (relatedEntries.length > 0) {
           lines.push(
-            `As recompensas e paginas mais ligadas a esse encontro hoje incluem ${formatEntryTitleList(relatedEntries, 4)}, o que ajuda a mostrar por que derrotar o boss impacta diretamente no resto do arsenal cristalino.`
+            `As recompensas e paginas mais ligadas a esse encontro hoje incluem ${formatEntryTitleList(relatedEntries, 4)}, o que ajuda a mostrar por que derrotar o boss impacta diretamente no resto do arsenal atual do mod.`
           );
         }
         break;
@@ -1177,7 +1178,7 @@ function buildEntryNarrativeParagraphs(detailContext) {
         break;
       case "materials":
         lines.push(
-          `${title} atua como material-base do arco cristalino atual. Em vez de ser apenas um drop numerico, ele funciona como a ponte pratica entre o loot de um encontro e a construcao de armas, armaduras, acessorios e outros upgrades.`
+          `${title} atua como material-base de uma das linhas atuais do mod. Em vez de ser apenas um drop numerico, ele funciona como a ponte pratica entre loot, mineracao ou worldgen e a construcao de armas, armaduras, acessorios e outros upgrades.`
         );
         if (usedInEntries.length > 0) {
           lines.push(
@@ -1187,7 +1188,7 @@ function buildEntryNarrativeParagraphs(detailContext) {
         break;
       case "weapons":
         lines.push(
-          `${title} ocupa um lugar direto no arsenal cristalino do mod. A pagina nao serve so para listar dano e recipe: ela tambem ajuda a mostrar de onde vem o item, em que etapa ele aparece e como ele conversa com outras pecas do mesmo tier.`
+          `${title} ocupa um lugar direto no arsenal atual do mod. A pagina nao serve so para listar dano e recipe: ela tambem ajuda a mostrar de onde vem o item, em que etapa ele aparece e como ele conversa com outras pecas do mesmo tier.`
         );
         if (recipe.ingredients.length > 0) {
           lines.push(
@@ -1217,7 +1218,7 @@ function buildEntryNarrativeParagraphs(detailContext) {
         break;
       case "consumables":
         lines.push(
-          `${title} entra como consumivel premium do pacote cristalino. O papel dessa pagina e mostrar nao so a cura ou o buff isolado, mas o quanto o item estende a consistencia de tentativas, farm e lutas longas no mesmo tier.`
+          `${title} entra como consumivel premium do pacote atual. O papel dessa pagina e mostrar nao so a cura ou o buff isolado, mas o quanto o item estende a consistencia de tentativas, farm e lutas longas no mesmo tier.`
         );
         if (relatedBuffEntries.length > 0) {
           lines.push(
@@ -1255,7 +1256,7 @@ function buildEntryNarrativeParagraphs(detailContext) {
         }
         break;
       case "materials":
-        lines.push(`${title} acts as a core material for the current crystal branch. Instead of being just another drop, it turns encounter rewards into weapons, armor pieces, accessories and follow-up upgrades.`);
+        lines.push(`${title} acts as a core material for one of the current branches documented in the mod. Instead of being just another drop, it turns loot, mining or world progression into weapons, armor pieces, accessories and follow-up upgrades.`);
         if (usedInEntries.length > 0) {
           lines.push(`The current wiki already tracks ${usedInEntries.length} recipe link(s) for this material, including ${formatEntryTitleList(usedInEntries, 4)}, which makes this page a natural reference when planning the next craft.`);
         }
@@ -1331,7 +1332,7 @@ function buildEntryContextItems(detailContext) {
         lines.push(`${title} e um material de conversao: ele sai de uma etapa da progressao e reaparece em outra na forma de equipamentos, armas ou utilitarios.`);
         break;
       case "weapons":
-        lines.push(`${title} entra como arma do tier cristalino atual e existe para transformar recursos de progressao em dano e pressao imediata.`);
+        lines.push(`${title} entra como arma do tier atual documentado na wiki e existe para transformar recursos de progressao em dano e pressao imediata.`);
         break;
       case "armor":
         lines.push(`${title} organiza a parte defensiva do tier atual e distribui o valor do set entre base fixa e variacoes por classe.`);
@@ -1424,11 +1425,11 @@ function buildEntryUsageItems(detailContext) {
       case "materials":
         if (usedInEntries.length > 0) {
           lines.push(`O uso principal de ${title} hoje e alimentar crafts como ${formatEntryTitleList(usedInEntries, 4)}.`);
-          lines.push(`Na pratica, esse material mede o quanto da linha cristalina voce ja consegue converter em upgrade real.`);
+          lines.push(`Na pratica, esse material mede o quanto dessa linha de progressao voce ja consegue converter em upgrade real.`);
         }
         break;
       case "weapons":
-        lines.push(`${title} serve como opcao ofensiva direta do arco cristalino atual, entao o valor dela aparece quando o jogador quer transformar farm em poder imediato.`);
+        lines.push(`${title} serve como opcao ofensiva direta do tier atual do mod, entao o valor dela aparece quando o jogador quer transformar farm em poder imediato.`);
         if (relatedArmorEntries.length > 0) {
           lines.push(`Ela conversa especialmente bem com ${formatEntryTitleList(relatedArmorEntries, 3)}, porque essas paginas pertencem ao mesmo pacote de progressao.`);
         }
