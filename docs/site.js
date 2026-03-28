@@ -101,6 +101,12 @@ const TERRARIA_WIKI = {
 };
 
 const RUNTIME_TERRARIA_LOOKUP_ENABLED = false;
+const supportedLanguageOptions = languageOptions
+  .filter((option) => ["pt-BR", "en"].includes(option.code))
+  .map((option) => ({
+    ...option,
+    label: option.code === "en" ? "EN-US" : option.label
+  }));
 
 const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, entryOverrides);
 const pageId = document.body.dataset.page ?? "home";
@@ -543,14 +549,16 @@ const pageCopy = {
   }
 };
 
-pageCopy.es = pageCopy.en;
-pageCopy.ru = pageCopy.en;
-
 let allEntries = [];
 let orderedCategories = [];
 let craftableEntries = [];
 const externalAssetState = {
   cache: buildInitialExternalAssetCache()
+};
+const entryMentionCache = {
+  language: "",
+  count: -1,
+  candidates: []
 };
 
 const state = {
@@ -596,7 +604,7 @@ function hydrateStateFromUrl() {
   const entryId = url.searchParams.get("entry");
   const editId = url.searchParams.get("edit");
 
-  if (languageOptions.some((option) => option.code === language)) {
+  if (supportedLanguageOptions.some((option) => option.code === language)) {
     state.language = language;
   }
 
@@ -642,7 +650,7 @@ function renderHeader() {
     <a class="header-link ${pageId === key ? "is-active" : ""}" href="${buildPageUrl(key)}">${label}</a>
   `).join("");
 
-  const languageMarkup = languageOptions.map((option) => `
+  const languageMarkup = supportedLanguageOptions.map((option) => `
     <button class="language-pill ${option.code === state.language ? "is-active" : ""}" type="button" data-language="${option.code}">
       ${escapeHtml(option.label)}
     </button>
@@ -738,25 +746,33 @@ function renderHomePage() {
   `).join("");
 
   elements.main.innerHTML = `
-    <section class="page-section page-section--portal">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">${copy.siteLabel}</p>
-          <h1>${copy.home.title}</h1>
-          <p>${copy.home.lead}</p>
-        </div>
-        <div class="section-actions">
-          <a class="header-link header-link--button" href="${siteConfig.pagesUrl}" target="_blank" rel="noreferrer">${copy.common.liveSite}</a>
-          <a class="header-link header-link--button" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">${copy.common.github}</a>
-        </div>
+    <section class="home-hero">
+      <div class="home-hero-copy">
+        <p class="eyebrow">${copy.siteLabel}</p>
+        <h1>${copy.home.title}</h1>
+        <p class="hero-lead">${copy.home.lead}</p>
+        <p class="home-hero-body">${copy.home.introBody}</p>
       </div>
+      <aside class="home-hero-aside">
+        <article class="panel-card home-note-card">
+          <h2>${copy.home.introTitle}</h2>
+          <p>${copy.home.lead}</p>
+          <div class="button-row">
+            <a class="header-link header-link--button" href="${siteConfig.pagesUrl}" target="_blank" rel="noreferrer">${copy.common.liveSite}</a>
+            <a class="header-link header-link--button" href="${siteConfig.repoUrl}" target="_blank" rel="noreferrer">${copy.common.github}</a>
+          </div>
+        </article>
+      </aside>
+    </section>
+
+    <section class="page-section">
       <div class="section-head">
         <div>
           <h2>${copy.home.introTitle}</h2>
           <p>${copy.home.introBody}</p>
         </div>
       </div>
-      <div class="feature-grid">${pageLinks}</div>
+      <div class="feature-grid feature-grid--index">${pageLinks}</div>
     </section>
 
     <section class="page-section">
@@ -887,8 +903,10 @@ function renderLibraryPage() {
         </aside>
         <div class="catalog-results">
           <div class="section-head section-head--inline">
-            <h2>${copy.library.results}</h2>
-            <span class="subtle-label">${visibleEntries.length}</span>
+            <div>
+              <h2>${copy.library.results}</h2>
+              <p>${visibleEntries.length} ${copy.library.results.toLowerCase()}</p>
+            </div>
           </div>
           <div class="entry-grid">
             ${visibleEntries.length > 0 ? visibleEntries.map((entry) => renderEntryCard(entry, true)).join("") : `<div class="empty-card">${copy.library.empty}</div>`}
@@ -978,10 +996,10 @@ function renderEntryPage() {
           <p class="eyebrow">${getCategoryLabel(entry.category)}</p>
           <h1>${escapeHtml(content.title ?? entry.id)}</h1>
           <p class="entry-subtitle">${escapeHtml(content.subtitle ?? "")}</p>
-          <p class="hero-lead">${escapeHtml(content.overview ?? content.summary ?? "")}</p>
+          <p class="hero-lead">${renderLinkedText(content.overview ?? content.summary ?? "")}</p>
           ${narrativeParagraphs.length > 0 ? `
             <div class="entry-narrative">
-              ${narrativeParagraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+              ${narrativeParagraphs.map((paragraph) => `<p>${renderLinkedText(paragraph)}</p>`).join("")}
             </div>
           ` : ""}
           <div class="entry-inline-links">
@@ -1001,13 +1019,13 @@ function renderEntryPage() {
               <div class="content-block content-block--compact">
                 <h3>${copy.entry.summon}</h3>
                 <a class="entry-title-link" href="${buildPageUrl("entry", { entry: summonEntry.id })}">${escapeHtml(summonContent.title ?? summonEntry.id)}</a>
-                ${summonContent.crafting?.length ? `<ul class="content-list">${summonContent.crafting.slice(0, 4).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
+                ${summonContent.crafting?.length ? `<ul class="content-list">${summonContent.crafting.slice(0, 4).map((item) => `<li>${renderLinkedText(item)}</li>`).join("")}</ul>` : ""}
               </div>
             ` : ""}
             ${factItems.length > 0 ? `
               <div class="content-block content-block--compact">
                 <h3>${copy.entry.facts}</h3>
-                <ul class="content-list">${factItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+                <div class="info-table info-table--compact">${factItems.map((item) => renderInfoTableRow(item)).join("")}</div>
               </div>
             ` : ""}
           </div>
@@ -1781,6 +1799,98 @@ function dedupeLines(lines) {
   return output;
 }
 
+function getEntryMentionCandidates() {
+  if (entryMentionCache.language === state.language && entryMentionCache.count === allEntries.length) {
+    return entryMentionCache.candidates;
+  }
+
+  const candidates = [];
+  const seen = new Set();
+
+  allEntries.forEach((entry) => {
+    const content = getLocalizedEntry(entry);
+    const meta = getEntryMeta(entry);
+
+    [content.title, entry.id, meta.vanillaAlias]
+      .map((label) => String(label ?? "").trim())
+      .filter((label) => label.length >= 4)
+      .forEach((label) => {
+        const key = `${entry.id}:${normalize(label)}`;
+        if (seen.has(key)) {
+          return;
+        }
+
+        seen.add(key);
+        candidates.push({
+          entryId: entry.id,
+          label
+        });
+      });
+  });
+
+  candidates.sort((left, right) => right.label.length - left.label.length);
+  entryMentionCache.language = state.language;
+  entryMentionCache.count = allEntries.length;
+  entryMentionCache.candidates = candidates;
+  return candidates;
+}
+
+function renderLinkedText(value) {
+  const text = String(value ?? "");
+  if (!text.trim()) {
+    return "";
+  }
+
+  const matches = [];
+  getEntryMentionCandidates().forEach((candidate) => {
+    const regex = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegexPattern(candidate.label)}(?![\\p{L}\\p{N}])`, "giu");
+    for (const match of text.matchAll(regex)) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        entryId: candidate.entryId
+      });
+    }
+  });
+
+  if (matches.length === 0) {
+    return escapeHtml(text);
+  }
+
+  matches.sort((left, right) => {
+    if (left.start !== right.start) {
+      return left.start - right.start;
+    }
+
+    return (right.end - right.start) - (left.end - left.start);
+  });
+
+  const accepted = [];
+  let lastEnd = -1;
+  matches.forEach((match) => {
+    if (match.start < lastEnd) {
+      return;
+    }
+
+    accepted.push(match);
+    lastEnd = match.end;
+  });
+
+  let html = "";
+  let cursor = 0;
+  accepted.forEach((match) => {
+    html += escapeHtml(text.slice(cursor, match.start));
+    html += `<a class="inline-linked-entry" href="${buildPageUrl("entry", { entry: match.entryId })}">${escapeHtml(text.slice(match.start, match.end))}</a>`;
+    cursor = match.end;
+  });
+  html += escapeHtml(text.slice(cursor));
+  return html;
+}
+
+function escapeRegexPattern(value) {
+  return String(value ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function isEncounterCategory(category) {
   return ["bosses", "superbosses", "minibosses", "mobs"].includes(category);
 }
@@ -1843,8 +1953,10 @@ function renderCraftingPage() {
         </aside>
         <div class="catalog-results">
           <div class="section-head section-head--inline">
-            <h2>${copy.library.results}</h2>
-            <span class="subtle-label">${visibleRecipes.length}</span>
+            <div>
+              <h2>${copy.library.results}</h2>
+              <p>${visibleRecipes.length} ${copy.library.results.toLowerCase()}</p>
+            </div>
           </div>
           <div class="recipe-list">
             ${visibleRecipes.length > 0 ? visibleRecipes.map((entry) => renderRecipeCard(entry)).join("") : `<div class="empty-card">${copy.crafting.empty}</div>`}
@@ -2653,7 +2765,7 @@ function renderEntryCard(entry, includeFacts = false) {
           </div>
         </div>
       </div>
-      <p>${escapeHtml(content.summary ?? "")}</p>
+      <p>${renderLinkedText(content.summary ?? "")}</p>
       ${facts.length > 0 ? `<ul class="content-list">${facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}</ul>` : ""}
     </article>
   `;
@@ -2692,14 +2804,7 @@ function renderRecipeCard(entry) {
           </div>
         </div>
       ` : ""}
-      <div class="recipe-meta">
-        <div>
-          <strong>${copy.crafting.ingredients}</strong>
-          <div class="recipe-entry-list">
-            ${recipe.ingredients.slice(0, 6).map((ingredient) => renderRecipeIngredient(ingredient)).join("")}
-          </div>
-        </div>
-      </div>
+      ${renderRecipeIngredientTable(recipe.ingredients.slice(0, 6), { emptyLines: recipe.lines })}
     </article>
   `;
 }
@@ -2722,12 +2827,39 @@ function renderCraftingContentBlock(label, entry) {
           </div>
         </div>
       ` : ""}
-      <div class="recipe-entry-list recipe-entry-list--stacked">
-        ${recipe.ingredients.length > 0
-          ? recipe.ingredients.map((ingredient) => renderRecipeIngredient(ingredient)).join("")
-          : recipe.lines.map((line) => `<div class="recipe-entry recipe-entry--plain">${escapeHtml(line)}</div>`).join("")}
-      </div>
+      ${renderRecipeIngredientTable(recipe.ingredients, { emptyLines: recipe.lines })}
     </article>
+  `;
+}
+
+function renderRecipeIngredientTable(ingredients, options = {}) {
+  const emptyLines = options.emptyLines ?? [];
+  if ((!ingredients || ingredients.length === 0) && emptyLines.length === 0) {
+    return "";
+  }
+
+  if (!ingredients || ingredients.length === 0) {
+    return `
+      <div class="info-table">
+        ${emptyLines.map((line) => renderInfoTableRow(line)).join("")}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="wiki-table-wrap">
+      <table class="wiki-table wiki-table--recipe">
+        <thead>
+          <tr>
+            <th>${getCopy().crafting.ingredients}</th>
+            <th>${state.language === "pt-BR" ? "Qtd." : "Qty"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ingredients.map((ingredient) => renderRecipeIngredientRow(ingredient)).join("")}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
@@ -2786,6 +2918,37 @@ function renderRecipeIngredient(ingredient) {
   `;
 }
 
+function renderRecipeIngredientRow(ingredient) {
+  const entryAsset = ingredient.entry ? getEntryDisplayAsset(ingredient.entry) : null;
+  const vanillaAsset = !ingredient.entry ? getExternalAsset(ingredient.label) : null;
+  if (!ingredient.entry && !vanillaAsset) {
+    ensureExternalAsset(ingredient.label);
+  }
+
+  const image = entryAsset?.sourceType && entryAsset.sourceType !== "default"
+    ? entryAsset.imageUrl
+    : vanillaAsset?.imageUrl;
+  const labelMarkup = ingredient.entry
+    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(ingredient.label)}</a>`
+    : vanillaAsset
+      ? `<a class="entry-title-link" href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer">${escapeHtml(ingredient.label)}</a>`
+      : `<span>${escapeHtml(ingredient.label)}</span>`;
+
+  return `
+    <tr>
+      <td>
+        <div class="table-entry">
+          ${image ? `<img class="table-entry__image" src="${escapeHtml(image)}" alt="${escapeHtml(ingredient.label)}">` : `<span class="table-entry__fallback">${escapeHtml((ingredient.label || "?").slice(0, 2).toUpperCase())}</span>`}
+          <div class="table-entry__copy">
+            ${labelMarkup}
+          </div>
+        </div>
+      </td>
+      <td>${ingredient.amount ? `x${escapeHtml(ingredient.amount)}` : "-"}</td>
+    </tr>
+  `;
+}
+
 function renderProgressionCard(entry) {
   const copy = getCopy();
   const content = getLocalizedEntry(entry);
@@ -2806,7 +2969,7 @@ function renderProgressionCard(entry) {
         <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
           <h3>${escapeHtml(content.title ?? entry.id)}</h3>
         </a>
-        <p>${escapeHtml(content.summary ?? content.overview ?? "")}</p>
+        <p>${renderLinkedText(content.summary ?? content.overview ?? "")}</p>
         <div class="progress-detail-grid">
           ${summonEntry ? `
             <div class="progress-detail-block">
@@ -2817,13 +2980,13 @@ function renderProgressionCard(entry) {
           ${summonLines.length > 0 ? `
             <div class="progress-detail-block">
               <strong>${copy.progression.crafting}</strong>
-              <ul class="content-list">${summonLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+              <ul class="content-list">${summonLines.map((line) => `<li>${renderLinkedText(line)}</li>`).join("")}</ul>
             </div>
           ` : ""}
           ${noteLines.length > 0 ? `
             <div class="progress-detail-block">
               <strong>${copy.progression.curiosities}</strong>
-              <ul class="content-list">${noteLines.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+              <ul class="content-list">${noteLines.map((line) => `<li>${renderLinkedText(line)}</li>`).join("")}</ul>
             </div>
           ` : ""}
         </div>
@@ -2838,10 +3001,38 @@ function renderContentBlock(label, items) {
   }
 
   return `
-    <article class="content-block">
-      <h3>${label}</h3>
-      <ul class="content-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    <article class="content-block content-block--table">
+      <div class="content-block-head">
+        <h3>${label}</h3>
+        <span class="subtle-label">${items.length}</span>
+      </div>
+      <div class="info-table">${items.map((item) => renderInfoTableRow(item)).join("")}</div>
     </article>
+  `;
+}
+
+function renderInfoTableRow(item) {
+  const text = String(item ?? "").trim();
+  if (!text) {
+    return "";
+  }
+
+  const separatorIndex = text.indexOf(":");
+  if (separatorIndex > 0) {
+    const label = text.slice(0, separatorIndex).trim();
+    const value = text.slice(separatorIndex + 1).trim();
+    return `
+      <div class="info-table__row">
+        <div class="info-table__label">${escapeHtml(label)}</div>
+        <div class="info-table__value">${renderLinkedText(value)}</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="info-table__row info-table__row--single">
+      <div class="info-table__value">${renderLinkedText(text)}</div>
+    </div>
   `;
 }
 
@@ -2967,6 +3158,9 @@ function refreshEntryCache() {
   allEntries = mergeEntries(staticEntries, backendState.publishedEntries ?? []);
   orderedCategories = buildCategoryList(allEntries);
   craftableEntries = allEntries.filter((entry) => hasContentList(entry, "crafting"));
+  entryMentionCache.language = "";
+  entryMentionCache.count = -1;
+  entryMentionCache.candidates = [];
 
   if (!getEntryById(state.entryId)) {
     state.entryId = allEntries[0]?.id ?? siteConfig.defaultEntryId;
@@ -3538,7 +3732,7 @@ function buildLocalizedContentPayload(baseEntry, draft) {
     [state.language]: nextLanguageContent
   };
 
-  languageOptions.forEach((option) => {
+  supportedLanguageOptions.forEach((option) => {
     if (!nextContent[option.code]) {
       nextContent[option.code] = nextLanguageContent;
     }
