@@ -4,17 +4,26 @@ Todos os nomes abaixo sao os nomes exatos dos arquivos que o mod espera hoje.
 
 ## Ja implementado em codigo agora
 
+### Nota tecnica importante
+
+- Para `item icons`, variar alguns pixels quase nunca causa problema real.
+- Para `equip textures`, vale manter o padrao do Terraria.
+- Para `tiles`, o que importa e seguir o tipo de sheet certo:
+- bloco simples pode ser `16x16`
+- terrain sheet de bloco auto-conectavel pode ser `288x270`
+- furniture/multitile precisa seguir o layout esperado pelo `TileObjectData`
+
 ### Tiles e blocos
 
 | Arquivo | Pasta | Tamanho | Frames |
 |---|---|---:|---:|
-| `ShadowDirtTile.png` | `Content/Tiles/ShadowBiome` | `16x16` | `1` |
-| `ShadowGrassTile.png` | `Content/Tiles/ShadowBiome` | `16x16` | `1` |
-| `ShadowStoneTile.png` | `Content/Tiles/ShadowBiome` | `16x16` | `1` |
-| `ShadowWoodTile.png` | `Content/Tiles/ShadowBiome` | `16x16` | `1` |
-| `ShadowDirtBlock.png` | `Content/Items/ShadowBiome` | `20x20` | `1` |
-| `ShadowStoneBlock.png` | `Content/Items/ShadowBiome` | `20x20` | `1` |
-| `ShadowWood.png` | `Content/Items/ShadowBiome` | `20x20` | `1` |
+| `ShadowDirtTile.png` | `Content/Tiles/ShadowBiome` | `288x270` | `1 terrain sheet` |
+| `ShadowGrassTile.png` | `Content/Tiles/ShadowBiome` | `288x270` | `1 terrain sheet` |
+| `ShadowStoneTile.png` | `Content/Tiles/ShadowBiome` | `288x270` | `1 terrain sheet` |
+| `ShadowWoodTile.png` | `Content/Tiles/ShadowBiome` | `176x264` | `1 terrain-style sheet` |
+| `ShadowDirtBlock.png` | `Content/Items/ShadowBiome` | `16x16` | `1` |
+| `ShadowStoneBlock.png` | `Content/Items/ShadowBiome` | `16x16` | `1` |
+| `ShadowWood.png` | `Content/Items/ShadowBiome` | `24x22` | `1` |
 
 ### Materiais e acessorios
 
@@ -102,7 +111,7 @@ Spritesheet vertical recomendada.
 | `GloryBoots.png` | `Content/Items/ShadowBiome` | `32x32` | `1` |
 | `HeartOfTheGod.png` | `Content/Items/ShadowBiome` | `28x28` | `1` |
 | `GodnessAnvil.png` | `Content/Items/ShadowBiome` | `32x32` | `1` |
-| `GodnessAnvilTile.png` | `Content/Tiles/ShadowBiome` | `54x38` | `1` |
+| `GodnessAnvilTile.png` | `Content/Tiles/ShadowBiome` | `62x32` | `1 custom 3x2 placed sprite` |
 | `ShadowCrystalMinion.png` | `Content/Projectiles/Summon` | `30x168` | `4` |
 | `ShadowCrystalBolt.png` | `Content/Projectiles/Summon` | `18x18` | `1` |
 | `ShadowArrowProjectile.png` | `Content/Projectiles/Ranged` | `16x16` | `1` |
@@ -149,3 +158,6 @@ Spritesheet vertical recomendada.
 - Para whips, o projectile deve ser uma tira vertical com `handle`, `segment` e `tip`.
 - Para equipaveis do Terraria, mantenha o padrao `_Head`, `_Body`, `_Arms`, `_FemaleBody`, `_Legs`.
 - Os placeholders atuais sao apenas para teste. Quando voce trocar pelos finais, eu ajusto `frameCount`, `drawScale`, hitbox e qualquer detalhe fino se precisar.
+- `ShadowDirtTile`, `ShadowGrassTile` e `ShadowStoneTile` agora estao em sheet grande `288x270`, nao em `16x16`.
+- `ShadowWoodTile` atual esta em `176x264`.
+- `GodnessAnvilTile` atual esta em `62x32` e o codigo agora trata ele como `3x2` custom com `CoordinateWidth = 20`, `CoordinatePadding = 1`, `CoordinateHeights = [16, 15]` e `DrawYOffset = 4`.

@@ -317,6 +317,19 @@ Além disso, pressiona com:
 - pressão de projéteis
 - sky beams nas fases mais altas
 
+Detalhamento dessas pressões:
+
+- `CrystalineShard` funciona como um estilhaço vivo auxiliar do encontro.
+- ele nasce em leques disparados pela cabeça
+- tem vida curta, mas corrige trajetória na direção do alvo
+- aplica `Slow` ao acertar
+- existe para negar linha reta, punir desvio preguiçoso e forçar microajustes entre um dash e outro
+- `CrystalineDevourerSkyBeam` é um feixe massivo de arena
+- ele nasce já com telegraph visível antes do dano real
+- cruza a arena em linhas longas e pode aparecer inclinado, não apenas em eixo reto
+- o número de beams sobe quando a vida combinada cai, então a luta fica mais sobre leitura de espaço do que sobre tank puro
+- visualmente, ambos agora possuem sprite dedicada no projeto em vez de depender apenas de placeholder vanilla
+
 ### Drops
 
 Garantidos:
@@ -465,6 +478,12 @@ Stats do tile:
 - pode ser rastreado por Spelunker
 - fadas podem puxar o jogador até ele
 
+Observação visual e de uso:
+
+- o minério possui item e presença de mundo separados
+- o objetivo é fazer `ShadowOre` parecer um recurso de tier final do `ShadowBiome`, e não só um recolor de minério vanilla
+- ele é tratado como o metal-base da ascensão `Shadow`
+
 ### RosalitaOre
 
 Condição:
@@ -487,6 +506,12 @@ Mensagem ao nascer:
 
 - `Seu mundo foi abençoado com Minério de Rosalita!`
 
+Leitura de progressão:
+
+- `RosalitaOre` é o elo entre o hardmode vanilla alto e o late game próprio do mod
+- ela prepara o jogador para receitas que já começam a conversar com materiais `Shadow`
+- o minério também já tem sprite própria no projeto para reforçar a identidade do tier
+
 Mensagem do `ShadowOre`:
 
 - `Seu mundo foi abençoado com Minério de Sombra!`
@@ -500,22 +525,27 @@ Mensagem do `ShadowOre`:
 - bloco base do solo do `ShadowBiome`
 - dropado ao minerar `ShadowGrassTile`
 - hit sound de terra
+- item e tile possuem identidade visual própria dentro do projeto atual
 
 ### ShadowGrassTile
 
 - versão coberta de grama do `ShadowBiome`
 - se houver bloco sólido acima, volta para `ShadowDirtTile`
 - espalha horizontalmente para `ShadowDirtTile` exposto
+- serve como leitura visual imediata de superfície corrompida pelo `ShadowBiome`
 
 ### ShadowStoneBlock / ShadowStoneTile
 
 - pedra base do `ShadowBiome`
 - dropa o item placeable correspondente
+- foi pensada para vender a sensação de camada mineral morta/escurecida do bioma
 
 ### ShadowWood / ShadowWoodTile
 
 - madeira roxa/morta do bioma
 - usada para árvores do `ShadowBiome`
+- funciona tanto como material de ambientação quanto como bloco utilitário placeable
+- item e tile já possuem arte dedicada para manter coerência entre mundo e inventário
 
 ## Legacy blocks
 
@@ -551,6 +581,7 @@ Status atual:
 - item e tile existem em código
 - recipes que dependem dela já estão prontas
 - a rota de aquisição natural ainda precisa do gancho final de boss/drop
+- a estação agora já possui apresentação visual própria no projeto, tanto para o item quanto para a versão colocada no mundo
 
 ## Materiais e Recursos
 
@@ -569,6 +600,8 @@ Status atual:
 - valor: `2 gold`
 - material central do tier `Crystaline`
 - dropado em grande quantidade pelo `Crystaline Devourer`
+- visualmente é o recurso-símbolo do pós-`Moon Lord` atual do mod
+- ele é o material que mais comunica ao jogador que o encontro `Crystaline Devourer` foi superado com sucesso
 
 ### KrakenTear
 

@@ -3,14 +3,12 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
-{
-	public sealed class CrystalineShard : ModNPC
+	namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 	{
-		public override string Texture => "Terraria/Images/Projectile_936";
-
-		public override void SetDefaults() {
-			NPC.width = 40;
+		public sealed class CrystalineShard : ModNPC
+		{
+			public override void SetDefaults() {
+				NPC.width = 40;
 			NPC.height = 40;
 			NPC.damage = 125;
 			NPC.defense = 0;

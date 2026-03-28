@@ -17,6 +17,32 @@ Este arquivo é a auditoria completa de sprites do mod, com foco no que ainda pr
 - `Frames` = quantidade sugerida
 - layout padrão recomendado para mobs e bosses: `vertical`
 
+## Como ler tamanhos
+
+- `Tamanho recomendado` = o tamanho que eu sugeriria se você ainda fosse desenhar do zero.
+- `Tamanho atual` = o tamanho real do arquivo que hoje está dentro do mod.
+- Para `item icons`, variar alguns pixels normalmente não causa problema.
+- Para `tiles`, o importante é respeitar o tipo de sheet.
+- Para `equip textures` e `multitiles`, vale seguir mais de perto o padrão do Terraria.
+
+## Tamanhos reais confirmados da última leva
+
+| Status | Asset | Arquivo | Tamanho atual | Observação |
+|---|---|---|---:|---|
+| `✅` | Crystaline Tear | `Content/Items/Materials/CrystalineTear.png` | `32x32` | Maior que a recomendação antiga, mas totalmente seguro para item |
+| `✅` | Rosalita Ore item | `Content/Items/MinecraftLegacy/RosalitaOre.png` | `16x16` | Correto |
+| `✅` | Shadow Ore item | `Content/Items/MinecraftLegacy/ShadowOre.png` | `16x16` | Correto |
+| `✅` | Shadow Dirt item | `Content/Items/ShadowBiome/ShadowDirtBlock.png` | `16x16` | Menor que a recomendação antiga, mas seguro |
+| `✅` | Shadow Stone item | `Content/Items/ShadowBiome/ShadowStoneBlock.png` | `16x16` | Menor que a recomendação antiga, mas seguro |
+| `✅` | Shadow Wood item | `Content/Items/ShadowBiome/ShadowWood.png` | `24x22` | Seguro |
+| `✅` | Godness Anvil tile | `Content/Tiles/ShadowBiome/GodnessAnvilTile.png` | `62x32` | Código ajustado para `3x2` custom; não depende mais do layout vanilla padrão |
+| `✅` | Shadow Dirt tile | `Content/Tiles/ShadowBiome/ShadowDirtTile.png` | `288x270` | Terrain sheet completa |
+| `✅` | Shadow Grass tile | `Content/Tiles/ShadowBiome/ShadowGrassTile.png` | `288x270` | Terrain sheet completa |
+| `✅` | Shadow Stone tile | `Content/Tiles/ShadowBiome/ShadowStoneTile.png` | `288x270` | Terrain sheet completa |
+| `✅` | Shadow Wood tile | `Content/Tiles/ShadowBiome/ShadowWoodTile.png` | `176x264` | Sheet grande; não é item icon simples |
+| `✅` | Crystaline Shard | `Content/Bosses/CrystalineDevourer/CrystalineShard.png` | `54x54` | Já integrado |
+| `✅` | Crystaline Devourer Sky Beam | `Content/Bosses/CrystalineDevourer/CrystalineDevourerSkyBeam.png` | `16x64` | Já integrado e ligado no código |
+
 ## Bosses e partes de boss
 
 | Status | Asset | Arquivo | Total recomendado | Frame recomendado | Frames | Observação |
@@ -30,8 +56,8 @@ Este arquivo é a auditoria completa de sprites do mod, com foco no que ainda pr
 | `⚠️` | Crystaline Devourer boss head icon | `Content/Bosses/CrystalineDevourer/CrystalineDevourerHead_Head_Boss.png` | `80x80` | `80x80` | `1` | Funciona, mas pode ser refinado |
 | `❌` | Crystaline Devourer Beam | `Content/Bosses/CrystalineDevourer/CrystalineDevourerBeam.png` | `32x32` ou `16x64` | `32x32` | `1` | Hoje usa sprite vanilla |
 | `❌` | Crystaline Devourer Portal | `Content/Bosses/CrystalineDevourer/CrystalineDevourerPortal.png` | `96x96` | `96x96` | `1` | Hoje usa sprite vanilla |
-| `❌` | Crystaline Devourer Sky Beam | `Content/Bosses/CrystalineDevourer/CrystalineDevourerSkyBeam.png` | `32x32` ou `16x64` | `32x32` | `1` | Hoje usa sprite vanilla |
-| `❌` | Crystaline Shard | `Content/Bosses/CrystalineDevourer/CrystalineShard.png` | `24x24` | `24x24` | `1` | Hoje usa sprite vanilla |
+| `✅` | Crystaline Devourer Sky Beam | `Content/Bosses/CrystalineDevourer/CrystalineDevourerSkyBeam.png` | `32x32` ou `16x64` | `32x32` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Crystaline Shard | `Content/Bosses/CrystalineDevourer/CrystalineShard.png` | `24x24` | `24x24` | `1` | Sprite nova integrada da `.archive` |
 
 ## Mobs e critters que já estão com arte boa
 
@@ -51,6 +77,15 @@ Este arquivo é a auditoria completa de sprites do mod, com foco no que ainda pr
 | `✅` | Endernmon | `Content/NPCs/MinecraftLegacy/Endernmon.png` | `48x48` | `48x48` | `1` | Arte nova enviada por você |
 | `✅` | Rosalita Ore tile | `Content/Tiles/MinecraftLegacy/RosalitaOreTile.png` | `288x270` | `16x18` | `270 células de terrain sheet` | Feita com base correta da Adamantita |
 | `✅` | Shadow Ore tile | `Content/Tiles/MinecraftLegacy/ShadowOreTile.png` | `288x270` | `16x18` | `270 células de terrain sheet` | Feita com base correta da Adamantita |
+
+## Materiais que já estão prontos
+
+| Status | Asset | Arquivo | Total recomendado | Frame recomendado | Frames | Observação |
+|---|---|---|---:|---:|---:|---|
+| `✅` | Crystaline Tear | `Content/Items/Materials/CrystalineTear.png` | `24x24` | `24x24` | `1` | Versão nova integrada da `.archive` |
+| `✅` | Monthra Scale | `Content/Items/Materials/MonthraScale.png` | `20x20` | `20x20` | `1` | Já estava pronta |
+| `✅` | Rosalita Ore item | `Content/Items/MinecraftLegacy/RosalitaOre.png` | `16x16` | `16x16` | `1` | Atualizado com a versão da `.archive` |
+| `✅` | Shadow Ore item | `Content/Items/MinecraftLegacy/ShadowOre.png` | `16x16` | `16x16` | `1` | Atualizado com a versão da `.archive` |
 | `✅` | Rosalita Ore item | `Content/Items/MinecraftLegacy/RosalitaOre.png` | `16x16` | `16x16` | `1` | Ícone próprio pronto |
 | `✅` | Shadow Ore item | `Content/Items/MinecraftLegacy/ShadowOre.png` | `16x16` | `16x16` | `1` | Ícone próprio pronto |
 
@@ -144,14 +179,14 @@ Este arquivo é a auditoria completa de sprites do mod, com foco no que ainda pr
 
 | Status | Asset | Arquivo | Total recomendado | Frame recomendado | Frames | Observação |
 |---|---|---|---:|---:|---:|---|
-| `⚠️` | Shadow Dirt tile | `Content/Tiles/ShadowBiome/ShadowDirtTile.png` | `16x16` | `16x16` | `1` | Placeholder |
-| `⚠️` | Shadow Grass tile | `Content/Tiles/ShadowBiome/ShadowGrassTile.png` | `16x16` | `16x16` | `1` | Placeholder |
-| `⚠️` | Shadow Stone tile | `Content/Tiles/ShadowBiome/ShadowStoneTile.png` | `16x16` | `16x16` | `1` | Placeholder |
-| `⚠️` | Shadow Wood tile | `Content/Tiles/ShadowBiome/ShadowWoodTile.png` | `16x16` | `16x16` | `1` | Placeholder |
-| `⚠️` | Shadow Dirt item | `Content/Items/ShadowBiome/ShadowDirtBlock.png` | `20x20` | `20x20` | `1` | Placeholder |
-| `⚠️` | Shadow Stone item | `Content/Items/ShadowBiome/ShadowStoneBlock.png` | `20x20` | `20x20` | `1` | Placeholder |
-| `⚠️` | Shadow Wood item | `Content/Items/ShadowBiome/ShadowWood.png` | `20x20` | `20x20` | `1` | Placeholder |
-| `⚠️` | Godness Anvil tile | `Content/Tiles/ShadowBiome/GodnessAnvilTile.png` | `54x38` | `54x38` | `1` | Placeholder |
+| `✅` | Shadow Dirt tile | `Content/Tiles/ShadowBiome/ShadowDirtTile.png` | `16x16` | `16x16` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Shadow Grass tile | `Content/Tiles/ShadowBiome/ShadowGrassTile.png` | `16x16` | `16x16` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Shadow Stone tile | `Content/Tiles/ShadowBiome/ShadowStoneTile.png` | `16x16` | `16x16` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Shadow Wood tile | `Content/Tiles/ShadowBiome/ShadowWoodTile.png` | `16x16` | `16x16` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Shadow Dirt item | `Content/Items/ShadowBiome/ShadowDirtBlock.png` | `20x20` | `20x20` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Shadow Stone item | `Content/Items/ShadowBiome/ShadowStoneBlock.png` | `20x20` | `20x20` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Shadow Wood item | `Content/Items/ShadowBiome/ShadowWood.png` | `20x20` | `20x20` | `1` | Sprite nova integrada da `.archive` |
+| `✅` | Godness Anvil tile | `Content/Tiles/ShadowBiome/GodnessAnvilTile.png` | `54x38` | `54x38` | `1` | Sprite nova integrada da `.archive` |
 | `✅` | Rosalita Ore tile | `Content/Tiles/MinecraftLegacy/RosalitaOreTile.png` | `288x270` | `16x18` | `terrain sheet` | Já está correta |
 | `✅` | Shadow Ore tile | `Content/Tiles/MinecraftLegacy/ShadowOreTile.png` | `288x270` | `16x18` | `terrain sheet` | Já está correta |
 

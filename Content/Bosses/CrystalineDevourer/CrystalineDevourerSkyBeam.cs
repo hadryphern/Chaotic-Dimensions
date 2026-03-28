@@ -20,8 +20,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		private int TelegraphTime => (int)Projectile.ai[0];
 		private int FireTime => (int)Projectile.ai[1];
 		private bool IsFiring => Projectile.localAI[0] >= TelegraphTime;
-
-		public override string Texture => "Terraria/Images/Projectile_466";
+		public override string Texture => "ChaoticDimensions/Content/Bosses/CrystalineDevourer/CrystalineDevourerSkyBeam";
 
 		public override void SetDefaults() {
 			Projectile.width = 1;
@@ -63,24 +62,33 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 		}
 
 		public override bool PreDraw(ref Color lightColor) {
-			Texture2D pixel = TextureAssets.MagicPixel.Value;
+			Texture2D beamTexture = TextureAssets.Projectile[Type].Value;
 			Vector2 axis = Projectile.velocity.SafeNormalize(Vector2.UnitY);
 			Vector2 start = Projectile.Center - axis * BeamHalfLength - Main.screenPosition;
 			Vector2 end = Projectile.Center + axis * BeamHalfLength - Main.screenPosition;
 			float pulse = 0.96f + (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 20f + Projectile.identity) * 0.04f;
 
 			if (!IsFiring) {
-				DrawBeam(Main.spriteBatch, pixel, start, end, new Color(255, 255, 255, 210), TelegraphDrawThickness);
+				DrawBeam(Main.spriteBatch, beamTexture, start, end, new Color(255, 255, 255, 210), TelegraphDrawThickness * 5f);
 				return false;
 			}
 
-			DrawBeam(Main.spriteBatch, pixel, start, end, new Color(255, 245, 255) * 0.95f, FireDrawThickness * pulse);
+			DrawBeam(Main.spriteBatch, beamTexture, start, end, new Color(255, 245, 255) * 0.95f, FireDrawThickness * pulse * 5f);
 			return false;
 		}
 
-		private static void DrawBeam(SpriteBatch spriteBatch, Texture2D pixel, Vector2 start, Vector2 end, Color color, float thickness) {
+		private static void DrawBeam(SpriteBatch spriteBatch, Texture2D texture, Vector2 start, Vector2 end, Color color, float thickness) {
 			Vector2 edge = end - start;
-			spriteBatch.Draw(pixel, start, null, color, edge.ToRotation(), Vector2.Zero, new Vector2(edge.Length(), thickness), SpriteEffects.None, 0f);
+			spriteBatch.Draw(
+				texture,
+				start,
+				null,
+				color,
+				edge.ToRotation() - MathHelper.PiOver2,
+				new Vector2(texture.Width * 0.5f, 0f),
+				new Vector2(thickness, edge.Length() / texture.Height),
+				SpriteEffects.None,
+				0f);
 		}
 	}
 }

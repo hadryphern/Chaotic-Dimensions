@@ -19,7 +19,10 @@ namespace ChaoticDimensions.Content.Tiles.ShadowBiome
 			TileID.Sets.DisableSmartCursor[Type] = true;
 
 			TileObjectData.newTile.CopyFrom(TileObjectData.Style3x2);
-			TileObjectData.newTile.CoordinateHeights = [16, 18];
+			TileObjectData.newTile.CoordinateWidth = 20;
+			TileObjectData.newTile.CoordinatePadding = 1;
+			TileObjectData.newTile.CoordinateHeights = [16, 15];
+			TileObjectData.newTile.DrawYOffset = 4;
 			TileObjectData.addTile(Type);
 
 			AdjTiles = [TileID.MythrilAnvil, TileID.LunarCraftingStation];

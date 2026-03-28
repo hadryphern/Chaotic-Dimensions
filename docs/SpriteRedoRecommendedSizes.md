@@ -104,7 +104,7 @@ These are recommended sizes, not hard requirements. If you prefer a different ca
 ## Materials
 
 - `Content/Items/Materials/CrystalineTear.png`
-  - Recommended: `24x24`
+  - Recommended / current confirmed: `32x32`
   - Frames: `1`
 - `Content/Items/Materials/MonthraScale.png`
   - Recommended: `20x20`
@@ -325,6 +325,32 @@ These are recommended sizes, not hard requirements. If you prefer a different ca
 - `Content/Tiles/MinecraftLegacy/BlueBerryPlantTile.png`
   - Recommended: `32x32`
   - Tile size: `2x2 style`
+
+### ShadowBiome Tiles and Blocks
+
+- `Content/Tiles/ShadowBiome/ShadowDirtTile.png`
+  - Recommended / current confirmed: `288x270`
+  - Tile size: `terrain sheet`
+- `Content/Tiles/ShadowBiome/ShadowGrassTile.png`
+  - Recommended / current confirmed: `288x270`
+  - Tile size: `terrain sheet`
+- `Content/Tiles/ShadowBiome/ShadowStoneTile.png`
+  - Recommended / current confirmed: `288x270`
+  - Tile size: `terrain sheet`
+- `Content/Tiles/ShadowBiome/ShadowWoodTile.png`
+  - Recommended / current confirmed: `176x264`
+  - Tile size: `terrain-style sheet`
+- `Content/Tiles/ShadowBiome/GodnessAnvilTile.png`
+  - Current confirmed: `62x32`
+  - Current code expects a custom `3x2` layout with `CoordinateWidth = 20`, `CoordinatePadding = 1`, `CoordinateHeights = [16, 15]`, `DrawYOffset = 4`
+  - Recommended fallback if redraw is needed: keep `62x32` unless you want to fully redraw it for a standard vanilla furniture layout
+
+- `Content/Items/ShadowBiome/ShadowDirtBlock.png`
+  - Recommended / current confirmed: `16x16`
+- `Content/Items/ShadowBiome/ShadowStoneBlock.png`
+  - Recommended / current confirmed: `16x16`
+- `Content/Items/ShadowBiome/ShadowWood.png`
+  - Recommended / current confirmed: `24x22`
 
 ## UI
 
