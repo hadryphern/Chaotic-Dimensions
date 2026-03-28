@@ -12,8 +12,8 @@ namespace ChaoticDimensions.Content.Items.Weapons.Summon
 	public sealed class MonthraButterflyStaff : ModItem
 	{
 		public override void SetDefaults() {
-			Item.width = 34;
-			Item.height = 34;
+			Item.width = 40;
+			Item.height = 60;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.useAnimation = 30;
 			Item.useTime = 30;

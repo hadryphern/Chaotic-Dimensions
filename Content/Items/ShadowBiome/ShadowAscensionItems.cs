@@ -33,10 +33,10 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 
 	public sealed class GodnessAnvil : ModItem
 	{
-		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/GodnessAnvil";
+		public override string Texture => "ChaoticDimensions/Content/Tiles/ShadowBiome/GodnessAnvilTile";
 
 		public override void SetDefaults() {
-			Item.width = 32;
+			Item.width = 62;
 			Item.height = 32;
 			Item.maxStack = Item.CommonMaxStack;
 			Item.useStyle = ItemUseStyleID.Swing;

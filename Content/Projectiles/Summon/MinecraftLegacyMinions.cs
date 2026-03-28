@@ -8,7 +8,7 @@ namespace ChaoticDimensions.Content.Projectiles.Summon
 {
 	public sealed class HappyCreeperMinion : ModProjectile
 	{
-		public override string Texture => "ChaoticDimensions/Content/NPCs/MinecraftLegacy/HappyCreeper";
+		public override string Texture => "ChaoticDimensions/Content/Projectiles/Summon/HappyCreeperMinion";
 
 		public override void SetStaticDefaults() {
 			Main.projFrames[Type] = 4;
@@ -107,7 +107,7 @@ namespace ChaoticDimensions.Content.Projectiles.Summon
 	{
 		private int shotTimer;
 
-		public override string Texture => "ChaoticDimensions/Content/NPCs/MinecraftLegacy/SquidKraken";
+		public override string Texture => "ChaoticDimensions/Content/Projectiles/Summon/SquidKrakenMinion";
 
 		public override void SetStaticDefaults() {
 			Main.projFrames[Type] = 2;

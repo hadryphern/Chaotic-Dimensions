@@ -13,7 +13,7 @@ namespace ChaoticDimensions.Content.Projectiles.Summon
 		public override string Texture => "ChaoticDimensions/Content/NPCs/Critters/MonthraButterfly";
 
 		public override void SetStaticDefaults() {
-			Main.projFrames[Type] = 5;
+			Main.projFrames[Type] = 6;
 			Main.projPet[Type] = true;
 			ProjectileID.Sets.MinionSacrificable[Type] = true;
 			ProjectileID.Sets.MinionTargettingFeature[Type] = true;

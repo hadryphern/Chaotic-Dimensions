@@ -463,10 +463,8 @@ NPCs: {
 	BlueButterfly.DisplayName: Blue Butterfly
 	ChaoticMimic.DisplayName: Chaotic Mimic
 	CrystalAppleCow.DisplayName: Crystal Apple Cow
-	CrystalCreeper.DisplayName: Crystal Creeper
 	CrystalGoldenAppleCow.DisplayName: Crystal Golden Apple Cow
 	DimensionPig.DisplayName: Dimension Pig
-	Endernmon.DisplayName: Endernmon
 	Fantasm.DisplayName: Fantasm
 	FireflyCritter.DisplayName: Firefly Critter
 	FlyZombieSquid.DisplayName: Fly Zombie Squid
@@ -474,18 +472,12 @@ NPCs: {
 	GiantZombie.DisplayName: Giant Zombie
 	GoldenAppleCow.DisplayName: Golden Apple Cow
 	GreenButterfly.DisplayName: Green Butterfly
-	HappyCreeper.DisplayName: Happy Creeper
 	RatMonster.DisplayName: Rat Monster
 	RedButterfly.DisplayName: Red Butterfly
 	RedGiantSpider.DisplayName: Red Giant Spider
-	ShadowCreeper.DisplayName: Shadow Creeper
-	SnowBlaze.DisplayName: Snow Blaze
-	WhiteCreeper.DisplayName: White Creeper
 	WhiteZombie.DisplayName: White Zombie
 	YellowButterfly.DisplayName: Yellow Butterfly
 	ZombieSombra.DisplayName: Zombie Sombra
-	Kraken.DisplayName: Kraken
-	SquidKraken.DisplayName: Squid Kraken
 	Phantasm.DisplayName: Phantasm
 	ShadowEye.DisplayName: Shadow Eye
 	ShadowSlime.DisplayName: Shadow Slime

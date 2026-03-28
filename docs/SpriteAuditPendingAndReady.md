@@ -30,18 +30,10 @@ Esses ja entraram no mod e hoje nao sao prioridade visual.
 | Status | Asset | Arquivo | Tamanho atual | Observacao |
 |---|---|---|---:|---|
 | `✅` | Monthra Boss | `Content/Bosses/Monthra/MonthraBoss.png` | `880x640` | 12 frames; sprite enviada por voce |
-| `✅` | Monthra Butterfly | `Content/NPCs/Critters/MonthraButterfly.png` | `32x96` | Critter/summon ja integrado |
+| `✅` | Monthra Butterfly | `Content/NPCs/Critters/MonthraButterfly.png` | `40x360` | Critter/summon atualizado; 6 frames |
 | `✅` | Blue Butterfly | `Content/NPCs/MinecraftLegacy/BlueButterfly.png` | `40x120` | 2 frames |
-| `✅` | Crystal Creeper | `Content/NPCs/MinecraftLegacy/CrystalCreeper.png` | `48x192` | 4 frames |
-| `✅` | Happy Creeper | `Content/NPCs/MinecraftLegacy/HappyCreeper.png` | `48x192` | 4 frames |
-| `✅` | Kraken | `Content/NPCs/MinecraftLegacy/Kraken.png` | `64x256` | 4 frames |
 | `✅` | Red Butterfly | `Content/NPCs/MinecraftLegacy/RedButterfly.png` | `40x120` | 2 frames |
-| `✅` | Shadow Creeper | `Content/NPCs/MinecraftLegacy/ShadowCreeper.png` | `48x192` | 4 frames |
-| `✅` | Snow Blaze | `Content/NPCs/MinecraftLegacy/SnowBlaze.png` | `48x192` | 4 frames |
-| `✅` | Squid Kraken | `Content/NPCs/MinecraftLegacy/SquidKraken.png` | `32x64` | 2 frames |
-| `✅` | White Creeper | `Content/NPCs/MinecraftLegacy/WhiteCreeper.png` | `48x192` | 4 frames |
 | `✅` | Yellow Butterfly | `Content/NPCs/MinecraftLegacy/YellowButterfly.png` | `40x120` | 2 frames |
-| `✅` | Endernmon | `Content/NPCs/MinecraftLegacy/Endernmon.png` | `48x48` | 1 frame |
 | `✅` | Crystaline Tear | `Content/Items/Materials/CrystalineTear.png` | `32x32` | Item novo integrado da `.archive` |
 | `✅` | Crystaline Shard | `Content/Bosses/CrystalineDevourer/CrystalineShard.png` | `54x54` | Ja ligado no mod |
 | `✅` | Crystaline Devourer Sky Beam | `Content/Bosses/CrystalineDevourer/CrystalineDevourerSkyBeam.png` | `16x64` | Ja ligado no codigo |
@@ -57,6 +49,7 @@ Esses ja entraram no mod e hoje nao sao prioridade visual.
 | `✅` | Shadow Stone tile | `Content/Tiles/ShadowBiome/ShadowStoneTile.png` | `288x270` | Terrain sheet completa |
 | `✅` | Shadow Wood tile | `Content/Tiles/ShadowBiome/ShadowWoodTile.png` | `176x264` | Sheet pronta |
 | `✅` | Godness Anvil tile | `Content/Tiles/ShadowBiome/GodnessAnvilTile.png` | `62x32` | Sprite pronta e tile ja ajustado no codigo |
+| `✅` | Godness Anvil item | `Content/Items/ShadowBiome/GodnessAnvil.png` | `62x32` | Agora usa exatamente a mesma textura do tile |
 
 ## Bosses e visuais principais que ainda faltam
 
@@ -132,7 +125,6 @@ Esses ja entraram no mod e hoje nao sao prioridade visual.
 | `⚠️` | Shadow Melee Potion | `Content/Items/ShadowBiome/ShadowMeleePotion.png` | `24x32` | `24x32` | `1` | Placeholder |
 | `⚠️` | Heart of Shadows | `Content/Items/ShadowBiome/HeartOfShadows.png` | `32x32` | `32x32` | `1` | Placeholder |
 | `⚠️` | Heart of the God | `Content/Items/ShadowBiome/HeartOfTheGod.png` | `28x28` | `28x28` | `1` | Placeholder |
-| `⚠️` | Godness Anvil item | `Content/Items/ShadowBiome/GodnessAnvil.png` | `32x32` | `32x32` | `1` | Placeholder |
 | `⚠️` | Glory Boots item | `Content/Items/ShadowBiome/GloryBoots.png` | `32x32` | `32x32` | `1` | Placeholder |
 
 ### Minecraft Legacy e Monthra extras
@@ -149,7 +141,7 @@ Esses ja entraram no mod e hoje nao sao prioridade visual.
 | `⚠️` | Monthra Blade | `Content/Items/Weapons/Melee/MonthraBlade.png` | `48x48` | `48x48` | `1` | Base de teste |
 | `⚠️` | Monthra Wand | `Content/Items/Weapons/Magic/MonthraWand.png` | `32x48` | `32x48` | `1` | Base de teste |
 | `⚠️` | Monthra Bow | `Content/Items/Weapons/Ranged/MonthraBow.png` | `32x48` | `32x48` | `1` | Base de teste |
-| `⚠️` | Monthra Butterfly Staff | `Content/Items/Weapons/Summon/MonthraButterflyStaff.png` | `32x48` | `32x48` | `1` | Base de teste |
+| `✅` | Monthra Butterfly Staff | `Content/Items/Weapons/Summon/MonthraButterflyStaff.png` | `40x60` | `40x60` | `1` | Adaptada da nova Month de 6 frames |
 
 ## Armaduras e equipaveis que ainda faltam
 

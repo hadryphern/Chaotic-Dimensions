@@ -11,11 +11,13 @@ namespace ChaoticDimensions.Content.NPCs.Critters
 	public sealed class MonthraButterfly : ModNPC
 	{
 		public override void SetStaticDefaults() {
-			Main.npcFrameCount[Type] = 3;
+			Main.npcFrameCount[Type] = 6;
 			NPCID.Sets.CountsAsCritter[Type] = true;
 		}
 
 		public override void SetDefaults() {
+			NPC.width = 24;
+			NPC.height = 24;
 			NPC.damage = 0;
 			NPC.defense = 0;
 			NPC.lifeMax = 20;
