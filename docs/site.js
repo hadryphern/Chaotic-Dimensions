@@ -63,6 +63,20 @@ const PROGRESSION_GROUPS = [
   { key: "post_moonlord" }
 ];
 
+const PROGRESSION_ENTRY_IDS = {
+  pre_hardmode: ["monthra"],
+  pre_moonlord: [],
+  post_moonlord: ["crystaline-devourer"]
+};
+
+const PROGRESSION_ENTRY_GROUP_LOOKUP = Object.entries(PROGRESSION_ENTRY_IDS)
+  .reduce((lookup, [groupKey, ids]) => {
+    ids.forEach((id) => {
+      lookup[id] = groupKey;
+    });
+    return lookup;
+  }, {});
+
 const WORKSTATIONS = [
   { id: "lunar-crafting-station", label: "Lunar Crafting Station", short: "LC", keywords: ["lunar crafting station"] },
   { id: "ancient-manipulator", label: "Ancient Manipulator", short: "AM", keywords: ["ancient manipulator"] },
@@ -173,7 +187,7 @@ const pageCopy = {
     },
     progression: {
       title: "Progressao",
-      body: "Uma rota simples para ligar spawn, drops, crafting e checkpoints do mod.",
+      body: "Acompanhe apenas os bosses e mini-bosses reais do mod, separados pela etapa em que entram na progressao.",
       open: "Abrir pagina",
       summon: "Invocacao",
       crafting: "Como chamar",
@@ -181,15 +195,15 @@ const pageCopy = {
       groups: {
         pre_hardmode: {
           title: "Pre-Hardmode",
-          body: "Criaturas, minibosses e loops iniciais antes da quebra do mundo."
+          body: "Encontros oficiais do inicio do mod, antes do hardmode."
         },
         pre_moonlord: {
           title: "Pre-Moon Lord",
-          body: "Hardmode avancado com encontros que preparam o salto final da progressao."
+          body: "Faixa reservada para futuros bosses e mini-bosses do hardmode."
         },
         post_moonlord: {
           title: "Post-Moon Lord",
-          body: "Conteudo de pico, pensado para encounters e rewards do endgame atual."
+          body: "Bosses oficiais do endgame atual, depois do Moon Lord."
         }
       }
     },
@@ -386,7 +400,7 @@ const pageCopy = {
     },
     progression: {
       title: "Progression",
-      body: "A simple route that links spawns, drops, crafting and progression checkpoints.",
+      body: "Track only the mod's real bosses and minibosses, grouped by the stage where they enter progression.",
       open: "Open page",
       summon: "Summon",
       crafting: "How to call it",
@@ -394,15 +408,15 @@ const pageCopy = {
       groups: {
         pre_hardmode: {
           title: "Pre-Hardmode",
-          body: "Creatures, minibosses and early loops before the world break."
+          body: "Official early-mod encounters that happen before hardmode."
         },
         pre_moonlord: {
           title: "Pre-Moon Lord",
-          body: "Late hardmode encounters that prepare the final jump in progression."
+          body: "Reserved for future hardmode bosses and minibosses."
         },
         post_moonlord: {
           title: "Post-Moon Lord",
-          body: "Peak content built around current endgame encounters and rewards."
+          body: "Official endgame bosses that come after Moon Lord."
         }
       }
     },
@@ -1688,20 +1702,7 @@ function resolveProgressionGroupKey(entry) {
     return "";
   }
 
-  const meta = getEntryMeta(entry);
-  if (meta.progressionGroup) {
-    return meta.progressionGroup;
-  }
-
-  if (entry.id === "crystaline-devourer") {
-    return "post_moonlord";
-  }
-
-  if ((entry.related ?? []).includes("crystaline-devourer")) {
-    return "post_moonlord";
-  }
-
-  return "";
+  return PROGRESSION_ENTRY_GROUP_LOOKUP[entry.id] ?? "";
 }
 
 function formatEntryTitleList(entries, limit = 3) {
@@ -2994,14 +2995,10 @@ function getEntriesByCategory(category) {
 }
 
 function getProgressionEntries(groupKey) {
-  return allEntries.filter((entry) => {
-    const meta = getEntryMeta(entry);
-    if (entry.id === "crystaline-devourer") {
-      return groupKey === "post_moonlord";
-    }
-
-    return Boolean(meta.featureInProgression) && meta.progressionGroup === groupKey;
-  }).sort(compareEntries);
+  return (PROGRESSION_ENTRY_IDS[groupKey] ?? [])
+    .map((entryId) => getEntryById(entryId))
+    .filter(Boolean)
+    .sort(compareEntries);
 }
 
 function getEntryById(entryId) {

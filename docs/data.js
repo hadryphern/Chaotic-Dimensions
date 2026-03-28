@@ -702,6 +702,122 @@ export const uiCopy = {
 
 export const entries = [
   {
+    id: "monthra",
+    category: "bosses",
+    image: "./assets/images/content/Bosses/Monthra/MonthraBoss_Head_Boss.png",
+    related: ["monthra-scale"],
+    content: {
+      "pt-BR": {
+        title: "Monthra",
+        subtitle: "Boss pre-hardmode",
+        summary: "Boss aereo do inicio do mod, com pressao constante por volleys de fogo e rasantes de borboleta sombria.",
+        overview: "Monthra faz parte da linha atual de bosses reais do mod e representa o encontro principal do pre-hardmode. A luta acontece no ar, alternando ciclos de hover com disparos em leque e passagens agressivas que cobrem bastante espaco.",
+        facts: [
+          "16.000 de vida base",
+          "24 de dano e 8 de defesa na configuracao atual",
+          "A fase dois comeca abaixo de 50% de vida",
+          "Alterna entre Hover Volley e Sweeping Burst",
+          "Usa MusicID.Boss3 no encontro atual"
+        ],
+        obtain: [
+          "Pertence ao roster atual de bosses do pre-hardmode.",
+          "Monte uma arena com bastante mobilidade horizontal e espaco vertical.",
+          "A logica do encounter ja existe no mod e pode continuar sendo refinada junto das sprites e drops."
+        ],
+        drops: [
+          "22 a 30 Monthra Scales garantidas",
+          "5 a 10 Healing Potions"
+        ],
+        tactics: [
+          "Durante o hover, acompanhe o lado em que ela estabiliza antes de cada volley.",
+          "Na fase dois, espere volleys mais densas e um homing shot extra no ciclo agressivo.",
+          "Dashes curtos e movimento vertical ajudam bastante a escapar dos disparos em leque."
+        ]
+      },
+      en: {
+        title: "Monthra",
+        subtitle: "Pre-hardmode boss",
+        summary: "An early aerial boss built around constant pressure from fire volleys and dark butterfly sweep attacks.",
+        overview: "Monthra is part of the current real boss roster in the mod and serves as the main pre-hardmode encounter. The fight stays airborne, alternating hover patterns, spread fire volleys and aggressive sweeps that cover a large amount of space.",
+        facts: [
+          "16,000 base life",
+          "24 damage and 8 defense in the current setup",
+          "Phase two begins below 50% life",
+          "Alternates between Hover Volley and Sweeping Burst",
+          "Uses MusicID.Boss3 in the current encounter"
+        ],
+        obtain: [
+          "Part of the mod's current pre-hardmode boss roster.",
+          "Build an arena with strong horizontal movement and enough vertical room.",
+          "The encounter logic already exists in the mod and can keep evolving alongside sprites and drops."
+        ],
+        drops: [
+          "22 to 30 guaranteed Monthra Scales",
+          "5 to 10 Healing Potions"
+        ],
+        tactics: [
+          "During hover cycles, track the side where it settles before each volley.",
+          "Phase two adds denser volleys and an extra homing shot during the aggressive pattern.",
+          "Short dashes and vertical movement help a lot against the spread projectiles."
+        ]
+      },
+      es: {
+        title: "Monthra",
+        subtitle: "Boss pre-hardmode",
+        summary: "Boss aereo temprano centrado en volleys de fuego y barridos agresivos con tema de mariposa oscura.",
+        overview: "Monthra forma parte de la alineacion real actual de bosses del mod y funciona como el encuentro principal del pre-hardmode. La pelea ocurre en el aire, alternando patrones de hover, disparos en abanico y barridos rapidos que cubren mucho espacio.",
+        facts: [
+          "16.000 de vida base",
+          "24 de dano y 8 de defensa en la version actual",
+          "La fase dos empieza por debajo del 50% de vida",
+          "Alterna entre Hover Volley y Sweeping Burst",
+          "Usa MusicID.Boss3 en el encuentro actual"
+        ],
+        obtain: [
+          "Forma parte del roster actual de bosses pre-hardmode del mod.",
+          "Conviene preparar una arena con buena movilidad horizontal y altura libre.",
+          "La logica del encuentro ya existe en el mod y puede seguir refinandose junto a sprites y drops."
+        ],
+        drops: [
+          "22 a 30 Monthra Scales garantizadas",
+          "5 a 10 Healing Potions"
+        ],
+        tactics: [
+          "Durante el hover, sigue el lado en que se estabiliza antes de cada volley.",
+          "La fase dos agrega volleys mas densas y un disparo homing extra en el patron agresivo.",
+          "Dashes cortos y movimiento vertical ayudan mucho contra los proyectiles en abanico."
+        ]
+      },
+      ru: {
+        title: "Monthra",
+        subtitle: "Boss pre-hardmode",
+        summary: "Ranniy vozdushnyy boss, kotoryy davyit ognennymi zalpami i rezkimi prokhodami v stile temnoy babochki.",
+        overview: "Monthra vhodit v tekushchiy realnyy roster bossov moda i vystupaet glavnym encounter pre-hardmode. Boy prokhodit v vozdukhe, chereduya hover-patterny, zalpy po ploshchadi i bystrye sweep-ataki, kotorye zakryvayut mnogo prostranstva.",
+        facts: [
+          "16 000 bazovogo HP",
+          "24 urona i 8 zashchity v tekushchey versii",
+          "Vtoraya faza nachinaetsya nizhe 50% HP",
+          "Cherezduet Hover Volley i Sweeping Burst",
+          "Ispolzuet MusicID.Boss3 v tekushchem encounter"
+        ],
+        obtain: [
+          "Vkhodit v tekushchiy pre-hardmode roster bossov moda.",
+          "Luchshe podgotovit arenu s horoshim gorizontalnym dvizheniem i zapasom vysoty.",
+          "Logika encounter uzhe est v mode i mozhet dal'she uluchshat'sya vmeste so spriteami i dropami."
+        ],
+        drops: [
+          "22-30 garantirovannykh Monthra Scales",
+          "5-10 Healing Potions"
+        ],
+        tactics: [
+          "Vo vremya hover-fazy otslezhivayte storonu, na kotoroy boss zakreplyaetsya pered zalpom.",
+          "Vo vtoroy faze zalpy stanovjatsya plotnee, a v agressivnom cikle dobavlyaetsya homing-vystrel.",
+          "Korotkie dashi i vertikalnoe dvizhenie silno pomagajut protiv veernykh proektilov."
+        ]
+      }
+    }
+  },
+  {
     id: "crystaline-devourer",
     category: "bosses",
     image: "./assets/images/content/Bosses/CrystalineDevourer/CrystalineDevourerHead_Head_Boss.png",
