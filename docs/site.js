@@ -101,7 +101,7 @@ const TERRARIA_WIKI = {
   pageBaseUrl: "https://terraria.wiki.gg/wiki/"
 };
 
-const RUNTIME_TERRARIA_LOOKUP_ENABLED = false;
+const RUNTIME_TERRARIA_LOOKUP_ENABLED = true;
 const supportedLanguageOptions = languageOptions
   .filter((option) => ["pt-BR", "en"].includes(option.code))
   .map((option) => ({
@@ -561,6 +561,7 @@ const entryMentionCache = {
   count: -1,
   candidates: []
 };
+const entryLookupCandidateCache = new WeakMap();
 
 const state = {
   language: siteConfig.defaultLanguage,
@@ -2777,6 +2778,7 @@ function renderRecipeCard(entry) {
   const content = getLocalizedEntry(entry);
   const asset = getEntryDisplayAsset(entry);
   const recipe = parseRecipeModel(entry);
+  const compactGroups = buildRecipeDisplayGroups(entry, recipe, { expandArmorVariants: false });
 
   return `
     <article class="recipe-card">
@@ -2797,7 +2799,7 @@ function renderRecipeCard(entry) {
           </div>
         </div>
       </div>
-      ${recipe.stations.length > 0 ? `
+      ${recipe.stations.length > 0 && compactGroups.length === 0 ? `
         <div class="recipe-stations">
           <strong>${copy.crafting.station}</strong>
           <div class="workstation-list">
@@ -2805,13 +2807,16 @@ function renderRecipeCard(entry) {
           </div>
         </div>
       ` : ""}
-      ${renderRecipeIngredientTable(recipe.ingredients.slice(0, 6), { emptyLines: recipe.lines })}
+      ${compactGroups.length > 0
+        ? renderRecipeGroupGrid(compactGroups, { compact: true })
+        : renderRecipeIngredientTable(recipe.ingredients.slice(0, 6), { emptyLines: recipe.lines })}
     </article>
   `;
 }
 
 function renderCraftingContentBlock(label, entry) {
   const recipe = parseRecipeModel(entry);
+  const detailedGroups = buildRecipeDisplayGroups(entry, recipe, { expandArmorVariants: true });
 
   if (recipe.lines.length === 0) {
     return "";
@@ -2820,7 +2825,7 @@ function renderCraftingContentBlock(label, entry) {
   return `
     <article class="content-block">
       <h3>${label}</h3>
-      ${recipe.stations.length > 0 ? `
+      ${recipe.stations.length > 0 && detailedGroups.length === 0 ? `
         <div class="recipe-stations">
           <strong>${getCopy().crafting.station}</strong>
           <div class="workstation-list">
@@ -2828,7 +2833,66 @@ function renderCraftingContentBlock(label, entry) {
           </div>
         </div>
       ` : ""}
-      ${renderRecipeIngredientTable(recipe.ingredients, { emptyLines: recipe.lines })}
+      ${detailedGroups.length > 0
+        ? renderRecipeGroupGrid(detailedGroups, { compact: false })
+        : renderRecipeIngredientTable(recipe.ingredients, { emptyLines: recipe.lines })}
+    </article>
+  `;
+}
+
+function renderRecipeGroupGrid(groups, options = {}) {
+  if (!groups.length) {
+    return "";
+  }
+
+  const compactClass = options.compact ? " recipe-group-grid--compact" : "";
+  return `
+    <div class="recipe-group-grid${compactClass}">
+      ${groups.map((group) => renderRecipeGroupCard(group, options)).join("")}
+    </div>
+  `;
+}
+
+function renderRecipeGroupCard(group, options = {}) {
+  const compact = Boolean(options.compact);
+  const imageMarkup = group.imageUrl
+    ? `<img class="recipe-piece-card__image" src="${escapeHtml(group.imageUrl)}" alt="${escapeHtml(group.title)}">`
+    : `<span class="recipe-piece-card__fallback">${escapeHtml((group.shortLabel || group.title || "?").slice(0, 2).toUpperCase())}</span>`;
+  const titleMarkup = group.entry
+    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: group.entry.id })}">${escapeHtml(group.title)}</a>`
+    : `<span>${escapeHtml(group.title)}</span>`;
+  const stationMarkup = group.stations.length > 0
+    ? `
+      <div class="recipe-piece-card__stations">
+        <strong>${getCopy().crafting.station}</strong>
+        <div class="workstation-list">
+          ${group.stations.map((station) => renderWorkstationPill(station)).join("")}
+        </div>
+      </div>
+    `
+    : "";
+  const variantsMarkup = group.variantEntries?.length
+    ? `
+      <div class="recipe-piece-card__variants">
+        ${group.variantEntries.map((variant) => `<span class="inline-tag inline-tag--subtle">${escapeHtml(getLocalizedEntry(variant).title ?? variant.id)}</span>`).join("")}
+      </div>
+    `
+    : "";
+
+  return `
+    <article class="recipe-piece-card${compact ? " recipe-piece-card--compact" : ""}">
+      <div class="recipe-piece-card__head">
+        <div class="recipe-piece-card__media">${imageMarkup}</div>
+        <div class="recipe-piece-card__copy">
+          ${group.groupLabel ? `<span class="recipe-piece-card__eyebrow">${escapeHtml(group.groupLabel)}</span>` : ""}
+          <h4>${titleMarkup}</h4>
+          ${variantsMarkup}
+        </div>
+      </div>
+      ${stationMarkup}
+      ${compact
+        ? `<div class="recipe-entry-list">${group.ingredients.map((ingredient) => renderRecipeIngredient(ingredient)).join("")}</div>`
+        : renderRecipeIngredientTable(group.ingredients)}
     </article>
   `;
 }
@@ -2865,15 +2929,16 @@ function renderRecipeIngredientTable(ingredients, options = {}) {
 }
 
 function renderWorkstationPill(station) {
-  const stationEntry = findEntryByMention(station.label);
+  const stationEntry = findEntryByMention(station.label, { allowPartial: false });
   const stationAsset = stationEntry ? getEntryDisplayAsset(stationEntry) : null;
-  const vanillaAsset = !stationEntry ? getExternalAsset(station.label) : null;
+  const vanillaAsset = !stationEntry ? (getExternalAsset(station.label) || getExternalAsset(station.id)) : null;
   const stationImage = stationAsset?.sourceType && stationAsset.sourceType !== "default"
     ? stationAsset.imageUrl
     : "";
 
   if (!stationEntry && !vanillaAsset) {
     ensureExternalAsset(station.label);
+    ensureExternalAsset(station.id);
   }
 
   return `
@@ -3377,6 +3442,15 @@ function getEntryDisplayAsset(entry, options = {}) {
     };
   }
 
+  const guessedLocalImage = guessEntryLocalImage(entry);
+  if (guessedLocalImage) {
+    return {
+      imageUrl: guessedLocalImage,
+      externalPageUrl: "",
+      sourceType: "guessed"
+    };
+  }
+
   const lookupLabel = getEntryExternalLookup(entry);
   const externalAsset = lookupLabel ? getExternalAsset(lookupLabel) : null;
   if (!externalAsset && options.ensure !== false && lookupLabel) {
@@ -3396,6 +3470,21 @@ function getEntryDisplayAsset(entry, options = {}) {
     externalPageUrl: buildTerrariaWikiPageUrl(meta.wikiSource),
     sourceType: "default"
   };
+}
+
+function guessEntryLocalImage(entry) {
+  if (entry?.category !== "armor") {
+    return "";
+  }
+
+  const parentArmorEntry = (entry.related ?? [])
+    .map((entryId) => getEntryById(entryId))
+    .find((relatedEntry) => relatedEntry?.category === "armor" && !isDefaultEntryImage(relatedEntry.image));
+  if (!parentArmorEntry) {
+    return "";
+  }
+
+  return guessArmorPieceImage(parentArmorEntry, getLocalizedEntry(entry).title ?? entry.id);
 }
 
 function getTagLabel(entry) {
@@ -3750,26 +3839,41 @@ function parseRecipeModel(entry) {
   const lines = content.crafting ?? [];
   const stations = extractWorkstations(lines);
   const ingredients = [];
+  const recipes = [];
 
   lines.forEach((line) => {
+    const lineStations = extractWorkstations([line]);
     const cleanedLine = stripStationClause(line);
     if (!cleanedLine) {
       return;
     }
 
-    cleanedLine
+    const labelMatch = cleanedLine.match(/^([^:]+):\s*(.+)$/);
+    const groupLabel = labelMatch?.[1]?.trim() ?? "";
+    const ingredientSource = labelMatch?.[2]?.trim() ?? cleanedLine;
+    const lineIngredients = ingredientSource
       .split("+")
       .map((segment) => segment.trim())
       .filter(Boolean)
-      .forEach((segment) => {
-        ingredients.push(parseRecipeIngredientLine(segment));
+      .map((segment) => parseRecipeIngredientLine(segment));
+
+    if (lineIngredients.length > 0) {
+      ingredients.push(...lineIngredients);
+      recipes.push({
+        raw: line,
+        label: groupLabel,
+        groupKey: getRecipeGroupKey(groupLabel),
+        stations: lineStations.length > 0 ? lineStations : stations,
+        ingredients: lineIngredients
       });
+    }
   });
 
   return {
     lines,
     stations,
-    ingredients
+    ingredients,
+    recipes
   };
 }
 
@@ -3789,6 +3893,197 @@ function parseRecipeIngredientLine(segment) {
     label,
     entry
   };
+}
+
+function getRecipeGroupKey(label) {
+  const normalizedLabel = canonicalizeLookupLabel(label);
+  if (!normalizedLabel) {
+    return "";
+  }
+
+  if (/(^|\s)(breastplate|peitoral|chestplate)(\s|$)/.test(normalizedLabel)) {
+    return "breastplate";
+  }
+
+  if (/(^|\s)(greaves|leggings|legs|pants)(\s|$)/.test(normalizedLabel)) {
+    return "greaves";
+  }
+
+  if (/(^|\s)(helm|helms|helmet|helmets)(\s|$)/.test(normalizedLabel)) {
+    return "helm";
+  }
+
+  return normalizedLabel;
+}
+
+function getRecipeGroupLabel(groupKey, entry) {
+  const language = state.language === "pt-BR" ? "pt-BR" : "en";
+  const labels = {
+    breastplate: {
+      "pt-BR": "Peitoral",
+      en: "Breastplate"
+    },
+    greaves: {
+      "pt-BR": "Greaves",
+      en: "Greaves"
+    },
+    helm: {
+      "pt-BR": "Helms",
+      en: "Helms"
+    }
+  };
+
+  return labels[groupKey]?.[language] ?? (getLocalizedEntry(entry).title ?? entry.id);
+}
+
+function buildRecipeDisplayGroups(entry, recipe, options = {}) {
+  const structuredRecipes = recipe.recipes?.filter((group) => group.ingredients.length > 0 && group.label) ?? [];
+  if (structuredRecipes.length === 0 || entry.category !== "armor") {
+    return [];
+  }
+
+  const expandArmorVariants = Boolean(options.expandArmorVariants);
+  const armorVariants = getArmorRecipeVariants(entry);
+  const output = [];
+
+  structuredRecipes.forEach((group) => {
+    if (group.groupKey === "helm" && armorVariants.length > 0) {
+      if (expandArmorVariants) {
+        armorVariants.forEach((variant) => {
+          output.push(createRecipeDisplayGroup(entry, group, {
+            title: getLocalizedEntry(variant).title ?? variant.id,
+            entry: variant
+          }));
+        });
+        return;
+      }
+
+      output.push(createRecipeDisplayGroup(entry, group, {
+        title: getRecipeGroupLabel(group.groupKey, entry),
+        variantEntries: armorVariants,
+        entry: armorVariants[0] ?? null
+      }));
+      return;
+    }
+
+    output.push(createRecipeDisplayGroup(entry, group, {
+      title: group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : group.label || getLocalizedEntry(entry).title || entry.id
+    }));
+  });
+
+  return output;
+}
+
+function createRecipeDisplayGroup(entry, group, options = {}) {
+  const variantEntry = options.entry ?? null;
+  const asset = getRecipeDisplayGroupAsset(entry, group, variantEntry, options.variantEntries ?? []);
+
+  return {
+    ...group,
+    title: options.title ?? group.label ?? getLocalizedEntry(entry).title ?? entry.id,
+    groupLabel: group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : "",
+    shortLabel: options.title ?? group.label ?? group.groupKey,
+    entry: variantEntry,
+    variantEntries: options.variantEntries ?? [],
+    imageUrl: asset.imageUrl,
+    imageSourceType: asset.sourceType
+  };
+}
+
+function getArmorRecipeVariants(entry) {
+  return (entry.related ?? [])
+    .map((entryId) => getEntryById(entryId))
+    .filter((relatedEntry) => relatedEntry?.category === "armor")
+    .filter((relatedEntry) => {
+      const title = canonicalizeLookupLabel(getLocalizedEntry(relatedEntry).title ?? relatedEntry.id);
+      return title.includes("helm") || title.includes("helmet");
+    });
+}
+
+function getRecipeDisplayGroupAsset(entry, group, variantEntry, variantEntries = []) {
+  if (variantEntry) {
+    const variantAsset = getEntryDisplayAsset(variantEntry);
+    if (variantAsset.sourceType !== "default") {
+      return variantAsset;
+    }
+
+    const guessedVariantImage = guessArmorPieceImage(entry, getLocalizedEntry(variantEntry).title ?? variantEntry.id);
+    if (guessedVariantImage) {
+      return {
+        imageUrl: guessedVariantImage,
+        sourceType: "guessed"
+      };
+    }
+  }
+
+  if (group.groupKey === "breastplate") {
+    return getEntryDisplayAsset(entry);
+  }
+
+  if (group.groupKey === "helm" && variantEntries.length > 0) {
+    return getRecipeDisplayGroupAsset(entry, group, variantEntries[0], []);
+  }
+
+  const guessedImage = guessArmorPieceImage(entry, group.groupKey || group.label);
+  if (guessedImage) {
+    return {
+      imageUrl: guessedImage,
+      sourceType: "guessed"
+    };
+  }
+
+  return getEntryDisplayAsset(entry);
+}
+
+function guessArmorPieceImage(entry, pieceLabel) {
+  const sourceImage = String(entry.image ?? "").trim();
+  const match = sourceImage.match(/^(.*\/)([^/]+?)(\.[a-z0-9]+)$/i);
+  if (!match) {
+    return "";
+  }
+
+  const [, directory, baseName, extension] = match;
+  const knownSuffixes = [
+    "SummonerHelm",
+    "RangedHelm",
+    "MeleeHelm",
+    "MagicHelm",
+    "Breastplate",
+    "Greaves",
+    "Helmet",
+    "Helm",
+    "Leggings"
+  ];
+  const suffix = knownSuffixes.find((candidate) => baseName.endsWith(candidate));
+  const prefix = suffix ? baseName.slice(0, -suffix.length) : baseName;
+  const normalizedLabel = canonicalizeLookupLabel(pieceLabel);
+  let targetSuffix = "";
+
+  if (normalizedLabel.includes("magic helm")) {
+    targetSuffix = "MagicHelm";
+  }
+  else if (normalizedLabel.includes("melee helm")) {
+    targetSuffix = "MeleeHelm";
+  }
+  else if (normalizedLabel.includes("ranged helm")) {
+    targetSuffix = "RangedHelm";
+  }
+  else if (normalizedLabel.includes("summoner helm")) {
+    targetSuffix = "SummonerHelm";
+  }
+  else if (normalizedLabel.includes("breastplate") || normalizedLabel.includes("peitoral")) {
+    targetSuffix = "Breastplate";
+  }
+  else if (normalizedLabel.includes("greaves") || normalizedLabel.includes("leggings")) {
+    targetSuffix = "Greaves";
+  }
+  else if (normalizedLabel.includes("helm") || normalizedLabel.includes("helmet")) {
+    targetSuffix = "MagicHelm";
+  }
+
+  return targetSuffix
+    ? `${directory}${prefix}${targetSuffix}${extension}`
+    : "";
 }
 
 function extractWorkstations(lines) {
@@ -3831,11 +4126,12 @@ function stripStationClause(line) {
   return trimmed;
 }
 
-function findEntryByMention(label) {
-  const normalizedLabel = normalize(label).replace(/^the\s+/, "").trim();
-  if (!normalizedLabel) {
+function findEntryByMention(label, options = {}) {
+  const normalizedCandidates = buildLookupLabelCandidates(label);
+  if (normalizedCandidates.length === 0) {
     return null;
   }
+  const allowPartial = options.allowPartial !== false;
 
   const candidateEntries = [...allEntries].sort((left, right) => {
     const leftTitle = getLocalizedEntry(left).title ?? left.id;
@@ -3844,26 +4140,49 @@ function findEntryByMention(label) {
   });
 
   const exact = candidateEntries.find((entry) => {
-    const content = getLocalizedEntry(entry);
-    const meta = getEntryMeta(entry);
-    const alias = normalize(meta.vanillaAlias).trim();
-    return normalize(entry.id) === normalizedLabel
-      || normalize(content.title) === normalizedLabel
-      || (alias && alias === normalizedLabel);
+    const entryCandidates = getEntryLookupCandidates(entry);
+    return normalizedCandidates.some((candidate) => entryCandidates.includes(candidate));
   });
 
   if (exact) {
     return exact;
   }
 
+  if (!allowPartial) {
+    return null;
+  }
+
   return candidateEntries.find((entry) => {
-    const content = getLocalizedEntry(entry);
-    const meta = getEntryMeta(entry);
-    const alias = normalize(meta.vanillaAlias).trim();
-    return normalizedLabel.includes(normalize(content.title))
-      || normalizedLabel.includes(normalize(entry.id))
-      || (alias && normalizedLabel.includes(alias));
+    const entryCandidates = getEntryLookupCandidates(entry);
+    return normalizedCandidates.some((candidate) => entryCandidates.some((entryCandidate) => candidate.includes(entryCandidate) || entryCandidate.includes(candidate)));
   }) ?? null;
+}
+
+function getEntryLookupCandidates(entry) {
+  if (!entry) {
+    return [];
+  }
+
+  const cached = entryLookupCandidateCache.get(entry);
+  if (cached) {
+    return cached;
+  }
+
+  const meta = getEntryMeta(entry);
+  const values = [
+    entry.id,
+    meta.vanillaAlias,
+    meta.wikiSource,
+    ...getEntryLanguageContents(entry).map((content) => content.title)
+  ];
+  const candidates = new Set();
+  values.forEach((value) => {
+    buildLookupLabelCandidates(value).forEach((candidate) => candidates.add(candidate));
+  });
+
+  const output = [...candidates];
+  entryLookupCandidateCache.set(entry, output);
+  return output;
 }
 
 function loadExternalAssetCache() {
@@ -3897,40 +4216,61 @@ function saveExternalAssetCache() {
 }
 
 function getExternalAsset(label) {
-  const record = externalAssetState.cache[getExternalAssetKey(label)];
-  return record?.status === "ready" ? record.data : null;
+  const candidates = buildTerrariaWikiCandidates(label);
+  for (const candidate of candidates) {
+    const record = externalAssetState.cache[getExternalAssetKey(candidate)];
+    if (record?.status === "ready") {
+      return record.data;
+    }
+  }
+
+  return null;
 }
 
 function ensureExternalAsset(label) {
-  const key = getExternalAssetKey(label);
-  if (!key || !shouldResolveExternalAsset(label) || !RUNTIME_TERRARIA_LOOKUP_ENABLED) {
+  const candidates = buildTerrariaWikiCandidates(label);
+  if (candidates.length === 0 || !shouldResolveExternalAsset(label) || !RUNTIME_TERRARIA_LOOKUP_ENABLED) {
     return;
   }
 
-  const current = externalAssetState.cache[key];
-  if (current?.status === "loading" || current?.status === "ready" || current?.status === "missing") {
+  const records = candidates.map((candidate) => externalAssetState.cache[getExternalAssetKey(candidate)]);
+  if (records.some((record) => record?.status === "ready" || record?.status === "loading")) {
     return;
   }
 
+  if (records.length > 0 && records.every((record) => record?.status === "missing")) {
+    return;
+  }
+
+  const key = getExternalAssetKey(candidates[0]);
   externalAssetState.cache[key] = { status: "loading" };
 
   fetchTerrariaWikiAsset(label)
     .then((asset) => {
-      externalAssetState.cache[key] = asset
-        ? { status: "ready", data: asset }
-        : { status: "missing" };
+      const keys = new Set(candidates.map((candidate) => getExternalAssetKey(candidate)));
+      if (asset) {
+        keys.add(getExternalAssetKey(asset.title));
+      }
+
+      keys.forEach((candidateKey) => {
+        externalAssetState.cache[candidateKey] = asset
+          ? { status: "ready", data: asset }
+          : { status: "missing" };
+      });
       saveExternalAssetCache();
       render();
     })
     .catch(() => {
-      externalAssetState.cache[key] = { status: "missing" };
+      candidates.forEach((candidate) => {
+        externalAssetState.cache[getExternalAssetKey(candidate)] = { status: "missing" };
+      });
       saveExternalAssetCache();
       render();
     });
 }
 
 function getExternalAssetKey(label) {
-  return normalize(parseTerrariaWikiReference(label) || label)
+  return canonicalizeLookupLabel(parseTerrariaWikiReference(label) || label)
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -4001,18 +4341,8 @@ async function fetchTerrariaWikiParse(title) {
 }
 
 function buildTerrariaWikiCandidates(label) {
-  const clean = (parseTerrariaWikiReference(label) || String(label ?? ""))
-    .replace(/\s+x\d+(?:-\d+)?$/i, "")
-    .replace(/^\d+(?:-\d+)?\s+/, "")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  const candidates = new Set([clean]);
-  if (clean.endsWith("s")) {
-    candidates.add(clean.slice(0, -1));
-  }
-
-  return [...candidates].filter(Boolean);
+  return buildLookupLabelCandidates(label)
+    .map((candidate) => candidate.replace(/\b\w/g, (character) => character.toUpperCase()));
 }
 
 function parseTerrariaWikiReference(reference) {
@@ -4097,6 +4427,80 @@ function joinLines(value) {
 
 function normalize(value) {
   return String(value ?? "").toLowerCase();
+}
+
+function canonicalizeLookupLabel(value) {
+  return normalize(
+    String(value ?? "")
+      .replace(/\([^)]*\)/g, " ")
+      .replace(/[_/\\-]+/g, " ")
+      .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+      .replace(/\s+x\d+(?:-\d+)?$/i, " ")
+      .replace(/^\d+(?:-\d+)?\s+/, "")
+      .replace(/\s+/g, " ")
+      .replace(/^the\s+/, "")
+      .trim()
+  );
+}
+
+function buildLookupLabelCandidates(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) {
+    return [];
+  }
+
+  const candidates = new Set();
+  const rawValues = new Set([
+    raw,
+    parseTerrariaWikiReference(raw)
+  ]);
+
+  if (raw.includes(":")) {
+    rawValues.add(raw.split(":").pop().trim());
+  }
+
+  rawValues.forEach((input) => {
+    const current = String(input ?? "").trim();
+    if (!current) {
+      return;
+    }
+
+    const rawCandidates = new Set([
+      current,
+      current.replace(/[_/\\-]+/g, " "),
+      current.replace(/([a-z0-9])([A-Z])/g, "$1 $2"),
+      current.replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2"),
+      current
+        .replace(/[_/\\-]+/g, " ")
+        .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+        .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    ]);
+
+    rawCandidates.forEach((candidate) => {
+      const normalizedCandidate = canonicalizeLookupLabel(candidate);
+      if (!normalizedCandidate) {
+        return;
+      }
+
+      candidates.add(normalizedCandidate);
+      if (normalizedCandidate.endsWith(" bars")) {
+        candidates.add(normalizedCandidate.slice(0, -1));
+      }
+      else if (normalizedCandidate.endsWith(" bar")) {
+        candidates.add(`${normalizedCandidate}s`);
+      }
+
+      if (normalizedCandidate.endsWith("ies")) {
+        candidates.add(`${normalizedCandidate.slice(0, -3)}y`);
+      }
+      else if (normalizedCandidate.endsWith("s") && !normalizedCandidate.endsWith("ss")) {
+        candidates.add(normalizedCandidate.slice(0, -1));
+      }
+    });
+  });
+
+  return [...candidates].filter(Boolean);
 }
 
 function humanizeCategory(category) {
