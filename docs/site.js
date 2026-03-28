@@ -228,10 +228,14 @@ const pageCopy = {
       browserPublished: "publicadas",
       browserDrafts: "rascunhos",
       browserEmpty: "Nenhuma entrada bateu com a busca atual.",
+      browserShowing: "Mostrando",
+      browserOf: "de",
       browserLoad: "Carregar",
       editorTitle: "Editor de entrada",
       workspaceTitle: "Workspace de publicacao",
       workspaceBody: "Edite metadados, conteudo principal, imagem e relacoes sem misturar tudo em uma pagina publica.",
+      workspaceActionsTitle: "Acoes rapidas",
+      workspaceActionsBody: "Abra a pagina publica, carregue outra entrada ou comece um rascunho novo sem sair do painel.",
       identityTitle: "Identidade e publicacao",
       identityBody: "Defina slug, categoria, ordem, relacoes e status de publicacao da entrada.",
       mediaTitle: "Midia principal",
@@ -240,12 +244,25 @@ const pageCopy = {
       discoveryBody: "Use alias e fonte wiki quando o nome nao bater sozinho. A fallback image entra se nao houver sprite local.",
       metadataTitle: "Metadados",
       contentTitle: "Conteudo da pagina",
+      contentBody: "Defina o titulo, a apresentacao curta e o bloco principal que vai abrir a pagina com contexto suficiente.",
+      detailTitle: "Blocos de gameplay",
+      detailBody: "Preencha listas mais tecnicas da pagina para cobrir obtencao, crafting, drops, notas e leitura de combate.",
       previewTitle: "Preview rapido",
       previewEmpty: "Preencha titulo, resumo e imagem para visualizar melhor a ficha antes de publicar.",
+      checklistTitle: "Checklist editorial",
+      checklistBody: "Use este bloco para confirmar se a entrada ja esta pronta para publicar.",
+      checklistIdentity: "Slug, categoria e titulo",
+      checklistSummary: "Resumo ou overview",
+      checklistMedia: "Imagem principal ou fallback",
+      checklistDetails: "Blocos de gameplay preenchidos",
+      checklistLinks: "Relacoes com outras paginas",
+      checklistReady: "Pronto",
+      checklistPending: "Pendente",
       openEntry: "Abrir pagina",
       openLibrary: "Abrir biblioteca",
       uploadTitle: "Assets",
       moderationTitle: "Moderacao de comentarios",
+      moderationBody: "Revise feedback recente da comunidade e oculte comentarios fora de contexto sem apagar o historico.",
       save: "Salvar entrada",
       upload: "Enviar imagem",
       noComments: "Nenhum comentario recente para moderar.",
@@ -424,10 +441,14 @@ const pageCopy = {
       browserPublished: "published",
       browserDrafts: "drafts",
       browserEmpty: "No entries matched the current filters.",
+      browserShowing: "Showing",
+      browserOf: "of",
       browserLoad: "Load",
       editorTitle: "Entry editor",
       workspaceTitle: "Publishing workspace",
       workspaceBody: "Edit metadata, main content, image and relationships without mixing everything into a public-facing page.",
+      workspaceActionsTitle: "Quick actions",
+      workspaceActionsBody: "Open the public page, load another entry or start a fresh draft without leaving the editor.",
       identityTitle: "Identity and publishing",
       identityBody: "Set slug, category, order, related entries and the publication state.",
       mediaTitle: "Primary media",
@@ -436,12 +457,25 @@ const pageCopy = {
       discoveryBody: "Use alias and wiki source when the name does not match by itself. Fallback image is used when there is no local sprite yet.",
       metadataTitle: "Metadata",
       contentTitle: "Page content",
+      contentBody: "Define the title, the short introduction and the main overview that will carry the page at a glance.",
+      detailTitle: "Gameplay blocks",
+      detailBody: "Fill the more technical lists so the page covers acquisition, crafting, drops, notes and combat use.",
       previewTitle: "Quick preview",
       previewEmpty: "Fill title, summary and image to get a better preview before publishing.",
+      checklistTitle: "Editorial checklist",
+      checklistBody: "Use this block to confirm whether the entry is already ready to publish.",
+      checklistIdentity: "Slug, category and title",
+      checklistSummary: "Summary or overview",
+      checklistMedia: "Primary image or fallback",
+      checklistDetails: "Gameplay blocks filled",
+      checklistLinks: "Relationships with other pages",
+      checklistReady: "Ready",
+      checklistPending: "Pending",
       openEntry: "Open page",
       openLibrary: "Open library",
       uploadTitle: "Assets",
       moderationTitle: "Comment moderation",
+      moderationBody: "Review recent community feedback and hide off-topic comments without erasing the history.",
       save: "Save entry",
       upload: "Upload image",
       noComments: "No recent comments to moderate.",
@@ -2025,20 +2059,87 @@ function getDraftPreviewAsset(draft) {
   });
 }
 
+function inferAdminImagePath(url) {
+  const cleanUrl = String(url ?? "").trim();
+  if (!cleanUrl) {
+    return "entries";
+  }
+
+  try {
+    const parsed = new URL(cleanUrl, window.location.href);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    const publicIndex = segments.indexOf("public");
+    const contentIndex = segments.lastIndexOf("content");
+
+    if (publicIndex >= 0 && segments.length > publicIndex + 3) {
+      return segments.slice(publicIndex + 2, -1).join("/") || "entries";
+    }
+
+    if (contentIndex >= 0 && segments.length > contentIndex + 1) {
+      return segments.slice(contentIndex + 1, -1).join("/") || "entries";
+    }
+  }
+  catch {
+    return "entries";
+  }
+
+  return "entries";
+}
+
+function resetAdminWorkspaceMessages() {
+  backendState.entryError = "";
+  backendState.entryMessage = "";
+  backendState.uploadError = "";
+  backendState.uploadMessage = "";
+}
+
+function getAdminDraftInsights(draft) {
+  const detailCount = [
+    draft.facts,
+    draft.obtain,
+    draft.crafting,
+    draft.drops,
+    draft.pieces,
+    draft.notes,
+    draft.tactics
+  ].filter((value) => String(value ?? "").trim()).length;
+
+  return {
+    identityReady: Boolean(draft.id && draft.category && draft.title),
+    summaryReady: Boolean(String(draft.summary ?? "").trim() || String(draft.overview ?? "").trim()),
+    mediaReady: Boolean(String(draft.imageUrl ?? "").trim() || String(draft.fallbackImage ?? "").trim()),
+    detailCount,
+    relatedCount: parseCsvList(draft.related).length
+  };
+}
+
+function renderAdminChecklistItem(label, ready, copy) {
+  return `
+    <li class="admin-checklist-item ${ready ? "is-ready" : ""}">
+      <span>${escapeHtml(label)}</span>
+      <strong>${ready ? copy.admin.checklistReady : copy.admin.checklistPending}</strong>
+    </li>
+  `;
+}
+
 function renderAdminBrowserEntry(entry, activeEntryId, copy) {
   const content = getLocalizedEntry(entry);
   const asset = getEntryDisplayAsset(entry, { ensure: false });
+  const isActive = activeEntryId === entry.id;
+  const statusLabel = entry.isPublished ? copy.admin.fields.published : copy.admin.browserDrafts;
 
   return `
-    <button class="admin-entry-button ${activeEntryId === entry.id ? "is-active" : ""}" type="button" data-admin-entry="${entry.id}">
+    <button class="admin-entry-button ${isActive ? "is-active" : ""}" type="button" data-admin-entry="${entry.id}">
       <img class="admin-entry-button__thumb" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
       <span class="admin-entry-button__copy">
-        <strong>${escapeHtml(content.title ?? entry.id)}</strong>
+        <span class="admin-entry-button__topline">
+          <strong>${escapeHtml(content.title ?? entry.id)}</strong>
+          <span class="admin-state-badge ${entry.isPublished ? "is-published" : "is-draft"}">${escapeHtml(statusLabel)}</span>
+        </span>
         <small>${escapeHtml(entry.id)}</small>
-      </span>
-      <span class="admin-entry-button__meta">
-        <span class="inline-tag inline-tag--subtle">${getCategoryLabel(entry.category)}</span>
-        <span class="inline-tag inline-tag--subtle">${entry.isPublished ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
+        <span class="admin-entry-button__meta">
+          <span class="inline-tag inline-tag--subtle">${getCategoryLabel(entry.category)}</span>
+        </span>
       </span>
     </button>
   `;
@@ -2092,9 +2193,20 @@ function renderAdminPage() {
   const categoryOptions = [...new Set([...CATEGORY_ORDER, ...orderedCategories, draft.category].filter(Boolean))];
   const browserCategoryOptions = ["all", ...new Set([...CATEGORY_ORDER, ...orderedCategories].filter(Boolean))];
   const previewAsset = getDraftPreviewAsset(draft);
+  const draftInsights = getAdminDraftInsights(draft);
   const totalEntries = allEntries.length;
   const publishedEntries = allEntries.filter((entry) => entry.isPublished).length;
   const draftEntries = Math.max(totalEntries - publishedEntries, 0);
+  const browserSummary = `${copy.admin.browserShowing} ${adminEntries.length} ${copy.admin.browserOf} ${totalEntries}`;
+  const currentEntryTitle = draft.title || draft.id || copy.admin.browserNew;
+  const currentEntryBody = draft.subtitle || previewSummary;
+  const checklistMarkup = [
+    renderAdminChecklistItem(copy.admin.checklistIdentity, draftInsights.identityReady, copy),
+    renderAdminChecklistItem(copy.admin.checklistSummary, draftInsights.summaryReady, copy),
+    renderAdminChecklistItem(copy.admin.checklistMedia, draftInsights.mediaReady, copy),
+    renderAdminChecklistItem(copy.admin.checklistDetails, draftInsights.detailCount >= 2, copy),
+    renderAdminChecklistItem(copy.admin.checklistLinks, draftInsights.relatedCount > 0, copy)
+  ].join("");
 
   elements.main.innerHTML = `
     <section class="page-hero page-hero--compact">
@@ -2110,9 +2222,9 @@ function renderAdminPage() {
             <div class="section-head section-head--inline">
               <div>
                 <h2>${copy.admin.browserTitle}</h2>
-                <p>${adminEntries.length} ${copy.admin.browserResults}</p>
+                <p>${browserSummary}</p>
               </div>
-              <button class="action-button action-button--secondary" type="button" id="admin-new-entry">${copy.admin.browserNew}</button>
+              <button class="action-button action-button--secondary" type="button" data-admin-new-entry>${copy.admin.browserNew}</button>
             </div>
             <div class="admin-browser-stats">
               <article class="summary-tile admin-stat-tile">
@@ -2128,7 +2240,7 @@ function renderAdminPage() {
                 <span>${copy.admin.browserDrafts}</span>
               </article>
             </div>
-            <div class="admin-filter-grid">
+            <div class="admin-filter-grid admin-filter-grid--tight">
               <input class="field-input" id="admin-search" type="search" value="${escapeHtml(state.adminSearch)}" placeholder="${copy.admin.browserSearch}">
               <label class="field-group">
                 <span>${copy.admin.browserFilter}</span>
@@ -2146,15 +2258,36 @@ function renderAdminPage() {
         </aside>
 
         <div class="admin-main">
-          <article class="panel-card">
-            <div class="section-head">
+          <article class="panel-card admin-workspace-card">
+            <div class="admin-workspace-banner">
+              <div>
+                <p class="eyebrow">${copy.admin.editorTitle}</p>
+                <h2>${escapeHtml(currentEntryTitle)}</h2>
+                <p>${escapeHtml(currentEntryBody)}</p>
+                <div class="tag-row">
+                  <span class="inline-tag">${getCategoryLabel(draft.category || "materials")}</span>
+                  ${draft.id ? `<span class="inline-tag inline-tag--subtle">${escapeHtml(draft.id)}</span>` : ""}
+                  <span class="inline-tag inline-tag--subtle">${draft.published ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
+                  <span class="inline-tag inline-tag--subtle">${escapeHtml(draft.imagePath || "entries")}</span>
+                </div>
+              </div>
+              <div class="admin-action-cluster">
+                <div>
+                  <h3>${copy.admin.workspaceActionsTitle}</h3>
+                  <p>${copy.admin.workspaceActionsBody}</p>
+                </div>
+                <div class="button-row">
+                  <button class="action-button action-button--secondary" type="button" data-admin-new-entry>${copy.admin.browserNew}</button>
+                  ${previewHref ? `<a class="header-link header-link--button" href="${previewHref}">${copy.admin.openEntry}</a>` : ""}
+                  <a class="header-link header-link--button" href="${buildPageUrl("library")}">${copy.admin.openLibrary}</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-head section-head--inline">
               <div>
                 <h2>${copy.admin.workspaceTitle}</h2>
                 <p>${copy.admin.workspaceBody}</p>
-              </div>
-              <div class="button-row">
-                ${previewHref ? `<a class="header-link header-link--button" href="${previewHref}">${copy.admin.openEntry}</a>` : ""}
-                <a class="header-link header-link--button" href="${buildPageUrl("library")}">${copy.admin.openLibrary}</a>
               </div>
             </div>
 
@@ -2172,7 +2305,19 @@ function renderAdminPage() {
                   <p>${escapeHtml(previewSummary)}</p>
                 </article>
 
-                <article class="panel-card panel-card--nested">
+                <article class="panel-card panel-card--nested admin-checklist">
+                  <div class="section-head section-head--inline">
+                    <div>
+                      <h3>${copy.admin.checklistTitle}</h3>
+                      <p>${copy.admin.checklistBody}</p>
+                    </div>
+                  </div>
+                  <ul class="admin-checklist-list">
+                    ${checklistMarkup}
+                  </ul>
+                </article>
+
+                <article class="panel-card panel-card--nested admin-upload-card">
                   <div class="section-head section-head--inline">
                     <div>
                       <h3>${copy.admin.mediaTitle}</h3>
@@ -2192,74 +2337,105 @@ function renderAdminPage() {
               </div>
 
               <form class="editor-form admin-editor-form" id="admin-editor-form">
-                <div class="form-section">
-                  <div class="section-head section-head--inline">
-                    <div>
-                      <h3>${copy.admin.identityTitle}</h3>
-                      <p>${copy.admin.identityBody}</p>
+                <div class="admin-editor-grid">
+                  <div class="form-section form-section--card admin-form-card admin-form-card--wide">
+                    <div class="section-head section-head--inline">
+                      <div>
+                        <h3>${copy.admin.identityTitle}</h3>
+                        <p>${copy.admin.identityBody}</p>
+                      </div>
+                    </div>
+                    <div class="field-grid field-grid--triple">
+                      ${renderField(copy.admin.fields.slug, "id", draft.id)}
+                      ${renderSelectField(copy.admin.fields.category, "category", draft.category, categoryOptions)}
+                      ${renderField(copy.admin.fields.order, "sortOrder", draft.sortOrder, "number")}
+                    </div>
+                    <div class="field-grid field-grid--double">
+                      ${renderField(copy.admin.fields.title, "title", draft.title)}
+                      ${renderField(copy.admin.fields.subtitle, "subtitle", draft.subtitle)}
+                    </div>
+                    ${renderTextarea(copy.admin.fields.summary, "summary", draft.summary, 3)}
+                    <div class="checkbox-row">
+                      <input type="checkbox" name="published" ${draft.published ? "checked" : ""}>
+                      <span>${copy.admin.fields.published}</span>
                     </div>
                   </div>
-                  <div class="field-grid field-grid--triple">
-                    ${renderField(copy.admin.fields.slug, "id", draft.id)}
-                    ${renderSelectField(copy.admin.fields.category, "category", draft.category, categoryOptions)}
-                    ${renderField(copy.admin.fields.order, "sortOrder", draft.sortOrder, "number")}
-                  </div>
-                  <div class="field-grid field-grid--double">
+
+                  <div class="form-section form-section--card admin-form-card">
+                    <div class="section-head section-head--inline">
+                      <div>
+                        <h3>${copy.admin.mediaTitle}</h3>
+                        <p>${copy.admin.mediaBody}</p>
+                      </div>
+                    </div>
                     ${renderField(copy.admin.fields.imageUrl, "imageUrl", draft.imageUrl, "url", { hint: copy.admin.hints.imageUrl })}
                     ${renderField(copy.admin.fields.related, "related", draft.related, "text", { hint: copy.admin.hints.related })}
                   </div>
-                  <div class="checkbox-row">
-                    <input type="checkbox" name="published" ${draft.published ? "checked" : ""}>
-                    <span>${copy.admin.fields.published}</span>
-                  </div>
-                </div>
 
-                <div class="form-section">
-                  <div class="section-head section-head--inline">
-                    <div>
-                      <h3>${copy.admin.discoveryTitle}</h3>
-                      <p>${copy.admin.discoveryBody}</p>
+                  <div class="form-section form-section--card admin-form-card">
+                    <div class="section-head section-head--inline">
+                      <div>
+                        <h3>${copy.admin.discoveryTitle}</h3>
+                        <p>${copy.admin.discoveryBody}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div class="field-grid field-grid--double">
-                    ${renderField(copy.admin.fields.fallbackImage, "fallbackImage", draft.fallbackImage, "url", { hint: copy.admin.hints.fallbackImage })}
-                    ${renderField(copy.admin.fields.vanillaAlias, "vanillaAlias", draft.vanillaAlias, "text", { hint: copy.admin.hints.vanillaAlias })}
-                  </div>
-                  ${renderField(copy.admin.fields.wikiSource, "wikiSource", draft.wikiSource, "text", { hint: copy.admin.hints.wikiSource })}
-                </div>
-
-                <div class="form-section">
-                  <div class="section-head section-head--inline">
-                    <div>
-                      <h3>${copy.admin.contentTitle}</h3>
-                      <p>${copy.admin.workspaceBody}</p>
+                    <div class="field-grid field-grid--double">
+                      ${renderField(copy.admin.fields.fallbackImage, "fallbackImage", draft.fallbackImage, "url", { hint: copy.admin.hints.fallbackImage })}
+                      ${renderField(copy.admin.fields.vanillaAlias, "vanillaAlias", draft.vanillaAlias, "text", { hint: copy.admin.hints.vanillaAlias })}
                     </div>
+                    ${renderField(copy.admin.fields.wikiSource, "wikiSource", draft.wikiSource, "text", { hint: copy.admin.hints.wikiSource })}
                   </div>
-                  <div class="field-grid field-grid--double">
-                    ${renderField(copy.admin.fields.title, "title", draft.title)}
-                    ${renderField(copy.admin.fields.subtitle, "subtitle", draft.subtitle)}
-                  </div>
-                  ${renderTextarea(copy.admin.fields.summary, "summary", draft.summary, 3)}
-                  ${renderTextarea(copy.admin.fields.overview, "overview", draft.overview, 5)}
-                  <div class="field-grid field-grid--double">
-                    ${renderTextarea(copy.admin.fields.facts, "facts", draft.facts, 6)}
-                    ${renderTextarea(copy.admin.fields.obtain, "obtain", draft.obtain, 6)}
-                  </div>
-                  <div class="field-grid field-grid--double">
-                    ${renderTextarea(copy.admin.fields.crafting, "crafting", draft.crafting, 6, { hint: copy.admin.hints.crafting })}
-                    ${renderTextarea(copy.admin.fields.drops, "drops", draft.drops, 6)}
-                  </div>
-                  <div class="field-grid field-grid--double">
-                    ${renderTextarea(copy.admin.fields.pieces, "pieces", draft.pieces, 5)}
-                    ${renderTextarea(copy.admin.fields.notes, "notes", draft.notes, 5)}
-                  </div>
-                  ${renderTextarea(copy.admin.fields.tactics, "tactics", draft.tactics, 5)}
-                </div>
 
-                <div class="form-section">
-                  <div class="button-row">
-                    <button class="action-button" type="submit">${copy.admin.save}</button>
-                    ${previewHref ? `<a class="header-link header-link--button" href="${previewHref}">${copy.admin.openEntry}</a>` : ""}
+                  <div class="form-section form-section--card admin-form-card admin-form-card--wide">
+                    <div class="section-head section-head--inline">
+                      <div>
+                        <h3>${copy.admin.contentTitle}</h3>
+                        <p>${copy.admin.contentBody}</p>
+                      </div>
+                    </div>
+                    ${renderTextarea(copy.admin.fields.overview, "overview", draft.overview, 5)}
+                  </div>
+
+                  <div class="form-section form-section--card admin-form-card admin-form-card--wide">
+                    <div class="section-head section-head--inline">
+                      <div>
+                        <h3>${copy.admin.detailTitle}</h3>
+                        <p>${copy.admin.detailBody}</p>
+                      </div>
+                    </div>
+                    <div class="field-grid field-grid--double">
+                      ${renderTextarea(copy.admin.fields.facts, "facts", draft.facts, 6)}
+                      ${renderTextarea(copy.admin.fields.obtain, "obtain", draft.obtain, 6)}
+                    </div>
+                    <div class="field-grid field-grid--double">
+                      ${renderTextarea(copy.admin.fields.crafting, "crafting", draft.crafting, 6, { hint: copy.admin.hints.crafting })}
+                      ${renderTextarea(copy.admin.fields.drops, "drops", draft.drops, 6)}
+                    </div>
+                    <div class="field-grid field-grid--double">
+                      ${renderTextarea(copy.admin.fields.pieces, "pieces", draft.pieces, 5)}
+                      ${renderTextarea(copy.admin.fields.notes, "notes", draft.notes, 5)}
+                    </div>
+                    ${renderTextarea(copy.admin.fields.tactics, "tactics", draft.tactics, 5)}
+                  </div>
+
+                  <div class="form-section form-section--card admin-form-card admin-form-card--wide admin-save-card">
+                    <div class="section-head section-head--inline">
+                      <div>
+                        <h3>${copy.admin.save}</h3>
+                        <p>${copy.admin.previewEmpty}</p>
+                      </div>
+                    </div>
+                    <div class="admin-save-row">
+                      <div class="tag-row">
+                        <span class="inline-tag inline-tag--subtle">${draft.published ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
+                        <span class="inline-tag inline-tag--subtle">${draftInsights.detailCount} ${copy.admin.detailTitle.toLowerCase()}</span>
+                        <span class="inline-tag inline-tag--subtle">${draftInsights.relatedCount} ${copy.admin.checklistLinks.toLowerCase()}</span>
+                      </div>
+                      <div class="button-row">
+                        <button class="action-button" type="submit">${copy.admin.save}</button>
+                        ${previewHref ? `<a class="header-link header-link--button" href="${previewHref}">${copy.admin.openEntry}</a>` : ""}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </form>
@@ -2268,9 +2444,14 @@ function renderAdminPage() {
           </article>
 
           <div class="admin-subgrid admin-subgrid--single">
-            <article class="panel-card">
-              <h2>${copy.admin.moderationTitle}</h2>
-              <div class="comment-stack">
+            <article class="panel-card admin-comments-card">
+              <div class="section-head section-head--inline">
+                <div>
+                  <h2>${copy.admin.moderationTitle}</h2>
+                  <p>${copy.admin.moderationBody}</p>
+                </div>
+              </div>
+              <div class="comment-stack admin-comment-stack">
                 ${backendState.adminComments.length > 0 ? backendState.adminComments.map((comment) => `
                   <article class="comment-card">
                     <div class="comment-head">
@@ -2304,13 +2485,16 @@ function renderAdminPage() {
     renderAdminPage();
   });
 
-  elements.main.querySelector("#admin-new-entry")?.addEventListener("click", () => {
-    clearAdminDraft();
-    renderAdminPage();
+  elements.main.querySelectorAll("[data-admin-new-entry]").forEach((button) => {
+    button.addEventListener("click", () => {
+      clearAdminDraft();
+      renderAdminPage();
+    });
   });
 
   elements.main.querySelectorAll("[data-admin-entry]").forEach((button) => {
     button.addEventListener("click", () => {
+      resetAdminWorkspaceMessages();
       loadEntryIntoDraft(button.dataset.adminEntry);
       renderAdminPage();
     });
@@ -3164,6 +3348,12 @@ function loadEntryIntoDraft(entryId) {
   const entry = getEntryById(entryId);
   const content = getLocalizedEntry(entry);
   const meta = getEntryMeta(entry);
+  const existingDraftPath = state.adminDraft?.id === entry?.id
+    ? state.adminDraft?.imagePath
+    : "";
+  const inferredPath = inferAdminImagePath(entry?.image || meta?.fallbackImage);
+
+  state.entryId = entry?.id ?? state.entryId;
 
   state.adminDraft = {
     id: entry?.id ?? "",
@@ -3173,7 +3363,7 @@ function loadEntryIntoDraft(entryId) {
     fallbackImage: String(meta?.fallbackImage ?? ""),
     vanillaAlias: String(meta?.vanillaAlias ?? ""),
     wikiSource: String(meta?.wikiSource ?? ""),
-    imagePath: state.adminDraft?.imagePath ?? "entries",
+    imagePath: existingDraftPath || inferredPath || "entries",
     related: (entry?.related ?? []).join(", "),
     title: content?.title ?? "",
     subtitle: content?.subtitle ?? "",
@@ -3191,6 +3381,8 @@ function loadEntryIntoDraft(entryId) {
 }
 
 function clearAdminDraft() {
+  resetAdminWorkspaceMessages();
+  state.entryId = "";
   state.adminDraft = {
     id: "",
     category: state.adminCategory !== "all"
@@ -3222,6 +3414,8 @@ function clearAdminDraft() {
 
 function updateDraftFromForm(form) {
   const formData = new FormData(form);
+  const currentImagePath = String(state.adminDraft?.imagePath ?? "entries").trim() || "entries";
+
   state.adminDraft = {
     id: String(formData.get("id") ?? "").trim(),
     category: String(formData.get("category") ?? "").trim(),
@@ -3230,7 +3424,7 @@ function updateDraftFromForm(form) {
     fallbackImage: String(formData.get("fallbackImage") ?? "").trim(),
     vanillaAlias: String(formData.get("vanillaAlias") ?? "").trim(),
     wikiSource: String(formData.get("wikiSource") ?? "").trim(),
-    imagePath: state.adminDraft?.imagePath ?? "entries",
+    imagePath: currentImagePath,
     related: String(formData.get("related") ?? "").trim(),
     title: String(formData.get("title") ?? "").trim(),
     subtitle: String(formData.get("subtitle") ?? "").trim(),
