@@ -55,8 +55,8 @@ namespace ChaoticDimensions.Content.Tiles.MinecraftLegacy
 	public sealed class ShadowOreTile : MinecraftLegacyTileBase
 	{
 		protected override bool IsOre => true;
-		protected override int RequiredPickaxePower => 65;
-		protected override float TileMineResist => 2.6f;
+		protected override int RequiredPickaxePower => 225;
+		protected override float TileMineResist => 4.6f;
 		protected override Color MapColor => new(96, 84, 144);
 	}
 
@@ -71,8 +71,8 @@ namespace ChaoticDimensions.Content.Tiles.MinecraftLegacy
 	public sealed class RosalitaOreTile : MinecraftLegacyTileBase
 	{
 		protected override bool IsOre => true;
-		protected override int RequiredPickaxePower => 70;
-		protected override float TileMineResist => 2.9f;
+		protected override int RequiredPickaxePower => 180;
+		protected override float TileMineResist => 3.4f;
 		protected override Color MapColor => new(238, 119, 176);
 	}
 

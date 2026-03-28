@@ -123,7 +123,16 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 
 	public sealed class GlassStick : MinecraftLegacyMaterialItemBase
 	{
+		protected override int ItemWidth => 20;
+		protected override int ItemHeight => 20;
 		protected override int ItemRarity => ItemRarityID.White;
+
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient(ItemID.Glass, 50)
+				.AddTile(TileID.Furnaces)
+				.Register();
+		}
 	}
 
 	public sealed class ChaosCrystal : MinecraftLegacyMaterialItemBase
@@ -146,8 +155,17 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 
 	public sealed class RosalitaGem : MinecraftLegacyMaterialItemBase
 	{
+		protected override int ItemWidth => 20;
+		protected override int ItemHeight => 20;
 		protected override int ItemRarity => ItemRarityID.LightRed;
 		protected override int ItemValue => Item.sellPrice(silver: 45);
+
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient<RosalitaOre>(4)
+				.AddTile(TileID.Furnaces)
+				.Register();
+		}
 	}
 
 	public sealed class RubyGem : MinecraftLegacyMaterialItemBase
@@ -164,7 +182,9 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 
 	public sealed class VortexGem : MinecraftLegacyMaterialItemBase
 	{
-		protected override int ItemRarity => ItemRarityID.Pink;
+		protected override int ItemWidth => 24;
+		protected override int ItemHeight => 24;
+		protected override int ItemRarity => ItemRarityID.Red;
 		protected override int ItemValue => Item.sellPrice(gold: 1);
 	}
 
@@ -176,7 +196,56 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 
 	public sealed class IronStick : MinecraftLegacyMaterialItemBase
 	{
+		protected override int ItemWidth => 20;
+		protected override int ItemHeight => 20;
 		protected override int ItemRarity => ItemRarityID.Blue;
+
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient(ItemID.IronBar, 50)
+				.AddTile(TileID.Anvils)
+				.Register();
+
+			CreateRecipe()
+				.AddIngredient(ItemID.LeadBar, 50)
+				.AddTile(TileID.Anvils)
+				.Register();
+		}
+	}
+
+	public sealed class RatrixStick : MinecraftLegacyMaterialItemBase
+	{
+		protected override int ItemWidth => 20;
+		protected override int ItemHeight => 20;
+		protected override int ItemRarity => ItemRarityID.Cyan;
+		protected override int ItemValue => Item.sellPrice(gold: 15);
+
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient<RosalitaGem>(10)
+				.AddIngredient<ShadowBar>(10)
+				.AddIngredient(ItemID.LunarBar, 10)
+				.AddIngredient<ChaosCrystal>(10)
+				.AddTile(TileID.LunarCraftingStation)
+				.Register();
+		}
+	}
+
+	public sealed class ShadowBar : MinecraftLegacyMaterialItemBase
+	{
+		protected override int ItemWidth => 24;
+		protected override int ItemHeight => 16;
+		protected override int ItemRarity => ItemRarityID.Red;
+		protected override int ItemValue => Item.sellPrice(gold: 3);
+
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient<RosalitaGem>(1)
+				.AddIngredient(ItemID.LunarBar, 1)
+				.AddIngredient(ItemID.HallowedBar, 1)
+				.AddTile(TileID.MythrilAnvil)
+				.Register();
+		}
 	}
 
 	public sealed class RawAlexandriteBlock : MinecraftLegacyPlaceableItemBase
@@ -200,7 +269,7 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 	public sealed class ShadowOre : MinecraftLegacyPlaceableItemBase
 	{
 		protected override int TileType => ModContent.TileType<ShadowOreTile>();
-		protected override int ItemRarity => ItemRarityID.Orange;
+		protected override int ItemRarity => ItemRarityID.Red;
 	}
 
 	public sealed class RubyOre : MinecraftLegacyPlaceableItemBase
@@ -212,7 +281,7 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 	public sealed class RosalitaOre : MinecraftLegacyPlaceableItemBase
 	{
 		protected override int TileType => ModContent.TileType<RosalitaOreTile>();
-		protected override int ItemRarity => ItemRarityID.LightRed;
+		protected override int ItemRarity => ItemRarityID.Pink;
 	}
 
 	public sealed class BlueBerryPlant : MinecraftLegacyPlaceableItemBase
@@ -320,11 +389,19 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 	{
 		protected override int ItemWidth => 32;
 		protected override int ItemHeight => 32;
-		protected override int ItemRarity => ItemRarityID.LightRed;
+		protected override int ItemRarity => ItemRarityID.Yellow;
 
 		public override void UpdateAccessory(Player player, bool hideVisual) {
-			player.statDefense += 5;
+			player.statDefense += 8;
+			player.endurance += 0.05f;
 			player.noKnockback = true;
+		}
+
+		public override void AddRecipes() {
+			CreateRecipe()
+				.AddIngredient<RosalitaGem>(18)
+				.AddTile(TileID.MythrilAnvil)
+				.Register();
 		}
 	}
 }
