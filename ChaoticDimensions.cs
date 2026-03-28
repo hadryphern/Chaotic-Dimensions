@@ -1,4 +1,6 @@
 using ChaoticDimensions.Common.Graphics;
+using ChaoticDimensions.Content.Players;
+using System.IO;
 using Terraria;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
@@ -9,6 +11,11 @@ namespace ChaoticDimensions
 	public class ChaoticDimensions : Mod
 	{
 		internal const string CrystalineDevourerSkyKey = "ChaoticDimensions:CrystalineDevourerSky";
+
+		internal enum MessageType : byte
+		{
+			ShadowAscensionPlayerSync
+		}
 
 		public override void Load() {
 			if (Main.dedServ) {
@@ -34,6 +41,20 @@ namespace ChaoticDimensions
 				SkyManager.Instance?.Deactivate(CrystalineDevourerSkyKey);
 			}
 			catch {
+			}
+		}
+
+		public override void HandlePacket(BinaryReader reader, int whoAmI) {
+			switch ((MessageType)reader.ReadByte()) {
+				case MessageType.ShadowAscensionPlayerSync:
+					byte playerNumber = reader.ReadByte();
+					ShadowAscensionPlayer player = Main.player[playerNumber].GetModPlayer<ShadowAscensionPlayer>();
+					player.ReceivePlayerSync(reader);
+
+					if (Main.netMode == Terraria.ID.NetmodeID.Server) {
+						player.SyncPlayer(-1, whoAmI, false);
+					}
+					break;
 			}
 		}
 	}

@@ -168,18 +168,6 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 		}
 	}
 
-	public sealed class RubyGem : MinecraftLegacyMaterialItemBase
-	{
-		protected override int ItemRarity => ItemRarityID.Orange;
-		protected override int ItemValue => Item.sellPrice(silver: 22);
-	}
-
-	public sealed class RubyNugget : MinecraftLegacyMaterialItemBase
-	{
-		protected override int ItemRarity => ItemRarityID.Blue;
-		protected override int ItemValue => Item.sellPrice(silver: 6);
-	}
-
 	public sealed class VortexGem : MinecraftLegacyMaterialItemBase
 	{
 		protected override int ItemWidth => 24;
@@ -272,12 +260,6 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 		protected override int ItemRarity => ItemRarityID.Red;
 	}
 
-	public sealed class RubyOre : MinecraftLegacyPlaceableItemBase
-	{
-		protected override int TileType => ModContent.TileType<RubyOreTile>();
-		protected override int ItemRarity => ItemRarityID.Orange;
-	}
-
 	public sealed class RosalitaOre : MinecraftLegacyPlaceableItemBase
 	{
 		protected override int TileType => ModContent.TileType<RosalitaOreTile>();
@@ -290,50 +272,6 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 		protected override int ItemWidth => 24;
 		protected override int ItemHeight => 24;
 		protected override int ItemRarity => ItemRarityID.Blue;
-	}
-
-	public sealed class RubySword : MinecraftLegacySwordBase
-	{
-		protected override int Damage => 18;
-		protected override int ItemRarity => ItemRarityID.Orange;
-
-		public override void AddRecipes() {
-			CreateRecipe()
-				.AddIngredient<RubyGem>(10)
-				.AddIngredient<GlassStick>(4)
-				.AddTile(TileID.Anvils)
-				.Register();
-		}
-	}
-
-	public sealed class RubyPickaxe : MinecraftLegacyPickaxeBase
-	{
-		protected override int PickPower => 75;
-		protected override int Damage => 10;
-		protected override int ItemRarity => ItemRarityID.Orange;
-
-		public override void AddRecipes() {
-			CreateRecipe()
-				.AddIngredient<RubyGem>(12)
-				.AddIngredient<GlassStick>(4)
-				.AddTile(TileID.Anvils)
-				.Register();
-		}
-	}
-
-	public sealed class RubyAxe : MinecraftLegacyAxeBase
-	{
-		protected override int AxePower => 12;
-		protected override int Damage => 16;
-		protected override int ItemRarity => ItemRarityID.Orange;
-
-		public override void AddRecipes() {
-			CreateRecipe()
-				.AddIngredient<RubyGem>(12)
-				.AddIngredient<GlassStick>(4)
-				.AddTile(TileID.Anvils)
-				.Register();
-		}
 	}
 
 	public sealed class ShadowSword : MinecraftLegacySwordBase

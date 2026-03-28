@@ -55,17 +55,16 @@ namespace ChaoticDimensions.Content.Tiles.MinecraftLegacy
 	public sealed class ShadowOreTile : MinecraftLegacyTileBase
 	{
 		protected override bool IsOre => true;
-		protected override int RequiredPickaxePower => 225;
+		protected override int RequiredPickaxePower => 300;
 		protected override float TileMineResist => 4.6f;
 		protected override Color MapColor => new(96, 84, 144);
-	}
 
-	public sealed class RubyOreTile : MinecraftLegacyTileBase
-	{
-		protected override bool IsOre => true;
-		protected override int RequiredPickaxePower => 55;
-		protected override float TileMineResist => 2.1f;
-		protected override Color MapColor => new(226, 55, 75);
+		public override void SetStaticDefaults() {
+			base.SetStaticDefaults();
+			TileID.Sets.FriendlyFairyCanLureTo[Type] = true;
+			Main.tileShine2[Type] = true;
+			Main.tileShine[Type] = 975;
+		}
 	}
 
 	public sealed class RosalitaOreTile : MinecraftLegacyTileBase
@@ -74,6 +73,13 @@ namespace ChaoticDimensions.Content.Tiles.MinecraftLegacy
 		protected override int RequiredPickaxePower => 180;
 		protected override float TileMineResist => 3.4f;
 		protected override Color MapColor => new(238, 119, 176);
+
+		public override void SetStaticDefaults() {
+			base.SetStaticDefaults();
+			TileID.Sets.FriendlyFairyCanLureTo[Type] = true;
+			Main.tileShine2[Type] = true;
+			Main.tileShine[Type] = 975;
+		}
 	}
 
 	public sealed class BlueBerryPlantTile : ModTile

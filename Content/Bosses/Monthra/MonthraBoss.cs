@@ -24,7 +24,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 	{
 		private const int HoverDuration = 180;
 		private const int SweepDuration = 110;
-		private const float DrawScale = 0.4f;
+		private const float DrawScale = 0.48f;
 
 		private ref float State => ref NPC.ai[0];
 		private ref float StateTimer => ref NPC.ai[1];
@@ -39,11 +39,11 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		}
 
 		public override void SetDefaults() {
-			NPC.width = 300;
-			NPC.height = 220;
-			NPC.damage = 24;
-			NPC.defense = 8;
-			NPC.lifeMax = 16000;
+			NPC.width = 340;
+			NPC.height = 260;
+			NPC.damage = 30;
+			NPC.defense = 10;
+			NPC.lifeMax = 22000;
 			NPC.knockBackResist = 0f;
 			NPC.value = Item.buyPrice(gold: 5);
 			NPC.npcSlots = 10f;
@@ -56,8 +56,8 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		}
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {
-			NPC.lifeMax = (int)(NPC.lifeMax * balance * 0.82f);
-			NPC.damage = (int)(NPC.damage * 0.9f);
+			NPC.lifeMax = (int)(NPC.lifeMax * balance * 0.88f);
+			NPC.damage = (int)(NPC.damage * 0.95f);
 		}
 
 		public override void AI() {
@@ -110,12 +110,12 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		}
 
 		private void RunHoverVolley(Player player) {
-			Vector2 hoverOffset = new Vector2(185f * HoverSide, -170f + (float)System.Math.Sin(StateTimer * 0.06f) * 22f);
-			SteerTowards(player.Center + hoverOffset, PhaseTwo ? 8.1f : 6.9f, 0.055f);
+			Vector2 hoverOffset = new Vector2(205f * HoverSide, -185f + (float)System.Math.Sin(StateTimer * 0.06f) * 24f);
+			SteerTowards(player.Center + hoverOffset, PhaseTwo ? 8.6f : 7.35f, 0.062f);
 
-			int volleyInterval = PhaseTwo ? 42 : 58;
+			int volleyInterval = PhaseTwo ? 36 : 50;
 			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer > 18f && StateTimer % volleyInterval == 0f) {
-				FireRegularVolley(player, PhaseTwo ? 4 : 3, PhaseTwo ? 9.5f : 8.35f, PhaseTwo ? 14f : 12f, 17);
+				FireRegularVolley(player, PhaseTwo ? 5 : 4, PhaseTwo ? 10.15f : 8.75f, PhaseTwo ? 16f : 13f, PhaseTwo ? 21 : 18);
 			}
 
 			if (StateTimer >= HoverDuration) {
@@ -124,16 +124,16 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		}
 
 		private void RunSweepingBurst(Player player) {
-			Vector2 sweepTarget = player.Center + new Vector2(-HoverSide * 280f, -90f);
-			SteerTowards(sweepTarget, PhaseTwo ? 10.2f : 8.9f, 0.085f);
+			Vector2 sweepTarget = player.Center + new Vector2(-HoverSide * 310f, -95f);
+			SteerTowards(sweepTarget, PhaseTwo ? 10.9f : 9.45f, 0.09f);
 
 			if (Main.netMode != NetmodeID.MultiplayerClient) {
 				if (StateTimer == 26f || (PhaseTwo && StateTimer == 54f)) {
-					FireHomingShot(player, 15);
+					FireHomingShot(player, 19);
 				}
 
 				if (StateTimer == 70f) {
-					FireRegularVolley(player, PhaseTwo ? 5 : 4, PhaseTwo ? 10.25f : 9.1f, 15f, 16);
+					FireRegularVolley(player, PhaseTwo ? 6 : 5, PhaseTwo ? 10.8f : 9.4f, 18f, PhaseTwo ? 20 : 17);
 				}
 			}
 

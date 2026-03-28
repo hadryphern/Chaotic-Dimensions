@@ -9,6 +9,7 @@ using ChaoticDimensions.Content.Items.Materials;
 using ChaoticDimensions.Content.Items.Weapons.Magic;
 using ChaoticDimensions.Content.Items.Weapons.Melee;
 using ChaoticDimensions.Content.Items.Weapons.Ranged;
+using ChaoticDimensions.Content.Items.ShadowBiome;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -636,6 +637,8 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrystalineTear>(), 1, 250, 250));
 			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<CrystalineSword>(), 40, 1, 1));
 			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<global::ChaoticDimensions.Content.Items.Accessories.CrystalineEye>(), 20, 1, 1));
+			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<ChaosCrystalPickaxe>(), 1, 1, 1));
+			npcLoot.Add(ItemDropRule.Common(ModContent.ItemType<HeartOfTheGod>(), 1, 1, 1));
 		}
 
 		public override void SendExtraAI(BinaryWriter writer) {

@@ -164,36 +164,6 @@ Items: {
 		Tooltip: ""
 	}
 
-	RubyAxe: {
-		DisplayName: Ruby Axe
-		Tooltip: ""
-	}
-
-	RubyGem: {
-		DisplayName: Ruby Gem
-		Tooltip: ""
-	}
-
-	RubyNugget: {
-		DisplayName: Ruby Nugget
-		Tooltip: ""
-	}
-
-	RubyOre: {
-		DisplayName: Ruby Ore
-		Tooltip: ""
-	}
-
-	RubyPickaxe: {
-		DisplayName: Ruby Pickaxe
-		Tooltip: ""
-	}
-
-	RubySword: {
-		DisplayName: Ruby Sword
-		Tooltip: ""
-	}
-
 	ShadowBlock: {
 		DisplayName: Shadow Block
 		Tooltip: ""
@@ -268,6 +238,216 @@ Items: {
 		DisplayName: Squid Kraken Staff
 		Tooltip: ""
 	}
+
+	RatrixStick: {
+		DisplayName: Ratrix Stick
+		Tooltip: ""
+	}
+
+	ShadowBar: {
+		DisplayName: Shadow Bar
+		Tooltip: ""
+	}
+
+	ShadowDirtBlock: {
+		DisplayName: Shadow Dirt
+		Tooltip: Soil saturated by the forbidden western biome
+	}
+
+	ShadowStoneBlock: {
+		DisplayName: Shadow Stone
+		Tooltip: Dense stone untouched by evil conversion
+	}
+
+	ShadowWood: {
+		DisplayName: Shadow Wood
+		Tooltip: Dead purple timber from the Shadow Biome
+	}
+
+	ShadowScrap: {
+		DisplayName: Shadow Scrap
+		Tooltip: Jagged remnants shed by creatures of the biome
+	}
+
+	SoulOfShadow: {
+		DisplayName: Soul of Shadow
+		Tooltip: A hardmode essence gathered in the deepest shade
+	}
+
+	ShadowTotem: {
+		DisplayName: Shadow Totem
+		Tooltip: Grants the blessing needed to survive the Shadow Biome
+	}
+
+	ChaosCrystalPickaxe: {
+		DisplayName: Chaos Crystal Pickaxe
+		Tooltip: Shatters even the deepest shadow ore
+	}
+
+	RosalitaHelmet: {
+		DisplayName: Rosalita Helmet
+		Tooltip: ""
+	}
+
+	RosalitaBreastplate: {
+		DisplayName: Rosalita Breastplate
+		Tooltip: ""
+	}
+
+	RosalitaGreaves: {
+		DisplayName: Rosalita Greaves
+		Tooltip: ""
+	}
+
+	RosalitaPickaxe: {
+		DisplayName: Rosalita Pickaxe
+		Tooltip: ""
+	}
+
+	RosalitaAxe: {
+		DisplayName: Rosalita Axe
+		Tooltip: ""
+	}
+
+	RosalitaHammer: {
+		DisplayName: Rosalita Hammer
+		Tooltip: ""
+	}
+
+	RosalitaBlade: {
+		DisplayName: Rosalita Blade
+		Tooltip: ""
+	}
+
+	RosalitaBow: {
+		DisplayName: Rosalita Bow
+		Tooltip: ""
+	}
+
+	RosalitaWand: {
+		DisplayName: Rosalita Wand
+		Tooltip: ""
+	}
+
+	RosalitaWhip: {
+		DisplayName: Rosalita Whip
+		Tooltip: ""
+	}
+
+	EclipsedMonthraPickaxe: {
+		DisplayName: Eclipsed Monthra Pickaxe
+		Tooltip: ""
+	}
+
+	EclipsedMonthraAxe: {
+		DisplayName: Eclipsed Monthra Axe
+		Tooltip: ""
+	}
+
+	EclipsedMonthraHammer: {
+		DisplayName: Eclipsed Monthra Hammer
+		Tooltip: ""
+	}
+
+	EclipsedMonthraBlade: {
+		DisplayName: Eclipsed Monthra Blade
+		Tooltip: ""
+	}
+
+	EclipsedMonthraBow: {
+		DisplayName: Eclipsed Monthra Bow
+		Tooltip: ""
+	}
+
+	EclipsedMonthraWand: {
+		DisplayName: Eclipsed Monthra Wand
+		Tooltip: ""
+	}
+
+	EclipsedMonthraWhip: {
+		DisplayName: Eclipsed Monthra Whip
+		Tooltip: ""
+	}
+
+	ShadowHelmet: {
+		DisplayName: Shadow Helmet
+		Tooltip: ""
+	}
+
+	ShadowBreastplate: {
+		DisplayName: Shadow Breastplate
+		Tooltip: ""
+	}
+
+	ShadowGreaves: {
+		DisplayName: Shadow Greaves
+		Tooltip: ""
+	}
+
+	GodnessAnvil: {
+		DisplayName: Godness Anvil
+		Tooltip: ""
+	}
+
+	HeartOfTheGod: {
+		DisplayName: Heart of the God
+		Tooltip: ""
+	}
+
+	HeartOfShadows: {
+		DisplayName: Heart of Shadows
+		Tooltip: ""
+	}
+
+	GloryBoots: {
+		DisplayName: Glory Boots
+		Tooltip: ""
+	}
+
+	ShadowManaPotion: {
+		DisplayName: Shadow Mana Potion
+		Tooltip: ""
+	}
+
+	ShadowMeleePotion: {
+		DisplayName: Shadow Melee Potion
+		Tooltip: ""
+	}
+
+	ShadowSummonStaff: {
+		DisplayName: Shadow Summon Staff
+		Tooltip: ""
+	}
+
+	ShadowWhip: {
+		DisplayName: Shadow Whip
+		Tooltip: ""
+	}
+
+	ShadowBow: {
+		DisplayName: Shadow Bow
+		Tooltip: ""
+	}
+
+	ShadowArrow: {
+		DisplayName: Shadow Arrow
+		Tooltip: ""
+	}
+
+	ShadowBullet: {
+		DisplayName: Shadow Bullet
+		Tooltip: ""
+	}
+
+	ShadowStaff: {
+		DisplayName: Shadow Staff
+		Tooltip: ""
+	}
+
+	ShadowZenith: {
+		DisplayName: Shadow Zenith
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -306,6 +486,11 @@ NPCs: {
 	ZombieSombra.DisplayName: Zombie Sombra
 	Kraken.DisplayName: Kraken
 	SquidKraken.DisplayName: Squid Kraken
+	Phantasm.DisplayName: Phantasm
+	ShadowEye.DisplayName: Shadow Eye
+	ShadowSlime.DisplayName: Shadow Slime
+	ShadowWorm.DisplayName: Shadow Worm
+	KrakenSquid.DisplayName: Kraken Squid
 }
 
 Projectiles: {
@@ -327,6 +512,16 @@ Projectiles: {
 	HappyCreeperMinion.DisplayName: Happy Creeper Minion
 	SquidKrakenMinion.DisplayName: Squid Kraken Minion
 	SquidKrakenMinionWaterBolt.DisplayName: Squid Kraken Minion Water Bolt
+	RosalitaMagicBolt.DisplayName: Rosalita Magic Bolt
+	RosalitaWhipProjectile.DisplayName: Rosalita Whip
+	EclipsedMonthraWhipProjectile.DisplayName: Eclipsed Monthra Whip
+	ShadowCrystalMinion.DisplayName: Shadow Crystal
+	ShadowCrystalBolt.DisplayName: Shadow Crystal Bolt
+	ShadowArrowProjectile.DisplayName: Shadow Arrow
+	ShadowBulletProjectile.DisplayName: Shadow Bullet
+	ShadowBoltProjectile.DisplayName: Shadow Bolt
+	ShadowZenithProjectile.DisplayName: Shadow Zenith
+	ShadowWhipProjectile.DisplayName: Shadow Whip
 }
 
 Buffs: {
@@ -364,6 +559,56 @@ Buffs: {
 		DisplayName: Squid Kraken Minion Buff
 		Description: Mods.ChaoticDimensions.Buffs.SquidKrakenMinionBuff.Description
 	}
+
+	RosalitaTagBuff: {
+		DisplayName: Rosalita Mark
+		Description: Minions deal extra damage to the marked target
+	}
+
+	EclipsedMonthraTagBuff: {
+		DisplayName: Eclipsed Mark
+		Description: Minions savagely tear into the marked target
+	}
+
+	ShadowTagBuff: {
+		DisplayName: Shadow Mark
+		Description: Minions violently tear into the marked target
+	}
+
+	ShadowRendDebuff: {
+		DisplayName: Shadow Rend
+		Description: Life drains away into the dark
+	}
+
+	ShadowManaPotionBuff: {
+		DisplayName: Shadow Mana Fortitude
+		Description: Mana surges while shadow plate hardens your body
+	}
+
+	ShadowMeleePotionBuff: {
+		DisplayName: Shadow Melee Ascension
+		Description: The shadows accelerate your melee carnage
+	}
+
+	ShadowCrystalMinionBuff: {
+		DisplayName: Shadow Crystals
+		Description: Shadow crystals orbit nearby and annihilate foes
+	}
 }
 
-Tiles.CrystalineBarrierBlock.MapEntry: Crystaline Barrier
+Tiles: {
+	CrystalineBarrierBlock.MapEntry: Crystaline Barrier
+	GodnessAnvilTile.MapEntry: Godness Anvil
+}
+
+WorldGen: {
+	RosalitaBlessingMessage: Seu mundo foi abençoado com Minério de Rosalita!
+	ShadowBlessingMessage: Seu mundo foi abençoado com Minério de Sombra!
+}
+
+Biomes: {
+	ShadowBiome: {
+		DisplayName: Shadow Biome
+		TownNPCDialogueName: the Shadow Biome
+	}
+}
