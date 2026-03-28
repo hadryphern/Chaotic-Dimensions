@@ -30,11 +30,6 @@ namespace ChaoticDimensions.Content.Tiles.MinecraftLegacy
 		}
 	}
 
-	public sealed class AlexandriteBlockTile : MinecraftLegacyTileBase
-	{
-		protected override Color MapColor => new(90, 255, 210);
-	}
-
 	public sealed class RawAlexandriteBlockTile : MinecraftLegacyTileBase
 	{
 		protected override Color MapColor => new(120, 235, 196);
@@ -50,22 +45,6 @@ namespace ChaoticDimensions.Content.Tiles.MinecraftLegacy
 			HitSound = SoundID.Dig;
 			DustType = DustID.WoodFurniture;
 		}
-	}
-
-	public sealed class AlexandriteOreTile : MinecraftLegacyTileBase
-	{
-		protected override bool IsOre => true;
-		protected override int RequiredPickaxePower => 50;
-		protected override float TileMineResist => 2.4f;
-		protected override Color MapColor => new(90, 255, 210);
-	}
-
-	public sealed class AlexandriteDeepslateOreTile : MinecraftLegacyTileBase
-	{
-		protected override bool IsOre => true;
-		protected override int RequiredPickaxePower => 60;
-		protected override float TileMineResist => 3f;
-		protected override Color MapColor => new(62, 168, 156);
 	}
 
 	public sealed class ShadowBlockTile : MinecraftLegacyTileBase

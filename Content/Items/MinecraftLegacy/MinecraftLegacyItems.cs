@@ -121,12 +121,6 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 		protected override int ItemValue => Item.sellPrice(silver: 25);
 	}
 
-	public sealed class RawAlexandrite : MinecraftLegacyMaterialItemBase
-	{
-		protected override int ItemRarity => ItemRarityID.Green;
-		protected override int ItemValue => Item.sellPrice(silver: 12);
-	}
-
 	public sealed class GlassStick : MinecraftLegacyMaterialItemBase
 	{
 		protected override int ItemRarity => ItemRarityID.White;
@@ -185,12 +179,6 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 		protected override int ItemRarity => ItemRarityID.Blue;
 	}
 
-	public sealed class AlexandriteBlock : MinecraftLegacyPlaceableItemBase
-	{
-		protected override int TileType => ModContent.TileType<AlexandriteBlockTile>();
-		protected override int ItemRarity => ItemRarityID.Green;
-	}
-
 	public sealed class RawAlexandriteBlock : MinecraftLegacyPlaceableItemBase
 	{
 		protected override int TileType => ModContent.TileType<RawAlexandriteBlockTile>();
@@ -201,18 +189,6 @@ namespace ChaoticDimensions.Content.Items.MinecraftLegacy
 	{
 		protected override int TileType => ModContent.TileType<GreystedWoodTile>();
 		protected override int ItemRarity => ItemRarityID.White;
-	}
-
-	public sealed class AlexandriteOre : MinecraftLegacyPlaceableItemBase
-	{
-		protected override int TileType => ModContent.TileType<AlexandriteOreTile>();
-		protected override int ItemRarity => ItemRarityID.Green;
-	}
-
-	public sealed class AlexandriteDeepslateOre : MinecraftLegacyPlaceableItemBase
-	{
-		protected override int TileType => ModContent.TileType<AlexandriteDeepslateOreTile>();
-		protected override int ItemRarity => ItemRarityID.Green;
 	}
 
 	public sealed class ShadowBlock : MinecraftLegacyPlaceableItemBase

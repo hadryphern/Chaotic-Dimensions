@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chaotic Dimensions | Admin</title>
+  <meta id="meta-description" name="description" content="Chaotic Dimensions wiki - Admin.">
+  <meta name="theme-color" content="#0b0d10">
+  <link rel="icon" type="image/png" href="./assets/images/favicon.png?v=20260327c">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body data-page="admin">
+  <div class="site-shell">
+    <header class="site-header" id="site-header">
+    <div class="header-brand">
+      <a class="brand-link" href="index.html?lang=pt-BR">
+        <img src="./assets/images/icon.png?v=20260327c" alt="Chaotic Dimensions icon">
+        <div>
+          <strong>Chaotic Dimensions</strong>
+          <span>Wiki Oficial</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-right">
+      <nav class="main-nav">
+    <a class="header-link " href="index.html?lang=pt-BR">Inicio</a>
+  
+    <a class="header-link " href="library.html?lang=pt-BR">Biblioteca</a>
+  
+    <a class="header-link " href="crafting.html?lang=pt-BR">Crafting</a>
+  
+    <a class="header-link " href="progression.html?lang=pt-BR">Progressao</a>
+  
+    <a class="header-link " href="feedback.html?lang=pt-BR">Feedback</a>
+  
+    <a class="header-link is-active" href="admin.html?lang=pt-BR">Admin</a>
+  </nav>
+      <div class="header-controls">
+        <div class="language-group">
+    <button class="language-pill is-active" type="button" data-language="pt-BR">
+      PT-BR
+    </button>
+  
+    <button class="language-pill " type="button" data-language="en">
+      English
+    </button>
+  
+    <button class="language-pill " type="button" data-language="es">
+      Español
+    </button>
+  
+    <button class="language-pill " type="button" data-language="ru">
+      Русский
+    </button>
+  </div>
+        <a class="header-link header-link--button" href="feedback.html?lang=pt-BR">Entrar</a>
+      </div>
+    </div>
+  </header>
+    <main class="page-root" id="page-root">
+      <section class="page-hero page-hero--compact">
+        <p class="eyebrow">Admin</p>
+        <h1>Painel Admin</h1>
+        <p class="hero-lead">Um painel mais profissional para editar conteudo, publicar entradas, subir imagens e moderar comentarios.</p>
+      </section>
+      <section class="page-section">
+        <div class="feedback-grid">
+          <article class="panel-card">
+            <h2>Acesso restrito</h2>
+            <p>Entre com uma conta admin para liberar o workspace de edicao.</p>
+            <a class="header-link header-link--button" href="feedback.html?lang=pt-BR">Feedback</a>
+          </article>
+          <article class="panel-card">
+            <h2>Fluxo de publicacao</h2>
+            <p>Crie sua conta no Feedback, promova para admin no SQL e depois volte aqui para publicar e editar.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer" id="site-footer">
+    <div class="footer-row">
+      <span>Chaotic Dimensions</span>
+      <div class="footer-links">
+        <a href="https://github.com/hadryphern/Chaotic-Dimensions" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/hadryphern/Chaotic-Dimensions/releases" target="_blank" rel="noreferrer">Releases</a>
+        <a href="https://hadryphern.github.io/Chaotic-Dimensions/" target="_blank" rel="noreferrer">Pages</a>
+      </div>
+    </div>
+  </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="./site.js"></script>
+
+
+</body></html>

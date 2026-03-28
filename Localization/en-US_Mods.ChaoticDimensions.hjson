@@ -233,6 +233,41 @@ Items: {
 		DisplayName: Vortex Gem
 		Tooltip: ""
 	}
+
+	EndernmonScale: {
+		DisplayName: Endernmon Scale
+		Tooltip: ""
+	}
+
+	FrozenFlame: {
+		DisplayName: Frozen Flame
+		Tooltip: ""
+	}
+
+	HappyCreeperStaff: {
+		DisplayName: Happy Creeper Staff
+		Tooltip: ""
+	}
+
+	KrakenBlade: {
+		DisplayName: Kraken Blade
+		Tooltip: ""
+	}
+
+	KrakenTear: {
+		DisplayName: Kraken Tear
+		Tooltip: ""
+	}
+
+	ShadowCreeperHead: {
+		DisplayName: Shadow Creeper Head
+		Tooltip: ""
+	}
+
+	SquidKrakenStaff: {
+		DisplayName: Squid Kraken Staff
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -269,6 +304,8 @@ NPCs: {
 	WhiteZombie.DisplayName: White Zombie
 	YellowButterfly.DisplayName: Yellow Butterfly
 	ZombieSombra.DisplayName: Zombie Sombra
+	Kraken.DisplayName: Kraken
+	SquidKraken.DisplayName: Squid Kraken
 }
 
 Projectiles: {
@@ -282,6 +319,14 @@ Projectiles: {
 	CrystalineBoltProjectile.DisplayName: Crystaline Bolt
 	CrystalineSwordProjectile.DisplayName: Absolute Crystal
 	CrystalineDevourerSkyBeam.DisplayName: Crystaline Sky Beam
+	KrakenLightningBolt.DisplayName: Kraken Lightning Bolt
+	SnowBlazeFrostFireball.DisplayName: Snow Blaze Frost Fireball
+	SnowBlazeIceShard.DisplayName: Snow Blaze Ice Shard
+	SquidKrakenWaterBolt.DisplayName: Squid Kraken Water Bolt
+	KrakenGuardianBolt.DisplayName: Kraken Guardian Bolt
+	HappyCreeperMinion.DisplayName: Happy Creeper Minion
+	SquidKrakenMinion.DisplayName: Squid Kraken Minion
+	SquidKrakenMinionWaterBolt.DisplayName: Squid Kraken Minion Water Bolt
 }
 
 Buffs: {
@@ -308,6 +353,16 @@ Buffs: {
 	MonthraButterflyBuff: {
 		DisplayName: Monthra Butterflies
 		Description: Dusk butterflies circle nearby and harass foes
+	}
+
+	HappyCreeperMinionBuff: {
+		DisplayName: Happy Creeper Minion Buff
+		Description: Mods.ChaoticDimensions.Buffs.HappyCreeperMinionBuff.Description
+	}
+
+	SquidKrakenMinionBuff: {
+		DisplayName: Squid Kraken Minion Buff
+		Description: Mods.ChaoticDimensions.Buffs.SquidKrakenMinionBuff.Description
 	}
 }
 

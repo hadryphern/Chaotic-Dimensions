@@ -23,8 +23,6 @@ namespace ChaoticDimensions.Common.Systems
 		private static void GenerateLegacyOres(GenerationProgress progress, GameConfiguration configuration) {
 			progress.Message = "Embedding legacy Chaotic ores";
 
-			GenerateOre(ModContent.TileType<AlexandriteOreTile>(), 0.22, 0.48, 55, 5, 8);
-			GenerateOre(ModContent.TileType<AlexandriteDeepslateOreTile>(), 0.45, 0.78, 60, 5, 9);
 			GenerateOre(ModContent.TileType<RubyOreTile>(), 0.26, 0.58, 50, 4, 7);
 			GenerateOre(ModContent.TileType<ShadowOreTile>(), 0.42, 0.82, 38, 4, 6);
 			GenerateOre(ModContent.TileType<RosalitaOreTile>(), 0.52, 0.88, 28, 3, 5);

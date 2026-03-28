@@ -21,7 +21,7 @@ namespace ChaoticDimensions.Content.Bosses.CrystalineDevourer
 			NPC.height = 56;
 			NPC.damage = 175;
 			NPC.defense = 5;
-			NPC.lifeMax = CrystalineDevourerHead.SharedLifeMax;
+			NPC.lifeMax = CrystalineDevourerHead.IndividualLifeMax;
 			NPC.knockBackResist = 0f;
 			NPC.aiStyle = -1;
 			NPC.noGravity = true;
