@@ -275,6 +275,7 @@ const pageCopy = {
       checklistPending: "Pendente",
       openEntry: "Abrir pagina",
       openLibrary: "Abrir biblioteca",
+      quickEdit: "Editar",
       uploadTitle: "Assets",
       moderationTitle: "Moderacao de comentarios",
       moderationBody: "Revise feedback recente da comunidade e oculte comentarios fora de contexto sem apagar o historico.",
@@ -488,6 +489,7 @@ const pageCopy = {
       checklistPending: "Pending",
       openEntry: "Open page",
       openLibrary: "Open library",
+      quickEdit: "Edit",
       uploadTitle: "Assets",
       moderationTitle: "Comment moderation",
       moderationBody: "Review recent community feedback and hide off-topic comments without erasing the history.",
@@ -898,8 +900,7 @@ function renderLibraryPage() {
 
   elements.main.querySelector("#library-search")?.addEventListener("input", (event) => {
     state.search = event.target.value;
-    renderLibraryPage();
-    syncUrl();
+    rerenderWithPreservedInput(renderLibraryPage, "#library-search", event.target, true);
   });
 
   elements.main.querySelector("#library-category")?.addEventListener("change", (event) => {
@@ -985,6 +986,7 @@ function renderEntryPage() {
           ` : ""}
           <div class="entry-inline-links">
             ${recipeUrl ? `<a class="inline-link" href="${recipeUrl}">${copy.entry.openCrafting}</a>` : ""}
+            ${backendState.isAdmin ? renderAdminQuickEditLink(entry.id, "entry-quick-edit") : ""}
             <a class="inline-link" href="${buildPageUrl("feedback")}">${copy.entry.comments}</a>
           </div>
         </div>
@@ -1854,8 +1856,7 @@ function renderCraftingPage() {
 
   elements.main.querySelector("#crafting-search")?.addEventListener("input", (event) => {
     state.search = event.target.value;
-    renderCraftingPage();
-    syncUrl();
+    rerenderWithPreservedInput(renderCraftingPage, "#crafting-search", event.target, true);
   });
 
   elements.main.querySelector("#crafting-category")?.addEventListener("change", (event) => {
@@ -2202,6 +2203,7 @@ function renderAdminPage() {
   const browserSummary = `${copy.admin.browserShowing} ${adminEntries.length} ${copy.admin.browserOf} ${totalEntries}`;
   const currentEntryTitle = draft.title || draft.id || copy.admin.browserNew;
   const currentEntryBody = draft.subtitle || previewSummary;
+  const entryStatusLabel = draft.published ? copy.admin.fields.published : copy.admin.browserDrafts;
   const checklistMarkup = [
     renderAdminChecklistItem(copy.admin.checklistIdentity, draftInsights.identityReady, copy),
     renderAdminChecklistItem(copy.admin.checklistSummary, draftInsights.summaryReady, copy),
@@ -2217,7 +2219,7 @@ function renderAdminPage() {
       <p class="hero-lead">${copy.admin.body}</p>
     </section>
 
-    <section class="page-section">
+    <section class="page-section page-section--admin">
       <div class="admin-layout">
         <aside class="admin-sidebar">
           <article class="panel-card admin-browser-card">
@@ -2242,7 +2244,7 @@ function renderAdminPage() {
                 <span>${copy.admin.browserDrafts}</span>
               </article>
             </div>
-            <div class="admin-filter-grid admin-filter-grid--tight">
+            <div class="admin-filter-grid">
               <input class="field-input" id="admin-search" type="search" value="${escapeHtml(state.adminSearch)}" placeholder="${copy.admin.browserSearch}">
               <label class="field-group">
                 <span>${copy.admin.browserFilter}</span>
@@ -2260,83 +2262,104 @@ function renderAdminPage() {
         </aside>
 
         <div class="admin-main">
-          <article class="panel-card admin-workspace-card">
-            <div class="admin-workspace-banner">
+          <article class="panel-card admin-summary-card">
+            <div class="admin-summary-copy">
+              <p class="eyebrow">${copy.admin.editorTitle}</p>
+              <h2>${escapeHtml(currentEntryTitle)}</h2>
+              <p>${escapeHtml(currentEntryBody)}</p>
+              <div class="tag-row">
+                <span class="inline-tag">${getCategoryLabel(draft.category || "materials")}</span>
+                ${draft.id ? `<span class="inline-tag inline-tag--subtle">${escapeHtml(draft.id)}</span>` : ""}
+                <span class="inline-tag inline-tag--subtle">${entryStatusLabel}</span>
+                <span class="inline-tag inline-tag--subtle">${escapeHtml(draft.imagePath || "entries")}</span>
+              </div>
+            </div>
+            <div class="admin-summary-actions">
               <div>
-                <p class="eyebrow">${copy.admin.editorTitle}</p>
-                <h2>${escapeHtml(currentEntryTitle)}</h2>
-                <p>${escapeHtml(currentEntryBody)}</p>
+                <h3>${copy.admin.workspaceActionsTitle}</h3>
+                <p>${copy.admin.workspaceActionsBody}</p>
+              </div>
+              <div class="button-row">
+                <button class="action-button action-button--secondary" type="button" data-admin-new-entry>${copy.admin.browserNew}</button>
+                ${previewHref ? `<a class="header-link header-link--button" href="${previewHref}">${copy.admin.openEntry}</a>` : ""}
+                <a class="header-link header-link--button" href="${buildPageUrl("library")}">${copy.admin.openLibrary}</a>
+              </div>
+            </div>
+            <div class="admin-summary-metrics">
+              <article class="summary-tile admin-summary-tile">
+                <strong>${entryStatusLabel}</strong>
+                <span>${copy.admin.fields.published}</span>
+              </article>
+              <article class="summary-tile admin-summary-tile">
+                <strong>${draftInsights.detailCount}</strong>
+                <span>${copy.admin.detailTitle}</span>
+              </article>
+              <article class="summary-tile admin-summary-tile">
+                <strong>${draftInsights.relatedCount}</strong>
+                <span>${copy.admin.checklistLinks}</span>
+              </article>
+            </div>
+          </article>
+
+          <div class="admin-workspace-grid">
+            <div class="admin-rail">
+              <article class="panel-card panel-card--nested admin-preview">
+                <div class="section-head section-head--inline">
+                  <div>
+                    <h3>${copy.admin.previewTitle}</h3>
+                    <p>${copy.admin.previewEmpty}</p>
+                  </div>
+                </div>
+                <img class="entry-image entry-image--large" src="${escapeHtml(previewAsset.imageUrl)}" alt="${escapeHtml(draft.title || draft.id || "Preview")}">
                 <div class="tag-row">
                   <span class="inline-tag">${getCategoryLabel(draft.category || "materials")}</span>
                   ${draft.id ? `<span class="inline-tag inline-tag--subtle">${escapeHtml(draft.id)}</span>` : ""}
-                  <span class="inline-tag inline-tag--subtle">${draft.published ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
-                  <span class="inline-tag inline-tag--subtle">${escapeHtml(draft.imagePath || "entries")}</span>
+                  <span class="inline-tag inline-tag--subtle">${entryStatusLabel}</span>
                 </div>
-              </div>
-              <div class="admin-action-cluster">
+                <strong>${escapeHtml(draft.title || copy.admin.editorTitle)}</strong>
+                <p>${escapeHtml(previewSummary)}</p>
+              </article>
+
+              <article class="panel-card panel-card--nested admin-upload-card">
+                <div class="section-head section-head--inline">
+                  <div>
+                    <h3>${copy.admin.mediaTitle}</h3>
+                    <p>${copy.admin.mediaBody}</p>
+                  </div>
+                </div>
+                <form class="editor-form" id="asset-form">
+                  ${renderField(copy.admin.fields.imageFolder, "pathPrefix", draft.imagePath)}
+                  <label class="field-group">
+                    <span>${copy.admin.fields.imageFile}</span>
+                    <input class="field-input" type="file" name="imageFile" accept="image/*" required>
+                  </label>
+                  <button class="action-button" type="submit">${copy.admin.upload}</button>
+                </form>
+                ${renderStatusMessage(backendState.uploadError || backendState.uploadMessage, Boolean(backendState.uploadError))}
+              </article>
+
+              <article class="panel-card panel-card--nested admin-checklist">
+                <div class="section-head section-head--inline">
+                  <div>
+                    <h3>${copy.admin.checklistTitle}</h3>
+                    <p>${copy.admin.checklistBody}</p>
+                  </div>
+                </div>
+                <ul class="admin-checklist-list">
+                  ${checklistMarkup}
+                </ul>
+              </article>
+            </div>
+
+            <article class="panel-card admin-editor-shell">
+              <div class="section-head section-head--inline">
                 <div>
-                  <h3>${copy.admin.workspaceActionsTitle}</h3>
-                  <p>${copy.admin.workspaceActionsBody}</p>
-                </div>
-                <div class="button-row">
-                  <button class="action-button action-button--secondary" type="button" data-admin-new-entry>${copy.admin.browserNew}</button>
-                  ${previewHref ? `<a class="header-link header-link--button" href="${previewHref}">${copy.admin.openEntry}</a>` : ""}
-                  <a class="header-link header-link--button" href="${buildPageUrl("library")}">${copy.admin.openLibrary}</a>
+                  <h2>${copy.admin.workspaceTitle}</h2>
+                  <p>${copy.admin.workspaceBody}</p>
                 </div>
               </div>
-            </div>
 
-            <div class="section-head section-head--inline">
-              <div>
-                <h2>${copy.admin.workspaceTitle}</h2>
-                <p>${copy.admin.workspaceBody}</p>
-              </div>
-            </div>
-
-            <div class="admin-workspace-grid">
-              <div class="admin-rail">
-                <article class="panel-card panel-card--nested admin-preview">
-                  <h3>${copy.admin.previewTitle}</h3>
-                  <img class="entry-image entry-image--large" src="${escapeHtml(previewAsset.imageUrl)}" alt="${escapeHtml(draft.title || draft.id || "Preview")}">
-                  <div class="tag-row">
-                    <span class="inline-tag">${getCategoryLabel(draft.category || "materials")}</span>
-                    ${draft.id ? `<span class="inline-tag inline-tag--subtle">${escapeHtml(draft.id)}</span>` : ""}
-                    <span class="inline-tag inline-tag--subtle">${draft.published ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
-                  </div>
-                  <strong>${escapeHtml(draft.title || copy.admin.editorTitle)}</strong>
-                  <p>${escapeHtml(previewSummary)}</p>
-                </article>
-
-                <article class="panel-card panel-card--nested admin-checklist">
-                  <div class="section-head section-head--inline">
-                    <div>
-                      <h3>${copy.admin.checklistTitle}</h3>
-                      <p>${copy.admin.checklistBody}</p>
-                    </div>
-                  </div>
-                  <ul class="admin-checklist-list">
-                    ${checklistMarkup}
-                  </ul>
-                </article>
-
-                <article class="panel-card panel-card--nested admin-upload-card">
-                  <div class="section-head section-head--inline">
-                    <div>
-                      <h3>${copy.admin.mediaTitle}</h3>
-                      <p>${copy.admin.mediaBody}</p>
-                    </div>
-                  </div>
-                  <form class="editor-form" id="asset-form">
-                    ${renderField(copy.admin.fields.imageFolder, "pathPrefix", draft.imagePath)}
-                    <label class="field-group">
-                      <span>${copy.admin.fields.imageFile}</span>
-                      <input class="field-input" type="file" name="imageFile" accept="image/*" required>
-                    </label>
-                    <button class="action-button" type="submit">${copy.admin.upload}</button>
-                  </form>
-                  ${renderStatusMessage(backendState.uploadError || backendState.uploadMessage, Boolean(backendState.uploadError))}
-                </article>
-              </div>
+              ${renderStatusMessage(backendState.entryError || backendState.entryMessage, Boolean(backendState.entryError))}
 
               <form class="editor-form admin-editor-form" id="admin-editor-form">
                 <div class="admin-editor-grid">
@@ -2429,7 +2452,7 @@ function renderAdminPage() {
                     </div>
                     <div class="admin-save-row">
                       <div class="tag-row">
-                        <span class="inline-tag inline-tag--subtle">${draft.published ? copy.admin.fields.published : copy.admin.browserDrafts}</span>
+                        <span class="inline-tag inline-tag--subtle">${entryStatusLabel}</span>
                         <span class="inline-tag inline-tag--subtle">${draftInsights.detailCount} ${copy.admin.detailTitle.toLowerCase()}</span>
                         <span class="inline-tag inline-tag--subtle">${draftInsights.relatedCount} ${copy.admin.checklistLinks.toLowerCase()}</span>
                       </div>
@@ -2441,37 +2464,34 @@ function renderAdminPage() {
                   </div>
                 </div>
               </form>
-            </div>
-            ${renderStatusMessage(backendState.entryError || backendState.entryMessage, Boolean(backendState.entryError))}
-          </article>
-
-          <div class="admin-subgrid admin-subgrid--single">
-            <article class="panel-card admin-comments-card">
-              <div class="section-head section-head--inline">
-                <div>
-                  <h2>${copy.admin.moderationTitle}</h2>
-                  <p>${copy.admin.moderationBody}</p>
-                </div>
-              </div>
-              <div class="comment-stack admin-comment-stack">
-                ${backendState.adminComments.length > 0 ? backendState.adminComments.map((comment) => `
-                  <article class="comment-card">
-                    <div class="comment-head">
-                      <strong>${escapeHtml(comment.display_name)}</strong>
-                      <span>${escapeHtml(comment.entry_id)}</span>
-                    </div>
-                    <p>${formatMultilineText(comment.body)}</p>
-                    <div class="button-row">
-                      <span class="subtle-label">${escapeHtml(formatDateTime(comment.created_at))}</span>
-                      <button class="action-button action-button--secondary" type="button" data-toggle-comment="${comment.id}" data-comment-hidden="${comment.is_hidden}">
-                        ${comment.is_hidden ? copy.admin.moderationShow : copy.admin.moderationHide}
-                      </button>
-                    </div>
-                  </article>
-                `).join("") : `<div class="empty-card">${copy.admin.noComments}</div>`}
-              </div>
             </article>
           </div>
+
+          <article class="panel-card admin-comments-card">
+            <div class="section-head section-head--inline">
+              <div>
+                <h2>${copy.admin.moderationTitle}</h2>
+                <p>${copy.admin.moderationBody}</p>
+              </div>
+            </div>
+            <div class="comment-stack admin-comment-stack">
+              ${backendState.adminComments.length > 0 ? backendState.adminComments.map((comment) => `
+                <article class="comment-card">
+                  <div class="comment-head">
+                    <strong>${escapeHtml(comment.display_name)}</strong>
+                    <span>${escapeHtml(comment.entry_id)}</span>
+                  </div>
+                  <p>${formatMultilineText(comment.body)}</p>
+                  <div class="button-row">
+                    <span class="subtle-label">${escapeHtml(formatDateTime(comment.created_at))}</span>
+                    <button class="action-button action-button--secondary" type="button" data-toggle-comment="${comment.id}" data-comment-hidden="${comment.is_hidden}">
+                      ${comment.is_hidden ? copy.admin.moderationShow : copy.admin.moderationHide}
+                    </button>
+                  </div>
+                </article>
+              `).join("") : `<div class="empty-card">${copy.admin.noComments}</div>`}
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -2479,7 +2499,7 @@ function renderAdminPage() {
 
   elements.main.querySelector("#admin-search")?.addEventListener("input", (event) => {
     state.adminSearch = event.target.value;
-    renderAdminPage();
+    rerenderWithPreservedInput(renderAdminPage, "#admin-search", event.target);
   });
 
   elements.main.querySelector("#admin-category-filter")?.addEventListener("change", (event) => {
@@ -2571,7 +2591,45 @@ function renderFooter() {
   `;
 }
 
+function rerenderWithPreservedInput(renderPage, inputSelector, inputElement, syncAfterRender = false) {
+  const selectionStart = typeof inputElement?.selectionStart === "number"
+    ? inputElement.selectionStart
+    : null;
+  const selectionEnd = typeof inputElement?.selectionEnd === "number"
+    ? inputElement.selectionEnd
+    : selectionStart;
+
+  renderPage();
+
+  if (syncAfterRender) {
+    syncUrl();
+  }
+
+  const nextInput = elements.main.querySelector(inputSelector);
+  if (!nextInput) {
+    return;
+  }
+
+  nextInput.focus({ preventScroll: true });
+
+  if (selectionStart !== null && typeof nextInput.setSelectionRange === "function") {
+    const nextStart = Math.min(selectionStart, nextInput.value.length);
+    const nextEnd = Math.min(selectionEnd ?? selectionStart, nextInput.value.length);
+    nextInput.setSelectionRange(nextStart, nextEnd);
+  }
+}
+
+function renderAdminQuickEditLink(entryId, extraClass = "") {
+  if (!backendState.isAdmin || !entryId) {
+    return "";
+  }
+
+  const className = `header-link header-link--button ${extraClass}`.trim();
+  return `<a class="${className}" href="${buildPageUrl("admin", { edit: entryId })}">${getCopy().admin.quickEdit}</a>`;
+}
+
 function renderEntryCard(entry, includeFacts = false) {
+  const copy = getCopy();
   const content = getLocalizedEntry(entry);
   const asset = getEntryDisplayAsset(entry);
   const facts = includeFacts ? (content.facts ?? []).slice(0, 2) : [];
@@ -2587,9 +2645,12 @@ function renderEntryCard(entry, includeFacts = false) {
             <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
             <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
           </div>
-          <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
-            <h3>${escapeHtml(content.title ?? entry.id)}</h3>
-          </a>
+          <div class="entry-card-actions">
+            <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
+              <h3>${escapeHtml(content.title ?? entry.id)}</h3>
+            </a>
+            ${backendState.isAdmin ? renderAdminQuickEditLink(entry.id, "entry-card-edit") : ""}
+          </div>
         </div>
       </div>
       <p>${escapeHtml(content.summary ?? "")}</p>
@@ -2615,9 +2676,12 @@ function renderRecipeCard(entry) {
             <span class="inline-tag">${getCategoryLabel(entry.category)}</span>
             <span class="inline-tag inline-tag--subtle">${escapeHtml(getTagLabel(entry))}</span>
           </div>
-          <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
-            <h3>${escapeHtml(content.title ?? entry.id)}</h3>
-          </a>
+          <div class="entry-card-actions">
+            <a class="entry-title-link" href="${buildPageUrl("entry", { entry: entry.id })}">
+              <h3>${escapeHtml(content.title ?? entry.id)}</h3>
+            </a>
+            ${backendState.isAdmin ? renderAdminQuickEditLink(entry.id, "entry-card-edit") : ""}
+          </div>
         </div>
       </div>
       ${recipe.stations.length > 0 ? `
