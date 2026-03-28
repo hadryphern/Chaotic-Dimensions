@@ -293,7 +293,7 @@ const pageCopy = {
         category: "Categoria",
         order: "Ordem",
         imageUrl: "Imagem principal",
-        fallbackImage: "Fallback image URL",
+        fallbackImage: "Imagem reserva",
         vanillaAlias: "Alias vanilla",
         wikiSource: "Wiki source",
         imageFolder: "Pasta da imagem",
@@ -313,8 +313,8 @@ const pageCopy = {
         published: "Publicado"
       },
       hints: {
-        imageUrl: "URL principal da imagem usada pela pagina e pelo card da biblioteca.",
-        fallbackImage: "Imagem reserva se a entrada ainda nao tiver sprite propria.",
+        imageUrl: "Aceita caminho local da wiki ou URL externa para a imagem principal da pagina.",
+        fallbackImage: "Aceita caminho local da wiki ou URL externa para usar como reserva.",
         vanillaAlias: "Nome vanilla exato para buscar sprite automaticamente na Terraria Wiki.",
         wikiSource: "Titulo da pagina vanilla ou URL completa da Terraria Wiki para forcar a origem.",
         related: "Use slugs separados por virgula para ligar summon, set, drops ou paginas irmas.",
@@ -507,7 +507,7 @@ const pageCopy = {
         category: "Category",
         order: "Order",
         imageUrl: "Primary image",
-        fallbackImage: "Fallback image URL",
+        fallbackImage: "Fallback image",
         vanillaAlias: "Vanilla alias",
         wikiSource: "Wiki source",
         imageFolder: "Image folder",
@@ -527,8 +527,8 @@ const pageCopy = {
         published: "Published"
       },
       hints: {
-        imageUrl: "Primary image used by the entry page and library card.",
-        fallbackImage: "Reserve image when the entry does not have its own sprite yet.",
+        imageUrl: "Accepts a local wiki path or an external URL for the main entry image.",
+        fallbackImage: "Accepts a local wiki path or an external URL for the reserve image.",
         vanillaAlias: "Exact vanilla Terraria item name used for automatic sprite lookup.",
         wikiSource: "Terraria Wiki page title or full URL to force a specific source.",
         related: "Use comma-separated slugs to connect summons, sets, drops or sibling pages.",
@@ -2505,7 +2505,7 @@ function renderAdminPage() {
                         <p>${copy.admin.mediaBody}</p>
                       </div>
                     </div>
-                    ${renderField(copy.admin.fields.imageUrl, "imageUrl", draft.imageUrl, "url", { hint: copy.admin.hints.imageUrl })}
+                    ${renderField(copy.admin.fields.imageUrl, "imageUrl", draft.imageUrl, "text", { hint: copy.admin.hints.imageUrl, inputMode: "url", autocapitalize: "off", spellcheck: false })}
                     ${renderField(copy.admin.fields.related, "related", draft.related, "text", { hint: copy.admin.hints.related })}
                   </div>
 
@@ -2517,7 +2517,7 @@ function renderAdminPage() {
                       </div>
                     </div>
                     <div class="field-grid field-grid--double">
-                      ${renderField(copy.admin.fields.fallbackImage, "fallbackImage", draft.fallbackImage, "url", { hint: copy.admin.hints.fallbackImage })}
+                      ${renderField(copy.admin.fields.fallbackImage, "fallbackImage", draft.fallbackImage, "text", { hint: copy.admin.hints.fallbackImage, inputMode: "url", autocapitalize: "off", spellcheck: false })}
                       ${renderField(copy.admin.fields.vanillaAlias, "vanillaAlias", draft.vanillaAlias, "text", { hint: copy.admin.hints.vanillaAlias })}
                     </div>
                     ${renderField(copy.admin.fields.wikiSource, "wikiSource", draft.wikiSource, "text", { hint: copy.admin.hints.wikiSource })}
@@ -3061,11 +3061,14 @@ function renderNotFound(title, body, href, label) {
 }
 
 function renderField(label, name, value, type = "text", options = {}) {
-  const { placeholder = "", hint = "" } = options;
+  const { placeholder = "", hint = "", inputMode = "", autocapitalize = "", spellcheck = true } = options;
+  const inputModeAttr = inputMode ? ` inputmode="${escapeHtml(inputMode)}"` : "";
+  const autocapitalizeAttr = autocapitalize ? ` autocapitalize="${escapeHtml(autocapitalize)}"` : "";
+  const spellcheckAttr = typeof spellcheck === "boolean" ? ` spellcheck="${spellcheck ? "true" : "false"}"` : "";
   return `
     <label class="field-group">
       <span>${label}</span>
-      <input class="field-input" type="${type}" name="${name}" value="${escapeHtml(value ?? "")}" placeholder="${escapeHtml(placeholder)}">
+      <input class="field-input" type="${type}" name="${name}" value="${escapeHtml(value ?? "")}" placeholder="${escapeHtml(placeholder)}"${inputModeAttr}${autocapitalizeAttr}${spellcheckAttr}>
       ${hint ? `<small class="field-hint">${escapeHtml(hint)}</small>` : ""}
     </label>
   `;
