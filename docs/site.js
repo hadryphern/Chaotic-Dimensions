@@ -2007,19 +2007,22 @@ function renderLinkedEntryRow(entry) {
   const subtitle = String(content.subtitle ?? "").trim();
   const summary = String(content.summary ?? content.overview ?? "").trim();
   const title = getEntryDisplayTitle(entry);
+  const entryUrl = buildPageUrl("entry", { entry: entry.id });
 
   return `
-    <a class="entry-inline-row entry-inline-row--detail" href="${buildPageUrl("entry", { entry: entry.id })}">
-      <img class="entry-inline-row__image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(title)}">
+    <article class="entry-inline-row entry-inline-row--detail">
+      <a class="entry-inline-row__image-link" href="${entryUrl}">
+        <img class="entry-inline-row__image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(title)}">
+      </a>
       <div class="entry-inline-row__body">
         <div class="entry-inline-row__meta">
           <span class="inline-tag inline-tag--subtle">${getCategoryLabel(entry.category)}</span>
         </div>
-        <strong>${escapeHtml(title)}</strong>
+        <a class="entry-title-link" href="${entryUrl}"><strong>${escapeHtml(title)}</strong></a>
         ${subtitle ? `<small class="entry-inline-row__subtitle">${escapeHtml(subtitle)}</small>` : ""}
         ${summary ? `<small class="entry-inline-row__summary">${renderLinkedText(summary)}</small>` : ""}
       </div>
-    </a>
+    </article>
   `;
 }
 

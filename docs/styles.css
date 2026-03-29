@@ -701,6 +701,11 @@ h3 {
   border-color: var(--line-strong);
 }
 
+.entry-inline-row__image-link {
+  display: inline-grid;
+  place-items: center;
+}
+
 .entry-inline-row--detail {
   align-items: start;
 }
