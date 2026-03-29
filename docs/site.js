@@ -1662,10 +1662,14 @@ function buildArmorPresentation(detailContext) {
   }
 
   const pieceMap = new Map();
+  const variantPieceMap = new Map();
+  const variantNoteMap = new Map();
   const relatedByNormalizedTitle = new Map();
   relatedArmorEntries.forEach((relatedEntry) => {
     relatedByNormalizedTitle.set(canonicalizeLookupLabel(getLocalizedEntry(relatedEntry).title ?? relatedEntry.id), relatedEntry);
   });
+  const helmetVariantEntries = relatedArmorEntries.filter((relatedEntry) => getArmorGroupKey(getLocalizedEntry(relatedEntry).title ?? relatedEntry.id) === "helmet");
+  const hasHelmetVariants = helmetVariantEntries.length > 1;
 
   const ensureGroup = (rawKey, preferredEntry = null) => {
     const groupKey = getArmorGroupKey(rawKey);
@@ -1690,31 +1694,114 @@ function buildArmorPresentation(detailContext) {
     return existing;
   };
 
+  const ensureVariantPieceGroup = (relatedEntry) => {
+    if (!variantPieceMap.has(relatedEntry.id)) {
+      variantPieceMap.set(relatedEntry.id, {
+        key: "helmet",
+        title: getEntryDisplayTitle(relatedEntry),
+        entry: relatedEntry,
+        stats: [],
+        detailCount: 0,
+        recipe: parseRecipeModel(relatedEntry, { allowDerived: false })
+      });
+    }
+
+    return variantPieceMap.get(relatedEntry.id);
+  };
+
+  const ensureVariantNoteGroup = (relatedEntry) => {
+    if (!variantNoteMap.has(relatedEntry.id)) {
+      variantNoteMap.set(relatedEntry.id, {
+        key: "set-bonus",
+        title: getEntryDisplayTitle(relatedEntry),
+        entry: relatedEntry,
+        stats: []
+      });
+    }
+
+    return variantNoteMap.get(relatedEntry.id);
+  };
+
+  const appendArmorGroupStat = (group, value) => {
+    const cleanValue = String(value ?? "").trim();
+    if (!cleanValue || group.stats.includes(cleanValue)) {
+      return;
+    }
+
+    group.stats.push(cleanValue);
+    group.detailCount = (group.detailCount ?? 0) + 1;
+  };
+
   relatedArmorEntries.forEach((relatedEntry) => {
-    const group = ensureGroup(getLocalizedEntry(relatedEntry).title ?? relatedEntry.id, relatedEntry);
-    const facts = (getLocalizedEntry(relatedEntry).facts ?? []).slice(0, 5);
-    facts.forEach((fact) => {
-      if (!group.stats.includes(fact)) {
-        group.stats.push(fact);
-      }
+    const relatedContent = getLocalizedEntry(relatedEntry);
+    const relatedTitle = relatedContent.title ?? relatedEntry.id;
+    const relatedGroupKey = getArmorGroupKey(relatedTitle);
+    const facts = [...(relatedContent.facts ?? [])];
+    const notes = [...(relatedContent.notes ?? [])]
+      .filter((line) => !/^relacionado a:/i.test(String(line ?? "").trim()) && !/^related to:/i.test(String(line ?? "").trim()));
+
+    if (hasHelmetVariants && relatedGroupKey === "helmet") {
+      const pieceGroup = ensureVariantPieceGroup(relatedEntry);
+      [...facts, ...notes]
+        .filter((line) => !isArmorSetBonusLine(line))
+        .slice(0, 6)
+        .forEach((fact) => appendArmorGroupStat(pieceGroup, fact));
+
+      const noteGroup = ensureVariantNoteGroup(relatedEntry);
+      [...facts, ...notes]
+        .filter((line) => isArmorSetBonusLine(line))
+        .map(cleanArmorSetBonusLine)
+        .forEach((fact) => appendArmorGroupStat(noteGroup, fact));
+      return;
+    }
+
+    const group = ensureGroup(relatedTitle, relatedEntry);
+    facts.slice(0, 6).forEach((fact) => {
+      appendArmorGroupStat(group, fact);
     });
   });
 
-  [...(content.pieces ?? []), ...(content.notes ?? [])].forEach((line) => {
+  (content.pieces ?? []).forEach((line) => {
     const parsed = parseArmorGroupedLine(line);
     if (!parsed) {
       return;
     }
 
-    const relatedEntry = parsed.entrySlug ? getEntryById(parsed.entrySlug) : null;
-    const group = ensureGroup(parsed.groupKey, relatedEntry);
-    if (!group.stats.includes(parsed.value)) {
-      group.stats.push(parsed.value);
-      group.detailCount += 1;
+    if (hasHelmetVariants && parsed.groupKey === "helmet") {
+      const targetEntries = parsed.entrySlug
+        ? helmetVariantEntries.filter((relatedEntry) => relatedEntry.id === parsed.entrySlug)
+        : helmetVariantEntries;
+      targetEntries.forEach((relatedEntry) => {
+        appendArmorGroupStat(ensureVariantPieceGroup(relatedEntry), parsed.value);
+      });
+      return;
     }
+
+    const relatedEntry = parsed.entrySlug ? getEntryById(parsed.entrySlug) : null;
+    appendArmorGroupStat(ensureGroup(parsed.groupKey, relatedEntry), parsed.value);
   });
 
-  const pieceGroups = ["helmet", "breastplate", "greaves"]
+  (content.notes ?? []).forEach((line) => {
+    const parsed = parseArmorGroupedLine(line);
+    if (!parsed) {
+      return;
+    }
+
+    if (hasHelmetVariants && parsed.groupKey === "helmet") {
+      const targetEntries = parsed.entrySlug
+        ? helmetVariantEntries.filter((relatedEntry) => relatedEntry.id === parsed.entrySlug)
+        : helmetVariantEntries;
+      targetEntries.forEach((relatedEntry) => {
+        appendArmorGroupStat(ensureVariantNoteGroup(relatedEntry), parsed.value);
+      });
+      return;
+    }
+
+    const relatedEntry = parsed.entrySlug ? getEntryById(parsed.entrySlug) : null;
+    appendArmorGroupStat(ensureGroup(parsed.groupKey, relatedEntry), parsed.value);
+  });
+
+  const basePieceGroups = ["helmet", "breastplate", "greaves"]
     .map((key) => pieceMap.get(key))
     .filter(Boolean)
     .map((group) => ({
@@ -1722,9 +1809,28 @@ function buildArmorPresentation(detailContext) {
       asset: group.entry ? getEntryDisplayAsset(group.entry) : getArmorGroupAsset(entry, group.key)
     }));
 
-  const noteGroups = ["set-bonus", "set", "general"]
+  const variantPieceGroups = hasHelmetVariants
+    ? helmetVariantEntries
+      .map((relatedEntry) => ensureVariantPieceGroup(relatedEntry))
+      .map((group) => ({
+        ...group,
+        asset: group.entry ? getEntryDisplayAsset(group.entry) : getArmorGroupAsset(entry, group.key)
+      }))
+    : [];
+
+  const pieceGroups = hasHelmetVariants
+    ? [...variantPieceGroups, ...basePieceGroups.filter((group) => group.key !== "helmet")]
+    : basePieceGroups;
+
+  const baseNoteGroups = ["set-bonus", "set", "general"]
     .map((key) => pieceMap.get(key))
     .filter(Boolean);
+  const variantNoteGroups = hasHelmetVariants
+    ? helmetVariantEntries
+      .map((relatedEntry) => ensureVariantNoteGroup(relatedEntry))
+      .filter((group) => group.stats.length > 0)
+    : [];
+  const noteGroups = [...variantNoteGroups, ...baseNoteGroups];
 
   const groupedRawValues = new Set(
     [...pieceGroups, ...noteGroups].flatMap((group) => group.stats.map((value) => String(value ?? "").trim()))
@@ -1858,6 +1964,14 @@ function getArmorGroupTitle(groupKey, entry) {
   return labels[groupKey] ?? (state.language === "pt-BR" ? "Peca" : "Piece");
 }
 
+function isArmorSetBonusLine(value) {
+  return /^(set bonus|bonus do set|bonus de conjunto)\s*:/i.test(String(value ?? "").trim());
+}
+
+function cleanArmorSetBonusLine(value) {
+  return String(value ?? "").trim().replace(/^(set bonus|bonus do set|bonus de conjunto)\s*:\s*/i, "").trim();
+}
+
 function getArmorSectionLabel(groupKey) {
   return getArmorGroupTitle(groupKey, null);
 }
@@ -1949,7 +2063,7 @@ function renderArmorNotesBlock(label, armorPresentation) {
         <div class="armor-note-grid">
           ${noteGroups.map((group) => `
             <section class="armor-note-card">
-              <h4>${escapeHtml(getArmorSectionLabel(group.key))}</h4>
+              <h4>${escapeHtml(group.title ?? getArmorSectionLabel(group.key))}</h4>
               <ul class="content-list">${group.stats.map((item) => `<li>${renderLinkedText(item)}</li>`).join("")}</ul>
             </section>
           `).join("")}

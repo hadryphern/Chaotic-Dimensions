@@ -1070,6 +1070,252 @@ export const entryOverrides = [
     }
   },
   {
+    id: "crystaline-devour-armor",
+    category: "armor",
+    related: [
+      "crystaline-devour-magic-helm",
+      "crystaline-devour-melee-helm",
+      "crystaline-devour-ranged-helm",
+      "crystaline-devour-summoner-helm",
+      "crystaline-devour-breastplate",
+      "crystaline-devour-greaves",
+      "crystaline-tear",
+      "crystaline-devour-aegis"
+    ],
+    content: {
+      "pt-BR": {
+        title: "Crystaline Devour Armor",
+        subtitle: "Set modular pós-boss",
+        summary: "Set modular do tier Crystaline, com peito e pernas compartilhados e quatro helms diferentes para fechar builds de melee, magic, ranged e summon.",
+        overview: "Crystaline Devour Armor organiza a linha pós-boss do mod num formato modular: o jogador mantém o mesmo núcleo defensivo e troca apenas o helm para mudar o foco da build.",
+        facts: [
+          "Peitoral com 40 de defesa",
+          "Greaves com 30 de defesa",
+          "Todos os helms possuem 29 de defesa base",
+          "O set completo ativa Crystaline Devour Aegis ao sofrer dano",
+          "A aegis dura 10 segundos e tem cooldown interno de 3 minutos"
+        ],
+        crafting: [
+          "Crystaline Devour Breastplate: Crystaline Tear x34 + Lunar Bar x18 em Lunar Crafting Station",
+          "Crystaline Devour Greaves: Crystaline Tear x28 + Lunar Bar x16 em Lunar Crafting Station",
+          "Magic Helm: Crystaline Tear x24 + Lunar Bar x14 em Lunar Crafting Station",
+          "Melee Helm: Crystaline Tear x24 + Lunar Bar x14 em Lunar Crafting Station",
+          "Ranged Helm: Crystaline Tear x24 + Lunar Bar x14 em Lunar Crafting Station",
+          "Summoner Helm: Crystaline Tear x24 + Lunar Bar x14 em Lunar Crafting Station"
+        ],
+        pieces: [
+          "Magic Helm: 29 de defesa",
+          "Melee Helm: 29 de defesa",
+          "Ranged Helm: 29 de defesa",
+          "Summoner Helm: 29 de defesa",
+          "Crystaline Devour Breastplate: 40 de defesa",
+          "Crystaline Devour Greaves: 30 de defesa"
+        ],
+        notes: [
+          "Bonus do Set: Ao sofrer dano, o set ativa Crystaline Devour Aegis por 10 segundos.",
+          "Bonus do Set: A aegis concede imunidade quase total, mobilidade extra e resistência a knockback.",
+          "Bonus do Set: O cooldown interno da aegis é de 3 minutos entre ativações."
+        ]
+      },
+      en: {
+        title: "Crystaline Devour Armor",
+        subtitle: "Post-boss modular set",
+        summary: "Crystaline tier modular set with a shared chest and greaves core plus four class-specific helms for melee, magic, ranged and summon builds.",
+        overview: "Crystaline Devour Armor structures the post-boss tier around one shared defensive core: only the helm changes, allowing the set to pivot into different class identities without replacing the whole armor line.",
+        facts: [
+          "Breastplate with 40 defense",
+          "Greaves with 30 defense",
+          "Every helm starts at 29 base defense",
+          "The full set activates Crystaline Devour Aegis after taking damage",
+          "Aegis lasts 10 seconds and has a 3 minute internal cooldown"
+        ],
+        crafting: [
+          "Crystaline Devour Breastplate: Crystaline Tear x34 + Lunar Bar x18 at Lunar Crafting Station",
+          "Crystaline Devour Greaves: Crystaline Tear x28 + Lunar Bar x16 at Lunar Crafting Station",
+          "Magic Helm: Crystaline Tear x24 + Lunar Bar x14 at Lunar Crafting Station",
+          "Melee Helm: Crystaline Tear x24 + Lunar Bar x14 at Lunar Crafting Station",
+          "Ranged Helm: Crystaline Tear x24 + Lunar Bar x14 at Lunar Crafting Station",
+          "Summoner Helm: Crystaline Tear x24 + Lunar Bar x14 at Lunar Crafting Station"
+        ],
+        pieces: [
+          "Magic Helm: 29 defense",
+          "Melee Helm: 29 defense",
+          "Ranged Helm: 29 defense",
+          "Summoner Helm: 29 defense",
+          "Crystaline Devour Breastplate: 40 defense",
+          "Crystaline Devour Greaves: 30 defense"
+        ],
+        notes: [
+          "Set Bonus: Taking damage activates Crystaline Devour Aegis for 10 seconds.",
+          "Set Bonus: Aegis grants near-total immunity, bonus mobility and knockback resistance.",
+          "Set Bonus: The aegis has a 3 minute internal cooldown between triggers."
+        ]
+      }
+    }
+  },
+  {
+    id: "crystaline-devour-magic-helm",
+    category: "armor",
+    content: {
+      "pt-BR": {
+        title: "Magic Helm",
+        subtitle: "Helm mágico do set Crystaline",
+        summary: "Variação mágica do set Crystaline Devour, mantendo a base do set e puxando o conjunto para dano mágico extremo.",
+        facts: [
+          "29 de defesa",
+          "+78% de dano mágico",
+          "-95% de custo de mana",
+          "+20% de velocidade de movimento",
+          "+0.75 de velocidade máxima"
+        ],
+        notes: [
+          "Bonus do Set: +51 de defesa adicional enquanto o set completo estiver equipado.",
+          "Bonus do Set: A versão mágica combina dano alto com custo de mana quase zerado.",
+          "Bonus do Set: Ao sofrer dano, ativa Crystaline Devour Aegis por 10 segundos."
+        ]
+      },
+      en: {
+        title: "Magic Helm",
+        subtitle: "Magic variant of the Crystaline set",
+        summary: "Magic-focused Crystaline Devour helm that keeps the same set core while pushing the build into extreme magic output.",
+        facts: [
+          "29 defense",
+          "+78% magic damage",
+          "-95% mana cost",
+          "+20% movement speed",
+          "+0.75 max run speed"
+        ],
+        notes: [
+          "Set Bonus: +51 bonus defense while the full set is equipped.",
+          "Set Bonus: This variant trades into overwhelming magic damage and near-zero mana cost.",
+          "Set Bonus: Taking damage activates Crystaline Devour Aegis for 10 seconds."
+        ]
+      }
+    }
+  },
+  {
+    id: "crystaline-devour-melee-helm",
+    category: "armor",
+    content: {
+      "pt-BR": {
+        title: "Melee Helm",
+        subtitle: "Helm melee do set Crystaline",
+        summary: "Variação melee do set Crystaline Devour, voltada para dano bruto, velocidade de ataque e movimentação mais agressiva.",
+        facts: [
+          "29 de defesa",
+          "+85% de dano melee",
+          "+35% de velocidade de ataque melee",
+          "+22% de velocidade de movimento",
+          "+0.9 de velocidade máxima"
+        ],
+        notes: [
+          "Bonus do Set: +151 de defesa adicional enquanto o set completo estiver equipado.",
+          "Bonus do Set: Esta versão empurra o set para agressão física e mobilidade ofensiva.",
+          "Bonus do Set: Ao sofrer dano, ativa Crystaline Devour Aegis por 10 segundos."
+        ]
+      },
+      en: {
+        title: "Melee Helm",
+        subtitle: "Melee variant of the Crystaline set",
+        summary: "Melee-focused Crystaline Devour helm built around raw melee power, faster swings and stronger movement pressure.",
+        facts: [
+          "29 defense",
+          "+85% melee damage",
+          "+35% melee attack speed",
+          "+22% movement speed",
+          "+0.9 max run speed"
+        ],
+        notes: [
+          "Set Bonus: +151 bonus defense while the full set is equipped.",
+          "Set Bonus: This variant pushes the set toward physical aggression and mobility.",
+          "Set Bonus: Taking damage activates Crystaline Devour Aegis for 10 seconds."
+        ]
+      }
+    }
+  },
+  {
+    id: "crystaline-devour-ranged-helm",
+    category: "armor",
+    content: {
+      "pt-BR": {
+        title: "Ranged Helm",
+        subtitle: "Helm ranged do set Crystaline",
+        summary: "Variação ranged do set Crystaline Devour, com dano alto, cadência extrema e economia pesada de munição.",
+        facts: [
+          "29 de defesa",
+          "+72% de dano ranged",
+          "+55% de velocidade de ataque ranged",
+          "+24% de velocidade de movimento",
+          "+1.15 de velocidade máxima"
+        ],
+        notes: [
+          "Bonus do Set: +111 de defesa adicional enquanto o set completo estiver equipado.",
+          "Bonus do Set: Ativa Ammo Box, Ammo Reservation e economia interna adicional de munição.",
+          "Bonus do Set: Ao sofrer dano, ativa Crystaline Devour Aegis por 10 segundos."
+        ]
+      },
+      en: {
+        title: "Ranged Helm",
+        subtitle: "Ranged variant of the Crystaline set",
+        summary: "Ranged-focused Crystaline Devour helm built around heavy ranged damage, extreme fire rate and massive ammo economy.",
+        facts: [
+          "29 defense",
+          "+72% ranged damage",
+          "+55% ranged attack speed",
+          "+24% movement speed",
+          "+1.15 max run speed"
+        ],
+        notes: [
+          "Set Bonus: +111 bonus defense while the full set is equipped.",
+          "Set Bonus: Enables Ammo Box, Ammo Reservation and extra internal ammo economy.",
+          "Set Bonus: Taking damage activates Crystaline Devour Aegis for 10 seconds."
+        ]
+      }
+    }
+  },
+  {
+    id: "crystaline-devour-summoner-helm",
+    category: "armor",
+    content: {
+      "pt-BR": {
+        title: "Summoner Helm",
+        subtitle: "Helm summoner do set Crystaline",
+        summary: "Variação summoner do set Crystaline Devour, focada em dano de summons, enxame de minions e alcance de whip.",
+        facts: [
+          "29 de defesa",
+          "+155% de dano summon",
+          "+10 minions máximos",
+          "+12% de velocidade de movimento",
+          "+0.45 de velocidade máxima",
+          "+25% de alcance de whip"
+        ],
+        notes: [
+          "Bonus do Set: versão sem defesa bônus extra, compensando em poder bruto para summons.",
+          "Bonus do Set: Ao sofrer dano, ativa Crystaline Devour Aegis por 10 segundos.",
+          "Bonus do Set: O set completo mantém o mesmo peito e greaves do restante da linha Crystaline."
+        ]
+      },
+      en: {
+        title: "Summoner Helm",
+        subtitle: "Summoner variant of the Crystaline set",
+        summary: "Summoner-focused Crystaline Devour helm centered on summon damage, a huge minion count and extra whip range.",
+        facts: [
+          "29 defense",
+          "+155% summon damage",
+          "+10 max minions",
+          "+12% movement speed",
+          "+0.45 max run speed",
+          "+25% whip range"
+        ],
+        notes: [
+          "Set Bonus: this variant gives up bonus defense in exchange for raw summon power.",
+          "Set Bonus: Taking damage activates Crystaline Devour Aegis for 10 seconds.",
+          "Set Bonus: The full set still uses the same shared breastplate and greaves."
+        ]
+      }
+    }
+  },
+  {
     id: "crystaline-sword",
     category: "weapons",
     isPublished: false,
