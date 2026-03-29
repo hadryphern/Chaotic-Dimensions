@@ -3258,7 +3258,7 @@ function renderRecipeCard(entry) {
   const content = getLocalizedEntry(entry);
   const asset = getEntryDisplayAsset(entry);
   const recipe = parseRecipeModel(entry);
-  const compactGroups = buildRecipeDisplayGroups(entry, recipe, { expandArmorVariants: false });
+  const compactGroups = dedupeRecipeDisplayGroups(buildRecipeDisplayGroups(entry, recipe, { expandArmorVariants: false }));
 
   return `
     <article class="recipe-card">
@@ -3296,7 +3296,7 @@ function renderRecipeCard(entry) {
 
 function renderCraftingContentBlock(label, entry) {
   const recipe = parseRecipeModel(entry);
-  const detailedGroups = buildRecipeDisplayGroups(entry, recipe, { expandArmorVariants: true });
+  const detailedGroups = dedupeRecipeDisplayGroups(buildRecipeDisplayGroups(entry, recipe, { expandArmorVariants: true }));
 
   if (recipe.lines.length === 0) {
     return "";
@@ -3328,7 +3328,7 @@ function renderRecipeGroupGrid(groups, options = {}) {
   const compactClass = options.compact ? " recipe-group-grid--compact" : "";
   return `
     <div class="recipe-group-grid${compactClass}">
-      ${groups.map((group) => renderRecipeGroupCard(group, options)).join("")}
+      ${dedupeRecipeDisplayGroups(groups).map((group) => renderRecipeGroupCard(group, options)).join("")}
     </div>
   `;
 }
@@ -4831,6 +4831,43 @@ function buildRecipeDisplayGroups(entry, recipe, options = {}) {
       title: group.entry ? getEntryDisplayTitle(group.entry) : (group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : group.label || getEntryDisplayTitle(entry)),
       entry: group.entry ?? null
     }));
+  });
+
+  return output;
+}
+
+function dedupeRecipeDisplayGroups(groups) {
+  const seen = new Set();
+  const output = [];
+
+  groups.forEach((group) => {
+    const entryId = group.entry?.id ?? "";
+    const stationKey = (group.stations ?? [])
+      .map((station) => station.id || canonicalizeLookupLabel(station.label))
+      .join("|");
+    const ingredientKey = (group.ingredients ?? [])
+      .map((ingredient) => {
+        const ingredientEntryId = ingredient.entry?.id ?? "";
+        const ingredientLabel = canonicalizeLookupLabel(ingredientEntryId ? getEntryDisplayTitle(ingredient.entry) : ingredient.label);
+        const amount = String(ingredient.amount ?? "");
+        return `${ingredientEntryId || ingredientLabel}:${amount}`;
+      })
+      .join("|");
+    const key = [
+      entryId,
+      canonicalizeLookupLabel(group.title),
+      canonicalizeLookupLabel(group.groupLabel),
+      canonicalizeLookupLabel(group.groupKey),
+      stationKey,
+      ingredientKey
+    ].join("::");
+
+    if (seen.has(key)) {
+      return;
+    }
+
+    seen.add(key);
+    output.push(group);
   });
 
   return output;
