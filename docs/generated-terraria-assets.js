@@ -26,6 +26,16 @@ export const generatedTerrariaAssets = {
     "imageUrl": "./assets/images/vanilla/bloody-spine.png",
     "pageUrl": "https://terraria.wiki.gg/wiki/Bloody_Spine"
   },
+  "bottle": {
+    "title": "Bottle",
+    "imageUrl": "./assets/images/vanilla/bottle.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Bottle"
+  },
+  "bottles": {
+    "title": "Bottle",
+    "imageUrl": "./assets/images/vanilla/bottle.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Bottle"
+  },
   "cobweb": {
     "title": "Cobweb",
     "imageUrl": "./assets/images/vanilla/cobweb.png",
@@ -61,10 +71,25 @@ export const generatedTerrariaAssets = {
     "imageUrl": "./assets/images/vanilla/mythril-anvil.png",
     "pageUrl": "https://terraria.wiki.gg/wiki/Mythril_Anvil"
   },
+  "placed bottle": {
+    "title": "Bottle",
+    "imageUrl": "./assets/images/vanilla/bottle.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Bottle"
+  },
   "sdmg": {
     "title": "SDMG",
     "imageUrl": "./assets/images/vanilla/sdmg.png",
     "pageUrl": "https://terraria.wiki.gg/wiki/SDMG"
+  },
+  "shadow scale": {
+    "title": "Shadow Scale",
+    "imageUrl": "./assets/images/vanilla/shadow-scale.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Shadow_Scale"
+  },
+  "soul of night": {
+    "title": "Soul of Night",
+    "imageUrl": "./assets/images/vanilla/soul-of-night.gif",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Soul_of_Night"
   },
   "soul of light": {
     "title": "Soul of Light",
@@ -76,10 +101,30 @@ export const generatedTerrariaAssets = {
     "imageUrl": "./assets/images/vanilla/stinger.png",
     "pageUrl": "https://terraria.wiki.gg/wiki/Stinger"
   },
+  "super mana potion": {
+    "title": "Super Mana Potion",
+    "imageUrl": "./assets/images/vanilla/super-mana-potion.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Super_Mana_Potion"
+  },
+  "terraspark boots": {
+    "title": "Terraspark Boots",
+    "imageUrl": "./assets/images/vanilla/terraspark-boots.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Terraspark_Boots"
+  },
+  "tissue sample": {
+    "title": "Tissue Sample",
+    "imageUrl": "./assets/images/vanilla/tissue-sample.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Tissue_Sample"
+  },
   "vine": {
     "title": "Vine",
     "imageUrl": "./assets/images/vanilla/vine.png",
     "pageUrl": "https://terraria.wiki.gg/wiki/Vine"
+  },
+  "worm food": {
+    "title": "Worm Food",
+    "imageUrl": "./assets/images/vanilla/worm-food.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Worm_Food"
   },
   "ice feather": {
     "title": "Ice Feather",
@@ -95,5 +140,35 @@ export const generatedTerrariaAssets = {
     "title": "Last Prism",
     "imageUrl": "./assets/images/vanilla/last-prism.png",
     "pageUrl": "https://terraria.wiki.gg/wiki/Last_Prism"
+  },
+  "crimtane bar": {
+    "title": "Crimtane Bar",
+    "imageUrl": "./assets/images/vanilla/crimtane-bar.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Crimtane_Bar"
+  },
+  "demonite bar": {
+    "title": "Demonite Bar",
+    "imageUrl": "./assets/images/vanilla/demonite-bar.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Demonite_Bar"
+  },
+  "glass": {
+    "title": "Glass",
+    "imageUrl": "./assets/images/vanilla/glass.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Glass"
+  },
+  "hallowed bar": {
+    "title": "Hallowed Bar",
+    "imageUrl": "./assets/images/vanilla/hallowed-bar.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Hallowed_Bar"
+  },
+  "iron bar": {
+    "title": "Iron Bar",
+    "imageUrl": "./assets/images/vanilla/iron-bar.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Iron_Bar"
+  },
+  "lead bar": {
+    "title": "Lead Bar",
+    "imageUrl": "./assets/images/vanilla/lead-bar.png",
+    "pageUrl": "https://terraria.wiki.gg/wiki/Lead_Bar"
   }
 };

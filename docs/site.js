@@ -1,4 +1,5 @@
 import { entries, languageOptions, siteConfig, uiCopy } from "./data.js";
+import { generatedCodeEntries } from "./generated-code-entries.js";
 import { generatedMinecraftLegacyEntries } from "./generated-minecraft-legacy-data.js";
 import { generatedReferenceEntries } from "./generated-reference-overrides.js";
 import { generatedTerrariaAssets } from "./generated-terraria-assets.js";
@@ -86,7 +87,8 @@ const WORKSTATIONS = [
   { id: "godness-anvil", label: "Godness Anvil", short: "GA", keywords: ["godness anvil", "godnessanvil"], lookup: ["Godness Anvil", "GodnessAnvil"] },
   { id: "adamantite-forge", label: "Adamantite Forge", short: "AF", keywords: ["adamantite forge"], lookup: ["Adamantite Forge"] },
   { id: "anvil", label: "Anvil", short: "AN", keywords: [" anvil", "anvil "], lookup: ["Iron Anvil", "Lead Anvil", "Anvil"] },
-  { id: "furnace", label: "Furnace", short: "FU", keywords: ["hellforge", "forge", "furnace"], lookup: ["Furnace", "Hellforge"] }
+  { id: "furnace", label: "Furnace", short: "FU", keywords: ["hellforge", "forge", "furnace"], lookup: ["Furnace", "Hellforge"] },
+  { id: "bottles", label: "Bottles", short: "BT", keywords: ["bottles", "placed bottle", "bottle"], lookup: ["Bottles", "Bottle", "Placed Bottle"] }
 ];
 
 const HOME_FEATURED_IDS = [
@@ -102,7 +104,7 @@ const TERRARIA_WIKI = {
   pageBaseUrl: "https://terraria.wiki.gg/wiki/"
 };
 
-const RUNTIME_TERRARIA_LOOKUP_ENABLED = true;
+const RUNTIME_TERRARIA_LOOKUP_ENABLED = false;
 const supportedLanguageOptions = languageOptions
   .filter((option) => ["pt-BR", "en"].includes(option.code))
   .map((option) => ({
@@ -110,7 +112,7 @@ const supportedLanguageOptions = languageOptions
     label: option.code === "en" ? "EN-US" : option.label
   }));
 
-const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, generatedReferenceEntries, entryOverrides);
+const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, generatedReferenceEntries, entryOverrides, generatedCodeEntries);
 const pageId = document.body.dataset.page ?? "home";
 
 const elements = {
@@ -943,7 +945,7 @@ function renderEntryPage() {
   const copy = getCopy();
   const entry = getEntryById(state.entryId);
 
-  if (!entry) {
+  if (!entry || (!isEntryPublic(entry) && !backendState.isAdmin)) {
     elements.main.innerHTML = renderNotFound(copy.entry.notFoundTitle, copy.entry.notFoundBody, buildPageUrl("library"), copy.entry.back);
     return;
   }
@@ -1097,14 +1099,14 @@ function buildEntryDetailModel(entry) {
   const content = getLocalizedEntry(entry);
   const entryAsset = getEntryDisplayAsset(entry);
   const bannerImage = entry.banner || "";
-  const recipeUrl = hasContentList(entry, "crafting") ? buildPageUrl("crafting", { q: content.title }) : "";
+  const recipeUrl = hasCraftingContent(entry) ? buildPageUrl("crafting", { q: content.title }) : "";
   const summonEntry = findSummonEntry(entry);
   const summonContent = getLocalizedEntry(summonEntry);
   const recipe = parseRecipeModel(entry);
   const usedInEntries = getUsedInEntries(entry).slice(0, 12);
   const relatedEntries = (entry.related ?? [])
     .map((entryId) => getEntryById(entryId))
-    .filter(Boolean);
+    .filter((candidate) => isEntryPublic(candidate) || backendState.isAdmin);
   const relatedBossEntries = relatedEntries.filter((candidate) => isEncounterCategory(candidate?.category));
   const relatedBuffEntries = relatedEntries.filter((candidate) => candidate?.category === "buffs");
   const relatedArmorEntries = relatedEntries.filter((candidate) => candidate?.category === "armor");
@@ -1220,9 +1222,16 @@ function buildEntryNarrativeParagraphs(detailContext) {
           `${title} ocupa um lugar direto no arsenal atual do mod. A pagina nao serve so para listar dano e recipe: ela tambem ajuda a mostrar de onde vem o item, em que etapa ele aparece e como ele conversa com outras pecas do mesmo tier.`
         );
         if (recipe.ingredients.length > 0) {
-          lines.push(
-            `A receita rastreada para essa arma passa por ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` em ${formatStationLabelList(recipe.stations, 2)}` : ""}, o que deixa claro como ela converte recursos de progressao em poder ofensivo imediato.`
-          );
+          if (hasAlternativeRecipeRoutes(entry, recipe)) {
+            lines.push(
+              `A receita rastreada para essa arma possui variantes separadas, hoje organizadas como ${summarizeRecipeRoutes(entry, recipe, 2)}, para evitar misturar componentes de biomas diferentes numa unica linha.`
+            );
+          }
+          else {
+            lines.push(
+              `A receita rastreada para essa arma passa por ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` em ${formatStationLabelList(recipe.stations, 2)}` : ""}, o que deixa claro como ela converte recursos de progressao em poder ofensivo imediato.`
+            );
+          }
         }
         break;
       case "armor":
@@ -1317,8 +1326,12 @@ function buildExpandedFacts(detailContext) {
 
   if (recipe.ingredients.length > 0) {
     lines.push(state.language === "pt-BR"
-      ? `Receita rastreada com ${recipe.ingredients.length} componente(s)`
-      : `Tracked recipe with ${recipe.ingredients.length} component(s)`);
+      ? hasAlternativeRecipeRoutes(detailContext.entry, recipe)
+        ? `${recipe.recipes.length} variante(s) de receita rastreadas`
+        : `Receita rastreada com ${recipe.ingredients.length} componente(s)`
+      : hasAlternativeRecipeRoutes(detailContext.entry, recipe)
+        ? `${recipe.recipes.length} tracked recipe variants`
+        : `Tracked recipe with ${recipe.ingredients.length} component(s)`);
   }
 
   if (recipe.stations.length > 0) {
@@ -1419,8 +1432,14 @@ function buildEntryObtainItems(detailContext) {
     }
 
     if (lines.length === 0 && recipe.ingredients.length > 0) {
-      lines.push(`${title} e obtido principalmente por crafting, nao por drop direto.`);
-      lines.push(`A receita rastreada usa ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` em ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+      if (hasAlternativeRecipeRoutes(entry, recipe)) {
+        lines.push(`${title} e obtido principalmente por crafting, com ${recipe.recipes.length} variantes de receita em vez de um drop direto.`);
+        lines.push(`As rotas rastreadas na wiki hoje sao ${summarizeRecipeRoutes(entry, recipe, 3)}${recipe.stations.length > 0 ? `, todas passando por ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+      }
+      else {
+        lines.push(`${title} e obtido principalmente por crafting, nao por drop direto.`);
+        lines.push(`A receita rastreada usa ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` em ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+      }
     }
 
     if (entry.category === "buffs" && relatedEntries.length > 0) {
@@ -1433,8 +1452,14 @@ function buildEntryObtainItems(detailContext) {
   }
   else {
     if (lines.length === 0 && recipe.ingredients.length > 0) {
-      lines.push(`${title} is primarily obtained through crafting rather than direct drops.`);
-      lines.push(`The tracked recipe uses ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` at ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+      if (hasAlternativeRecipeRoutes(entry, recipe)) {
+        lines.push(`${title} is primarily obtained through crafting, with ${recipe.recipes.length} recipe variants instead of a direct drop.`);
+        lines.push(`The tracked routes currently documented here are ${summarizeRecipeRoutes(entry, recipe, 3)}${recipe.stations.length > 0 ? `, all crafted at ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+      }
+      else {
+        lines.push(`${title} is primarily obtained through crafting rather than direct drops.`);
+        lines.push(`The tracked recipe uses ${formatIngredientLabelList(recipe.ingredients, 4)}${recipe.stations.length > 0 ? ` at ${formatStationLabelList(recipe.stations, 2)}` : ""}.`);
+      }
     }
     if (entry.category === "buffs" && relatedEntries.length > 0) {
       lines.push(`This buff is not obtained directly: it is applied by ${formatEntryTitleList(relatedEntries, 3)}.`);
@@ -1878,7 +1903,10 @@ function renderArmorPieceCard(group) {
     : `<span>${escapeHtml(group.title)}</span>`;
   const recipeStations = group.recipe?.stations ?? [];
   const recipeMarkup = group.recipe && (group.recipe.recipes?.length || group.recipe.ingredients?.length)
-    ? renderRecipeGroupGrid(buildRecipeDisplayGroups(group.entry ?? null, group.recipe, { expandArmorVariants: false, forceSingleGroup: true, fallbackTitle: group.title }), { compact: true })
+    ? renderRecipeGroupGrid(
+      buildRecipeDisplayGroups(group.entry ?? null, group.recipe, { expandArmorVariants: false, forceSingleGroup: true, fallbackTitle: group.title }),
+      { compact: true, hideHead: true, hideStations: true }
+    )
     : "";
 
   return `
@@ -2133,7 +2161,7 @@ function getEntryMentionCandidates() {
     const content = getLocalizedEntry(entry);
     const meta = getEntryMeta(entry);
 
-    [content.title, entry.id, meta.vanillaAlias]
+    [content.title, entry.id, meta.vanillaAlias, ...(meta.codeAliases ?? []), meta.codeTitles?.en, meta.codeTitles?.["pt-BR"]]
       .map((label) => String(label ?? "").trim())
       .filter((label) => label.length >= 4)
       .forEach((label) => {
@@ -3193,13 +3221,15 @@ function renderRecipeGroupGrid(groups, options = {}) {
 
 function renderRecipeGroupCard(group, options = {}) {
   const compact = Boolean(options.compact);
+  const hideHead = Boolean(options.hideHead);
+  const hideStations = Boolean(options.hideStations);
   const imageMarkup = group.imageUrl
     ? `<img class="recipe-piece-card__image" src="${escapeHtml(group.imageUrl)}" alt="${escapeHtml(group.title)}">`
     : `<span class="recipe-piece-card__fallback">${escapeHtml((group.shortLabel || group.title || "?").slice(0, 2).toUpperCase())}</span>`;
   const titleMarkup = group.entry
     ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: group.entry.id })}">${escapeHtml(group.title)}</a>`
     : `<span>${escapeHtml(group.title)}</span>`;
-  const stationMarkup = group.stations.length > 0
+  const stationMarkup = !hideStations && group.stations.length > 0
     ? `
       <div class="recipe-piece-card__stations">
         <strong>${getCopy().crafting.station}</strong>
@@ -3216,17 +3246,24 @@ function renderRecipeGroupCard(group, options = {}) {
       </div>
     `
     : "";
+  const resultAmount = Number(group.resultAmount ?? 1);
+  const outputBadge = resultAmount > 1
+    ? `<div class="tag-row"><span class="inline-tag inline-tag--subtle">x${escapeHtml(resultAmount)}</span></div>`
+    : "";
 
   return `
     <article class="recipe-piece-card${compact ? " recipe-piece-card--compact" : ""}">
-      <div class="recipe-piece-card__head">
-        <div class="recipe-piece-card__media">${imageMarkup}</div>
-        <div class="recipe-piece-card__copy">
-          ${group.groupLabel ? `<span class="recipe-piece-card__eyebrow">${escapeHtml(group.groupLabel)}</span>` : ""}
-          <h4>${titleMarkup}</h4>
-          ${variantsMarkup}
+      ${hideHead ? "" : `
+        <div class="recipe-piece-card__head">
+          <div class="recipe-piece-card__media">${imageMarkup}</div>
+          <div class="recipe-piece-card__copy">
+            ${group.groupLabel ? `<span class="recipe-piece-card__eyebrow">${escapeHtml(group.groupLabel)}</span>` : ""}
+            <h4>${titleMarkup}</h4>
+            ${outputBadge}
+            ${variantsMarkup}
+          </div>
         </div>
-      </div>
+      `}
       ${stationMarkup}
       ${compact
         ? `<div class="recipe-entry-list">${group.ingredients.map((ingredient) => renderRecipeIngredient(ingredient)).join("")}</div>`
@@ -3595,7 +3632,7 @@ function buildPageUrl(page, extraParams = {}) {
 function refreshEntryCache() {
   allEntries = mergeEntries(staticEntries, backendState.publishedEntries ?? []);
   orderedCategories = buildCategoryList(allEntries);
-  craftableEntries = allEntries.filter((entry) => hasContentList(entry, "crafting"));
+  craftableEntries = allEntries.filter((entry) => hasCraftingContent(entry));
   entryMentionCache.language = "";
   entryMentionCache.count = -1;
   entryMentionCache.candidates = [];
@@ -3630,6 +3667,10 @@ function getVisibleEntries() {
   const term = normalize(state.search);
 
   return allEntries.filter((entry) => {
+    if (!isEntryPublic(entry)) {
+      return false;
+    }
+
     if (state.category !== "all" && entry.category !== state.category) {
       return false;
     }
@@ -3646,6 +3687,10 @@ function getVisibleRecipes() {
   const term = normalize(state.search);
 
   return craftableEntries.filter((entry) => {
+    if (!isEntryPublic(entry)) {
+      return false;
+    }
+
     if (state.category !== "all" && entry.category !== state.category) {
       return false;
     }
@@ -3661,13 +3706,14 @@ function getVisibleRecipes() {
 function getHomeFeaturedEntries() {
   const curated = HOME_FEATURED_IDS
     .map((entryId) => getEntryById(entryId))
-    .filter(Boolean);
+    .filter((entry) => isEntryPublic(entry));
 
   if (curated.length >= 4) {
     return curated;
   }
 
   return allEntries
+    .filter((entry) => isEntryPublic(entry))
     .filter((entry) => entry.category !== "blocks" && entry.category !== "events" && entry.category !== "systems")
     .slice(0, 6);
 }
@@ -3688,13 +3734,13 @@ function getAdminBrowserEntries() {
 }
 
 function getEntriesByCategory(category) {
-  return allEntries.filter((entry) => entry.category === category);
+  return allEntries.filter((entry) => isEntryPublic(entry) && entry.category === category);
 }
 
 function getProgressionEntries(groupKey) {
   return (PROGRESSION_ENTRY_IDS[groupKey] ?? [])
     .map((entryId) => getEntryById(entryId))
-    .filter(Boolean)
+    .filter((entry) => isEntryPublic(entry))
     .sort(compareEntries);
 }
 
@@ -3709,6 +3755,10 @@ function getUsedInEntries(entry) {
     .map((value) => normalize(value));
 
   return allEntries.filter((candidate) => {
+    if (!isEntryPublic(candidate)) {
+      return false;
+    }
+
     if (candidate.id === entry.id) {
       return false;
     }
@@ -3725,17 +3775,26 @@ function getUsedInEntries(entry) {
 function findSummonEntry(entry) {
   const directMatch = (entry.related ?? [])
     .map((entryId) => getEntryById(entryId))
-    .find((relatedEntry) => relatedEntry?.category === "summons");
+    .find((relatedEntry) => isEntryPublic(relatedEntry) && relatedEntry?.category === "summons");
 
   if (directMatch) {
     return directMatch;
   }
 
-  return allEntries.find((candidate) => candidate.category === "summons" && (candidate.related ?? []).includes(entry.id));
+  return allEntries.find((candidate) => isEntryPublic(candidate) && candidate.category === "summons" && (candidate.related ?? []).includes(entry.id));
 }
 
 function getEntryMeta(entry) {
   return entry?.content?._meta ?? {};
+}
+
+function isEntryPublic(entry) {
+  return entry?.isPublished !== false;
+}
+
+function getCodeRecipes(entry) {
+  const meta = getEntryMeta(entry);
+  return Array.isArray(meta.codeRecipes) ? meta.codeRecipes : [];
 }
 
 function getEntryLanguageContents(entry) {
@@ -3757,6 +3816,19 @@ function getLocalizedEntry(entry) {
 
   if (String(localizedEntry.title ?? "").trim()) {
     return localizedEntry;
+  }
+
+  const meta = getEntryMeta(entry);
+  const fallbackTitle = String(meta.codeTitles?.[state.language]
+    ?? meta.codeTitles?.[siteConfig.defaultLanguage]
+    ?? meta.codeTitles?.en
+    ?? "").trim();
+
+  if (fallbackTitle) {
+    return {
+      ...localizedEntry,
+      title: fallbackTitle
+    };
   }
 
   return {
@@ -3795,10 +3867,14 @@ function isDefaultEntryImage(imageUrl) {
 function getEntryExternalLookup(entry) {
   const meta = getEntryMeta(entry);
   const content = getLocalizedEntry(entry);
-  return parseTerrariaWikiReference(meta.wikiSource)
-    || String(meta.vanillaAlias ?? "").trim()
-    || String(content.title ?? "").trim()
-    || String(entry?.id ?? "").trim();
+  const explicitLookup = parseTerrariaWikiReference(meta.wikiSource)
+    || String(meta.vanillaAlias ?? "").trim();
+  if (explicitLookup) {
+    return explicitLookup;
+  }
+
+  const titleLookup = String(content.title ?? "").trim();
+  return getExternalAsset(titleLookup) ? titleLookup : "";
 }
 
 function getEntryDisplayAsset(entry, options = {}) {
@@ -3942,6 +4018,7 @@ function getTagLabel(entry) {
 function buildSearchText(entry) {
   const content = getLocalizedEntry(entry);
   const meta = getEntryMeta(entry);
+  const craftingLines = getRecipeSearchLines(entry);
   return [
     entry.id,
     entry.category,
@@ -3951,17 +4028,28 @@ function buildSearchText(entry) {
     content.overview,
     ...(content.facts ?? []),
     ...(content.obtain ?? []),
-    ...(content.crafting ?? []),
+    ...craftingLines,
     ...(content.drops ?? []),
       ...(content.notes ?? []),
       ...(content.tactics ?? []),
       ...(content.pieces ?? []),
       meta.vanillaAlias,
       meta.wikiSource,
+      ...(meta.codeAliases ?? []),
       meta.progressionGate,
       meta.spawnKind,
       meta.eventKey
     ].filter(Boolean).join(" ");
+}
+
+function getRecipeSearchLines(entry) {
+  const content = getLocalizedEntry(entry);
+  const codeRecipes = getCodeRecipes(entry);
+  if (codeRecipes.length > 0) {
+    return buildCodeRecipeLines(codeRecipes);
+  }
+
+  return [...(content.crafting ?? [])];
 }
 
 function mergeEntries(baseEntries, publishedEntries) {
@@ -4221,7 +4309,80 @@ function buildLocalizedContentPayload(baseEntry, draft) {
   return nextContent;
 }
 
+function buildCodeRecipeLines(recipes) {
+  return recipes.map((recipe) => {
+    const ingredientText = (recipe.ingredients ?? [])
+      .map((ingredient) => `${ingredient.label}${ingredient.amount ? ` x${ingredient.amount}` : ""}`)
+      .join(" + ");
+    const stationText = (recipe.stations ?? [])
+      .map((station) => station.label)
+      .join(state.language === "pt-BR" ? " ou " : " or ");
+    const resultPrefix = Number(recipe.resultAmount ?? 1) > 1
+      ? state.language === "pt-BR"
+        ? `Cria x${recipe.resultAmount}: `
+        : `Creates x${recipe.resultAmount}: `
+      : "";
+
+    if (!stationText) {
+      return `${resultPrefix}${ingredientText}`.trim();
+    }
+
+    return `${resultPrefix}${ingredientText}${state.language === "pt-BR" ? " em " : " at "}${stationText}`.trim();
+  });
+}
+
+function mapCodeStation(station) {
+  const match = WORKSTATIONS.find((candidate) => candidate.id === station.id);
+  return match ?? {
+    id: station.id,
+    label: station.label,
+    short: String(station.label ?? "?").slice(0, 2).toUpperCase(),
+    keywords: [normalize(station.label)],
+    lookup: [station.label]
+  };
+}
+
+function mapCodeIngredient(ingredient) {
+  const entry = ingredient.entryId
+    ? getEntryById(ingredient.entryId)
+    : findEntryByMention(ingredient.label, { allowPartial: false }) ?? findEntryByMention(ingredient.label);
+
+  return {
+    raw: ingredient.label,
+    amount: ingredient.amount ? String(ingredient.amount) : "",
+    label: ingredient.label,
+    entry
+  };
+}
+
 function parseRecipeModel(entry, options = {}) {
+  const codeRecipes = getCodeRecipes(entry);
+  if (codeRecipes.length > 0) {
+    const recipes = codeRecipes.map((recipe, index) => ({
+      raw: buildCodeRecipeLines([recipe])[0] ?? `recipe-${index + 1}`,
+      label: "",
+      groupKey: "",
+      resultAmount: Number(recipe.resultAmount ?? 1) || 1,
+      stations: (recipe.stations ?? []).map(mapCodeStation),
+      ingredients: (recipe.ingredients ?? []).map(mapCodeIngredient)
+    }));
+    const stations = [];
+    recipes.forEach((recipe) => {
+      recipe.stations.forEach((station) => {
+        if (!stations.some((candidate) => candidate.id === station.id)) {
+          stations.push(station);
+        }
+      });
+    });
+
+    return {
+      lines: buildCodeRecipeLines(codeRecipes),
+      stations,
+      ingredients: recipes.flatMap((recipe) => recipe.ingredients),
+      recipes
+    };
+  }
+
   const content = getLocalizedEntry(entry);
   const lines = [...(content.crafting ?? [])];
   const stations = extractWorkstations(lines);
@@ -4250,6 +4411,7 @@ function parseRecipeModel(entry, options = {}) {
         raw: line,
         label: groupLabel,
         groupKey: getRecipeGroupKey(groupLabel),
+        resultAmount: 1,
         stations: lineStations.length > 0 ? lineStations : stations,
         ingredients: lineIngredients
       });
@@ -4283,6 +4445,7 @@ function parseRecipeModel(entry, options = {}) {
               ...group,
               label: pieceTitle,
               groupKey: getArmorGroupKey(pieceTitle),
+              resultAmount: Number(group.resultAmount ?? 1) || 1,
               entry: relatedEntry,
               stations: group.stations?.length ? group.stations : relatedRecipe.stations
             });
@@ -4293,6 +4456,7 @@ function parseRecipeModel(entry, options = {}) {
           raw: pieceTitle,
           label: pieceTitle,
           groupKey: getArmorGroupKey(pieceTitle),
+          resultAmount: 1,
           entry: relatedEntry,
           stations: relatedRecipe.stations,
           ingredients: relatedRecipe.ingredients
@@ -4375,6 +4539,123 @@ function getRecipeGroupLabel(groupKey, entry) {
   return labels[groupKey]?.[language] ?? getEntryDisplayTitle(entry);
 }
 
+function getRecipeVariantBadgeLabel() {
+  return state.language === "pt-BR" ? "Variante" : "Variant";
+}
+
+function getRecipeVariantTitle(group, allGroups, entry, index) {
+  const routeKey = inferRecipeVariantRoute(group);
+  if (routeKey === "corruption") {
+    return state.language === "pt-BR" ? "Rota Corruption" : "Corruption route";
+  }
+
+  if (routeKey === "crimson") {
+    return state.language === "pt-BR" ? "Rota Crimson" : "Crimson route";
+  }
+
+  const differentiators = getRecipeDifferentiatorLabels(group, allGroups);
+  if (differentiators.length > 0) {
+    return joinLocalizedList(differentiators.slice(0, 2));
+  }
+
+  const stationDifferentiators = getRecipeDifferentiatorStations(group, allGroups);
+  if (stationDifferentiators.length > 0) {
+    return joinLocalizedList(stationDifferentiators.slice(0, 2));
+  }
+
+  return `${state.language === "pt-BR" ? "Receita" : "Recipe"} ${index + 1}`;
+}
+
+function inferRecipeVariantRoute(group) {
+  const labels = (group.ingredients ?? []).map((ingredient) =>
+    canonicalizeLookupLabel(ingredient.entry ? getEntryDisplayTitle(ingredient.entry) : ingredient.label)
+  );
+
+  if (labels.some((label) => /(demonite|shadow scale|worm food|rotten chunk|ebonwood)/.test(label))) {
+    return "corruption";
+  }
+
+  if (labels.some((label) => /(crimtane|tissue sample|bloody spine|vertebra|shadewood)/.test(label))) {
+    return "crimson";
+  }
+
+  return "";
+}
+
+function getRecipeDifferentiatorLabels(group, allGroups) {
+  if (!Array.isArray(allGroups) || allGroups.length <= 1) {
+    return [];
+  }
+
+  const labelPresence = new Map();
+  allGroups.forEach((candidate) => {
+    const labels = new Set(
+      (candidate.ingredients ?? [])
+        .map((ingredient) => ({
+          key: canonicalizeLookupLabel(ingredient.entry ? getEntryDisplayTitle(ingredient.entry) : ingredient.label),
+          label: ingredient.entry ? getEntryDisplayTitle(ingredient.entry) : humanizeIdentifier(ingredient.label)
+        }))
+        .filter((item) => item.key)
+        .map((item) => JSON.stringify(item))
+    );
+
+    labels.forEach((serialized) => {
+      const item = JSON.parse(serialized);
+      const record = labelPresence.get(item.key) ?? { count: 0, label: item.label };
+      record.count += 1;
+      labelPresence.set(item.key, record);
+    });
+  });
+
+  return dedupeLines(
+    (group.ingredients ?? [])
+      .map((ingredient) => ({
+        key: canonicalizeLookupLabel(ingredient.entry ? getEntryDisplayTitle(ingredient.entry) : ingredient.label),
+        label: ingredient.entry ? getEntryDisplayTitle(ingredient.entry) : humanizeIdentifier(ingredient.label)
+      }))
+      .filter((item) => item.key && (labelPresence.get(item.key)?.count ?? 0) < allGroups.length)
+      .map((item) => item.label)
+  );
+}
+
+function getRecipeDifferentiatorStations(group, allGroups) {
+  if (!Array.isArray(allGroups) || allGroups.length <= 1) {
+    return [];
+  }
+
+  const stationPresence = new Map();
+  allGroups.forEach((candidate) => {
+    const labels = new Set((candidate.stations ?? []).map((station) => canonicalizeLookupLabel(station.label)).filter(Boolean));
+    labels.forEach((label) => {
+      stationPresence.set(label, (stationPresence.get(label) ?? 0) + 1);
+    });
+  });
+
+  return dedupeLines(
+    (group.stations ?? [])
+      .filter((station) => (stationPresence.get(canonicalizeLookupLabel(station.label)) ?? 0) < allGroups.length)
+      .map((station) => station.label)
+  );
+}
+
+function hasAlternativeRecipeRoutes(entry, recipe) {
+  return entry?.category !== "armor" && (recipe?.recipes?.filter((group) => group.ingredients?.length > 0).length ?? 0) > 1;
+}
+
+function summarizeRecipeRoutes(entry, recipe, limit = 3) {
+  const recipeGroups = recipe?.recipes?.filter((group) => group.ingredients?.length > 0) ?? [];
+  if (recipeGroups.length <= 1) {
+    return "";
+  }
+
+  return joinLocalizedList(
+    recipeGroups
+      .map((group, index) => getRecipeVariantTitle(group, recipeGroups, entry, index))
+      .filter(Boolean)
+      .slice(0, limit)
+  );
+}
+
 function buildRecipeDisplayGroups(entry, recipe, options = {}) {
   const recipeGroups = recipe.recipes?.filter((group) => group.ingredients.length > 0) ?? [];
   if (recipeGroups.length === 0) {
@@ -4392,8 +4673,15 @@ function buildRecipeDisplayGroups(entry, recipe, options = {}) {
     });
   }
 
-  if (entry.category !== "armor") {
-    return [];
+  if (entry?.category !== "armor") {
+    if (recipeGroups.length <= 1) {
+      return [];
+    }
+
+    return recipeGroups.map((group, index) => createRecipeDisplayGroup(entry, group, {
+      title: getRecipeVariantTitle(group, recipeGroups, entry, index),
+      groupLabel: getRecipeVariantBadgeLabel()
+    }));
   }
 
   const structuredRecipes = recipeGroups.filter((group) => group.label);
@@ -4437,7 +4725,7 @@ function createRecipeDisplayGroup(entry, group, options = {}) {
   return {
     ...group,
     title: options.title ?? group.label ?? getEntryDisplayTitle(entry),
-    groupLabel: group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : "",
+    groupLabel: options.groupLabel ?? (group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : ""),
     shortLabel: options.title ?? group.label ?? group.groupKey,
     entry: variantEntry,
     variantEntries: options.variantEntries ?? [],
@@ -4634,6 +4922,9 @@ function getEntryLookupCandidates(entry) {
     entry.id,
     meta.vanillaAlias,
     meta.wikiSource,
+    ...(meta.codeAliases ?? []),
+    meta.codeTitles?.en,
+    meta.codeTitles?.["pt-BR"],
     ...getEntryLanguageContents(entry).map((content) => content.title)
   ];
   const candidates = new Set();
@@ -4860,10 +5151,30 @@ function hasContentList(entry, key) {
   return getEntryLanguageContents(entry).some((content) => Array.isArray(content?.[key]) && content[key].length > 0);
 }
 
+function hasCraftingContent(entry) {
+  if (getCodeRecipes(entry).length > 0) {
+    return true;
+  }
+
+  if (hasContentList(entry, "crafting")) {
+    return true;
+  }
+
+  if (entry?.category !== "armor") {
+    return false;
+  }
+
+  return (entry.related ?? [])
+    .map((entryId) => getEntryById(entryId))
+    .some((relatedEntry) => getCodeRecipes(relatedEntry).length > 0 || hasContentList(relatedEntry, "crafting"));
+}
+
 function getEntrySortTitle(entry) {
   return entry?.content?.[siteConfig.defaultLanguage]?.title
     ?? entry?.content?.en?.title
     ?? getEntryLanguageContents(entry)[0]?.title
+    ?? getEntryMeta(entry)?.codeTitles?.[siteConfig.defaultLanguage]
+    ?? getEntryMeta(entry)?.codeTitles?.en
     ?? entry?.id
     ?? "";
 }
@@ -4911,7 +5222,7 @@ function humanizeIdentifier(value) {
     return "";
   }
 
-  return raw
+  const title = raw
     .replace(/\([^)]*\)/g, " ")
     .replace(/[_/\\-]+/g, " ")
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
@@ -4921,6 +5232,8 @@ function humanizeIdentifier(value) {
     .replace(/\s+/g, " ")
     .trim()
     .replace(/\b\w/g, (character) => character.toUpperCase());
+
+  return title.replace(/\b(Of|And|The|Or|At|In|On|For|To)\b/g, (match) => match.toLowerCase());
 }
 
 function buildLookupLabelCandidates(value) {

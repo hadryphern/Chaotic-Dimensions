@@ -9,8 +9,10 @@ const outputPath = path.join(docsRoot, "generated-terraria-assets.js");
 const localImageRoot = path.join(docsRoot, "assets", "images", "vanilla");
 
 const { entries } = await import(pathToFileURL(path.join(docsRoot, "data.js")).href);
-const { frontierEntries } = await import(pathToFileURL(path.join(docsRoot, "orespawn-data.js")).href);
-const { generatedOreSpawnEntries } = await import(pathToFileURL(path.join(docsRoot, "generated-orespawn-data.js")).href);
+const { generatedCodeEntries } = await import(pathToFileURL(path.join(docsRoot, "generated-code-entries.js")).href);
+const { generatedMinecraftLegacyEntries } = await import(pathToFileURL(path.join(docsRoot, "generated-minecraft-legacy-data.js")).href);
+const { generatedReferenceEntries } = await import(pathToFileURL(path.join(docsRoot, "generated-reference-overrides.js")).href);
+const { entryOverrides } = await import(pathToFileURL(path.join(docsRoot, "wiki-overrides.js")).href);
 
 const TERRARIA_WIKI = {
   apiUrl: "https://terraria.wiki.gg/api.php",
@@ -23,15 +25,18 @@ const WORKSTATIONS = [
   { label: "Mythril Anvil", keywords: ["mythril anvil", "orichalcum anvil"] },
   { label: "Adamantite Forge", keywords: ["adamantite forge"] },
   { label: "Anvil", keywords: [" anvil", "anvil "] },
-  { label: "Furnace", keywords: ["hellforge", "forge", "furnace"] }
+  { label: "Furnace", keywords: ["hellforge", "forge", "furnace"] },
+  { label: "Bottles", keywords: [" bottles ", " placed bottle ", " bottle "] }
 ];
 
 const EXPLICIT_PAGE_ALIASES = {
   "lunar bars": "Luminite Bar",
-  "lunar crafting station": "Ancient Manipulator"
+  "lunar crafting station": "Ancient Manipulator",
+  "bottles": "Bottle",
+  "placed bottle": "Bottle"
 };
 
-const allEntries = [...entries, ...generatedOreSpawnEntries, ...frontierEntries];
+const allEntries = [...entries, ...generatedMinecraftLegacyEntries, ...generatedReferenceEntries, ...entryOverrides, ...generatedCodeEntries];
 const existingManifest = await loadExistingManifest();
 const labels = collectLabels(allEntries);
 const manifest = { ...existingManifest };
@@ -88,6 +93,19 @@ function collectLabels(entryList) {
             set.add(cleanLabel(ingredientLabel));
           }
         });
+    });
+
+    const codeRecipes = meta.codeRecipes ?? [];
+    codeRecipes.forEach((recipe) => {
+      (recipe.stations ?? []).forEach((station) => {
+        set.add(cleanLabel(station.label));
+      });
+
+      (recipe.ingredients ?? []).forEach((ingredient) => {
+        if (!findEntryByMention(entryList, ingredient.entryId ?? ingredient.label)) {
+          set.add(cleanLabel(ingredient.label));
+        }
+      });
     });
   }
 
@@ -176,13 +194,40 @@ async function fetchTerrariaWikiAsset(label) {
   const candidates = buildTerrariaWikiCandidates(label);
 
   for (const candidate of candidates) {
-    const asset = await fetchTerrariaWikiPageAsset(candidate);
+    const resolvedTitle = await resolveTerrariaWikiTitle(candidate) || candidate;
+    const parsed = await fetchTerrariaWikiParse(resolvedTitle);
+    const parsedImage = parsed?.parse?.text?.["*"] ? extractTerrariaWikiImage(parsed.parse.text["*"]) : "";
+    if (parsedImage) {
+      return {
+        title: parsed?.parse?.title ?? resolvedTitle,
+        imageUrl: parsedImage,
+        pageUrl: `${TERRARIA_WIKI.pageBaseUrl}${encodeURIComponent((parsed?.parse?.title ?? resolvedTitle).replaceAll(" ", "_"))}`
+      };
+    }
+
+    const asset = await fetchTerrariaWikiPageAsset(resolvedTitle);
     if (asset?.imageUrl) {
       return asset;
     }
   }
 
   return null;
+}
+
+async function resolveTerrariaWikiTitle(candidate) {
+  const url = new URL(TERRARIA_WIKI.apiUrl);
+  url.searchParams.set("action", "query");
+  url.searchParams.set("titles", candidate);
+  url.searchParams.set("redirects", "1");
+  url.searchParams.set("format", "json");
+  const response = await fetchWithRetry(url);
+  if (!response.ok) {
+    return "";
+  }
+
+  const data = await response.json();
+  const page = Object.values(data?.query?.pages ?? {})[0];
+  return page?.missing === "" ? "" : page?.title ?? "";
 }
 
 async function fetchTerrariaWikiParse(title) {

@@ -1068,5 +1068,71 @@ export const entryOverrides = [
         ]
       }
     }
+  },
+  {
+    id: "crystaline-sword",
+    category: "weapons",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "ruby-axe",
+    category: "tools",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "ruby-gem",
+    category: "materials",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "ruby-nugget",
+    category: "materials",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "ruby-ore",
+    category: "materials",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "ruby-pickaxe",
+    category: "tools",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "ruby-sword",
+    category: "weapons",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "shadow-dirt-block-shadow-dirt-tile",
+    category: "blocks",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "shadow-stone-block-shadow-stone-tile",
+    category: "blocks",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "shadow-wood-shadow-wood-tile",
+    category: "blocks",
+    isPublished: false,
+    content: {}
+  },
+  {
+    id: "shadow-grass-tile",
+    category: "blocks",
+    isPublished: false,
+    content: {}
   }
 ];
