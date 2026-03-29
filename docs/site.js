@@ -83,6 +83,7 @@ const WORKSTATIONS = [
   { id: "lunar-crafting-station", label: "Lunar Crafting Station", short: "LC", keywords: ["lunar crafting station"], lookup: ["Lunar Crafting Station"] },
   { id: "ancient-manipulator", label: "Ancient Manipulator", short: "AM", keywords: ["ancient manipulator"], lookup: ["Ancient Manipulator"] },
   { id: "mythril-anvil", label: "Mythril Anvil", short: "MY", keywords: ["mythril anvil", "orichalcum anvil"], lookup: ["Mythril Anvil", "Orichalcum Anvil"] },
+  { id: "godness-anvil", label: "Godness Anvil", short: "GA", keywords: ["godness anvil", "godnessanvil"], lookup: ["Godness Anvil", "GodnessAnvil"] },
   { id: "adamantite-forge", label: "Adamantite Forge", short: "AF", keywords: ["adamantite forge"], lookup: ["Adamantite Forge"] },
   { id: "anvil", label: "Anvil", short: "AN", keywords: [" anvil", "anvil "], lookup: ["Iron Anvil", "Lead Anvil", "Anvil"] },
   { id: "furnace", label: "Furnace", short: "FU", keywords: ["hellforge", "forge", "furnace"], lookup: ["Furnace", "Hellforge"] }
@@ -4548,7 +4549,12 @@ function extractWorkstations(lines) {
   lines.forEach((line) => {
     const normalizedLine = ` ${normalize(line)} `;
     WORKSTATIONS.forEach((station) => {
-      if (station.id === "anvil" && (normalizedLine.includes(" mythril anvil ") || normalizedLine.includes(" orichalcum anvil "))) {
+      if (station.id === "anvil" && (
+        normalizedLine.includes(" mythril anvil ")
+        || normalizedLine.includes(" orichalcum anvil ")
+        || normalizedLine.includes(" godness anvil ")
+        || normalizedLine.includes(" godnessanvil ")
+      )) {
         return;
       }
 
