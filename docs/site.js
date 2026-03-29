@@ -80,12 +80,12 @@ const PROGRESSION_ENTRY_GROUP_LOOKUP = Object.entries(PROGRESSION_ENTRY_IDS)
   }, {});
 
 const WORKSTATIONS = [
-  { id: "lunar-crafting-station", label: "Lunar Crafting Station", short: "LC", keywords: ["lunar crafting station"] },
-  { id: "ancient-manipulator", label: "Ancient Manipulator", short: "AM", keywords: ["ancient manipulator"] },
-  { id: "mythril-anvil", label: "Mythril Anvil", short: "MY", keywords: ["mythril anvil", "orichalcum anvil"] },
-  { id: "adamantite-forge", label: "Adamantite Forge", short: "AF", keywords: ["adamantite forge"] },
-  { id: "anvil", label: "Anvil", short: "AN", keywords: [" anvil", "anvil "] },
-  { id: "furnace", label: "Furnace", short: "FU", keywords: ["hellforge", "forge", "furnace"] }
+  { id: "lunar-crafting-station", label: "Lunar Crafting Station", short: "LC", keywords: ["lunar crafting station"], lookup: ["Lunar Crafting Station"] },
+  { id: "ancient-manipulator", label: "Ancient Manipulator", short: "AM", keywords: ["ancient manipulator"], lookup: ["Ancient Manipulator"] },
+  { id: "mythril-anvil", label: "Mythril Anvil", short: "MY", keywords: ["mythril anvil", "orichalcum anvil"], lookup: ["Mythril Anvil", "Orichalcum Anvil"] },
+  { id: "adamantite-forge", label: "Adamantite Forge", short: "AF", keywords: ["adamantite forge"], lookup: ["Adamantite Forge"] },
+  { id: "anvil", label: "Anvil", short: "AN", keywords: [" anvil", "anvil "], lookup: ["Iron Anvil", "Lead Anvil", "Anvil"] },
+  { id: "furnace", label: "Furnace", short: "FU", keywords: ["hellforge", "forge", "furnace"], lookup: ["Furnace", "Hellforge"] }
 ];
 
 const HOME_FEATURED_IDS = [
@@ -109,7 +109,7 @@ const supportedLanguageOptions = languageOptions
     label: option.code === "en" ? "EN-US" : option.label
   }));
 
-const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, entryOverrides, generatedReferenceEntries);
+const staticEntries = mergeStaticSources(entries, generatedMinecraftLegacyEntries, generatedReferenceEntries, entryOverrides);
 const pageId = document.body.dataset.page ?? "home";
 
 const elements = {
@@ -966,7 +966,8 @@ function renderEntryPage() {
     dropItems,
     pieceItems,
     noteItems,
-    tacticItems
+    tacticItems,
+    armorPresentation
   } = detailModel;
   const detailCopy = getExpandedEntryCopy();
 
@@ -1043,8 +1044,12 @@ function renderEntryPage() {
         ${renderContentBlock(detailCopy.usage, usageItems)}
         ${renderContentBlock(detailCopy.progression, progressionItems)}
         ${renderContentBlock(copy.entry.drops, dropItems)}
-        ${renderContentBlock(copy.entry.pieces, pieceItems)}
-        ${renderContentBlock(copy.entry.notes, noteItems)}
+        ${entry.category === "armor"
+          ? renderArmorPiecesBlock(copy.entry.pieces, armorPresentation)
+          : renderContentBlock(copy.entry.pieces, pieceItems)}
+        ${entry.category === "armor"
+          ? renderArmorNotesBlock(copy.entry.notes, armorPresentation)
+          : renderContentBlock(copy.entry.notes, noteItems)}
         ${renderContentBlock(copy.entry.tactics, tacticItems)}
       </div>
       ${renderLinkedEntriesBlock(copy.entry.usedIn, usedInEntries)}
@@ -1132,7 +1137,8 @@ function buildEntryDetailModel(entry) {
     dropItems: buildEntryDropItems(detailContext),
     pieceItems: buildEntryPieceItems(detailContext),
     noteItems: buildEntryNoteItems(detailContext),
-    tacticItems: buildEntryTacticItems(detailContext)
+    tacticItems: buildEntryTacticItems(detailContext),
+    armorPresentation: buildArmorPresentation(detailContext)
   };
 }
 
@@ -1619,6 +1625,312 @@ function buildEntryNoteItems(detailContext) {
   return dedupeLines(lines);
 }
 
+function buildArmorPresentation(detailContext) {
+  const { entry, content, relatedArmorEntries, noteItems = [], recipe } = detailContext;
+  if (entry.category !== "armor") {
+    return {
+      pieceGroups: [],
+      noteGroups: [],
+      generalNotes: []
+    };
+  }
+
+  const pieceMap = new Map();
+  const relatedByNormalizedTitle = new Map();
+  relatedArmorEntries.forEach((relatedEntry) => {
+    relatedByNormalizedTitle.set(canonicalizeLookupLabel(getLocalizedEntry(relatedEntry).title ?? relatedEntry.id), relatedEntry);
+  });
+
+  const ensureGroup = (rawKey, preferredEntry = null) => {
+    const groupKey = getArmorGroupKey(rawKey);
+    if (!pieceMap.has(groupKey)) {
+      const fallbackEntry = preferredEntry || resolveArmorGroupEntry(groupKey, relatedArmorEntries, relatedByNormalizedTitle);
+      pieceMap.set(groupKey, {
+        key: groupKey,
+        title: getArmorGroupTitle(groupKey, fallbackEntry),
+        entry: fallbackEntry,
+        stats: [],
+        detailCount: 0,
+        recipe: fallbackEntry ? parseRecipeModel(fallbackEntry, { allowDerived: false }) : null
+      });
+    }
+
+    const existing = pieceMap.get(groupKey);
+    if (!existing.entry && preferredEntry) {
+      existing.entry = preferredEntry;
+      existing.title = getArmorGroupTitle(groupKey, preferredEntry);
+      existing.recipe = parseRecipeModel(preferredEntry, { allowDerived: false });
+    }
+    return existing;
+  };
+
+  relatedArmorEntries.forEach((relatedEntry) => {
+    const group = ensureGroup(getLocalizedEntry(relatedEntry).title ?? relatedEntry.id, relatedEntry);
+    const facts = (getLocalizedEntry(relatedEntry).facts ?? []).slice(0, 5);
+    facts.forEach((fact) => {
+      if (!group.stats.includes(fact)) {
+        group.stats.push(fact);
+      }
+    });
+  });
+
+  [...(content.pieces ?? []), ...(content.notes ?? [])].forEach((line) => {
+    const parsed = parseArmorGroupedLine(line);
+    if (!parsed) {
+      return;
+    }
+
+    const relatedEntry = parsed.entrySlug ? getEntryById(parsed.entrySlug) : null;
+    const group = ensureGroup(parsed.groupKey, relatedEntry);
+    if (!group.stats.includes(parsed.value)) {
+      group.stats.push(parsed.value);
+      group.detailCount += 1;
+    }
+  });
+
+  const pieceGroups = ["helmet", "breastplate", "greaves"]
+    .map((key) => pieceMap.get(key))
+    .filter(Boolean)
+    .map((group) => ({
+      ...group,
+      asset: group.entry ? getEntryDisplayAsset(group.entry) : getArmorGroupAsset(entry, group.key)
+    }));
+
+  const noteGroups = ["set-bonus", "set", "general"]
+    .map((key) => pieceMap.get(key))
+    .filter(Boolean);
+
+  const groupedRawValues = new Set(
+    [...pieceGroups, ...noteGroups].flatMap((group) => group.stats.map((value) => String(value ?? "").trim()))
+  );
+  const generalNotes = noteItems.filter((line) => !groupedRawValues.has(String(line ?? "").trim()));
+
+  if (generalNotes.length === 0 && recipe.stations.length > 0) {
+    generalNotes.push(state.language === "pt-BR"
+      ? `A linha de craft deste set passa principalmente por ${formatStationLabelList(recipe.stations, 2)}.`
+      : `The crafting line for this set mainly runs through ${formatStationLabelList(recipe.stations, 2)}.`);
+  }
+
+  return {
+    pieceGroups,
+    noteGroups,
+    generalNotes
+  };
+}
+
+function parseArmorGroupedLine(line) {
+  const text = String(line ?? "").trim();
+  if (!text || !text.includes(":")) {
+    return null;
+  }
+
+  const segments = text
+    .split(":")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+  if (segments.length < 2) {
+    return null;
+  }
+
+  const sectionKey = getArmorGroupKey(segments[0]);
+  if (sectionKey === "pieces" && segments.length >= 3) {
+    const pieceLabel = segments[1];
+    const pieceEntry = findEntryByMention(pieceLabel, { allowPartial: true });
+    return {
+      groupKey: getArmorGroupKey(pieceEntry ? getEntryDisplayTitle(pieceEntry) : pieceLabel),
+      value: segments.slice(2).join(": ").trim(),
+      entrySlug: pieceEntry?.id ?? ""
+    };
+  }
+
+  const entryCandidate = findEntryByMention(segments[0], { allowPartial: true });
+  if (entryCandidate && segments.length >= 2) {
+    return {
+      groupKey: getArmorGroupKey(getEntryDisplayTitle(entryCandidate)),
+      value: segments.slice(1).join(": ").trim(),
+      entrySlug: entryCandidate.id
+    };
+  }
+
+  return {
+    groupKey: sectionKey,
+    value: segments.slice(1).join(": ").trim(),
+    entrySlug: ""
+  };
+}
+
+function getArmorGroupKey(rawKey) {
+  const normalizedKey = canonicalizeLookupLabel(rawKey);
+  if (!normalizedKey) {
+    return "general";
+  }
+
+  if (/(^|\s)(pecas|peças|pieces)(\s|$)/.test(normalizedKey)) {
+    return "pieces";
+  }
+
+  if (/(^|\s)(set bonus|bonus do set|bonus de conjunto)(\s|$)/.test(normalizedKey)) {
+    return "set-bonus";
+  }
+
+  if (/(^|\s)(set|conjunto)(\s|$)/.test(normalizedKey)) {
+    return "set";
+  }
+
+  if (/(^|\s)(helmet|helm|cap|cabeca|cabeça|head)(\s|$)/.test(normalizedKey)) {
+    return "helmet";
+  }
+
+  if (/(^|\s)(breastplate|chestplate|peitoral|chest)(\s|$)/.test(normalizedKey)) {
+    return "breastplate";
+  }
+
+  if (/(^|\s)(greaves|leggings|legs|pants|pernas)(\s|$)/.test(normalizedKey)) {
+    return "greaves";
+  }
+
+  return "general";
+}
+
+function resolveArmorGroupEntry(groupKey, relatedArmorEntries, relatedByNormalizedTitle = new Map()) {
+  if (groupKey === "set-bonus" || groupKey === "set" || groupKey === "general" || groupKey === "pieces") {
+    return null;
+  }
+
+  const exactMatch = relatedArmorEntries.find((relatedEntry) => getArmorGroupKey(getEntryDisplayTitle(relatedEntry)) === groupKey);
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  const titleLookup = {
+    helmet: ["helmet", "helm", "head"],
+    breastplate: ["breastplate", "peitoral", "chestplate"],
+    greaves: ["greaves", "leggings", "legs", "pants"]
+  };
+  const aliases = titleLookup[groupKey] ?? [];
+  const aliasMatch = aliases
+    .map((alias) => relatedByNormalizedTitle.get(canonicalizeLookupLabel(alias)))
+    .find(Boolean);
+
+  return aliasMatch ?? null;
+}
+
+function getArmorGroupTitle(groupKey, entry) {
+  if (entry) {
+    return getEntryDisplayTitle(entry);
+  }
+
+  const labels = {
+    helmet: state.language === "pt-BR" ? "Capacete" : "Helmet",
+    breastplate: state.language === "pt-BR" ? "Peitoral" : "Breastplate",
+    greaves: state.language === "pt-BR" ? "Greaves" : "Greaves",
+    "set-bonus": state.language === "pt-BR" ? "Bonus do Set" : "Set Bonus",
+    set: state.language === "pt-BR" ? "Conjunto" : "Set",
+    general: state.language === "pt-BR" ? "Notas Gerais" : "General Notes"
+  };
+
+  return labels[groupKey] ?? (state.language === "pt-BR" ? "Peca" : "Piece");
+}
+
+function getArmorSectionLabel(groupKey) {
+  return getArmorGroupTitle(groupKey, null);
+}
+
+function getArmorGroupAsset(entry, groupKey) {
+  const guessedImage = guessArmorPieceImage(entry, groupKey);
+  if (guessedImage) {
+    return {
+      imageUrl: guessedImage,
+      sourceType: "guessed"
+    };
+  }
+
+  return getEntryDisplayAsset(entry);
+}
+
+function renderArmorPiecesBlock(label, armorPresentation) {
+  const pieceGroups = armorPresentation?.pieceGroups ?? [];
+  if (!label || pieceGroups.length === 0) {
+    return "";
+  }
+
+  return `
+    <article class="content-block content-block--armor">
+      <div class="content-block-head">
+        <h3>${label}</h3>
+        <span class="subtle-label">${pieceGroups.length}</span>
+      </div>
+      <div class="armor-piece-grid">
+        ${pieceGroups.map((group) => renderArmorPieceCard(group)).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderArmorPieceCard(group) {
+  const asset = group.asset ?? { imageUrl: DEFAULT_ENTRY_IMAGE, sourceType: "default" };
+  const imageMarkup = asset?.imageUrl
+    ? `<img class="armor-piece-card__image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(group.title)}">`
+    : `<span class="armor-piece-card__fallback">${escapeHtml(group.title.slice(0, 2).toUpperCase())}</span>`;
+  const titleMarkup = group.entry
+    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: group.entry.id })}">${escapeHtml(group.title)}</a>`
+    : `<span>${escapeHtml(group.title)}</span>`;
+  const recipeStations = group.recipe?.stations ?? [];
+  const recipeMarkup = group.recipe && (group.recipe.recipes?.length || group.recipe.ingredients?.length)
+    ? renderRecipeGroupGrid(buildRecipeDisplayGroups(group.entry ?? null, group.recipe, { expandArmorVariants: false, forceSingleGroup: true, fallbackTitle: group.title }), { compact: true })
+    : "";
+
+  return `
+    <article class="armor-piece-card">
+      <div class="armor-piece-card__head">
+        <div class="armor-piece-card__media">${imageMarkup}</div>
+        <div class="armor-piece-card__copy">
+          <span class="armor-piece-card__eyebrow">${escapeHtml(getArmorSectionLabel(group.key))}</span>
+          <h4>${titleMarkup}</h4>
+        </div>
+      </div>
+      ${recipeStations.length > 0 ? `
+        <div class="recipe-stations recipe-stations--inline">
+          <strong>${getCopy().crafting.station}</strong>
+          <div class="workstation-list">
+            ${recipeStations.map((station) => renderWorkstationPill(station)).join("")}
+          </div>
+        </div>
+      ` : ""}
+      ${group.stats.length > 0 ? `<div class="armor-piece-card__stats"><ul class="content-list">${group.stats.map((item) => `<li>${renderLinkedText(item)}</li>`).join("")}</ul></div>` : ""}
+      ${recipeMarkup}
+    </article>
+  `;
+}
+
+function renderArmorNotesBlock(label, armorPresentation) {
+  const noteGroups = armorPresentation?.noteGroups ?? [];
+  const generalNotes = armorPresentation?.generalNotes ?? [];
+  if ((!label || noteGroups.length === 0) && generalNotes.length === 0) {
+    return "";
+  }
+
+  return `
+    <article class="content-block content-block--armor-notes">
+      <div class="content-block-head">
+        <h3>${label}</h3>
+        <span class="subtle-label">${noteGroups.length + generalNotes.length}</span>
+      </div>
+      ${noteGroups.length > 0 ? `
+        <div class="armor-note-grid">
+          ${noteGroups.map((group) => `
+            <section class="armor-note-card">
+              <h4>${escapeHtml(getArmorSectionLabel(group.key))}</h4>
+              <ul class="content-list">${group.stats.map((item) => `<li>${renderLinkedText(item)}</li>`).join("")}</ul>
+            </section>
+          `).join("")}
+        </div>
+      ` : ""}
+      ${generalNotes.length > 0 ? `<div class="info-table">${generalNotes.map((item) => renderInfoTableRow(item)).join("")}</div>` : ""}
+    </article>
+  `;
+}
+
 function buildEntryTacticItems(detailContext) {
   const { entry, content, relatedBuffEntries } = detailContext;
   const lines = [...(content.tactics ?? [])];
@@ -1694,14 +2006,18 @@ function renderLinkedEntryRow(entry) {
   const asset = getEntryDisplayAsset(entry);
   const subtitle = String(content.subtitle ?? "").trim();
   const summary = String(content.summary ?? content.overview ?? "").trim();
+  const title = getEntryDisplayTitle(entry);
 
   return `
     <a class="entry-inline-row entry-inline-row--detail" href="${buildPageUrl("entry", { entry: entry.id })}">
-      <img class="entry-inline-row__image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(content.title ?? entry.id)}">
+      <img class="entry-inline-row__image" src="${escapeHtml(asset.imageUrl)}" alt="${escapeHtml(title)}">
       <div class="entry-inline-row__body">
-        <strong>${escapeHtml(content.title ?? entry.id)}</strong>
+        <div class="entry-inline-row__meta">
+          <span class="inline-tag inline-tag--subtle">${getCategoryLabel(entry.category)}</span>
+        </div>
+        <strong>${escapeHtml(title)}</strong>
         ${subtitle ? `<small class="entry-inline-row__subtitle">${escapeHtml(subtitle)}</small>` : ""}
-        ${summary ? `<small class="entry-inline-row__summary">${escapeHtml(summary)}</small>` : ""}
+        ${summary ? `<small class="entry-inline-row__summary">${renderLinkedText(summary)}</small>` : ""}
       </div>
     </a>
   `;
@@ -1881,12 +2197,30 @@ function renderLinkedText(value) {
   let html = "";
   let cursor = 0;
   accepted.forEach((match) => {
+    const linkedEntry = getEntryById(match.entryId);
+    const linkedLabel = linkedEntry
+      ? getPreferredLinkedLabel(linkedEntry, text.slice(match.start, match.end))
+      : text.slice(match.start, match.end);
     html += escapeHtml(text.slice(cursor, match.start));
-    html += `<a class="inline-linked-entry" href="${buildPageUrl("entry", { entry: match.entryId })}">${escapeHtml(text.slice(match.start, match.end))}</a>`;
+    html += `<a class="inline-linked-entry" href="${buildPageUrl("entry", { entry: match.entryId })}">${escapeHtml(linkedLabel)}</a>`;
     cursor = match.end;
   });
   html += escapeHtml(text.slice(cursor));
   return html;
+}
+
+function getPreferredLinkedLabel(entry, originalText) {
+  const entryTitle = getEntryDisplayTitle(entry);
+  const raw = String(originalText ?? "").trim();
+  if (!raw) {
+    return entryTitle;
+  }
+
+  const looksLikeIdentifier = /[_-]/.test(raw)
+    || /[a-z0-9][A-Z]/.test(raw)
+    || (!/\s/.test(raw) && canonicalizeLookupLabel(raw) === canonicalizeLookupLabel(entry.id));
+
+  return looksLikeIdentifier ? entryTitle : raw;
 }
 
 function escapeRegexPattern(value) {
@@ -2874,7 +3208,7 @@ function renderRecipeGroupCard(group, options = {}) {
   const variantsMarkup = group.variantEntries?.length
     ? `
       <div class="recipe-piece-card__variants">
-        ${group.variantEntries.map((variant) => `<span class="inline-tag inline-tag--subtle">${escapeHtml(getLocalizedEntry(variant).title ?? variant.id)}</span>`).join("")}
+        ${group.variantEntries.map((variant) => `<span class="inline-tag inline-tag--subtle">${escapeHtml(getEntryDisplayTitle(variant))}</span>`).join("")}
       </div>
     `
     : "";
@@ -2929,30 +3263,36 @@ function renderRecipeIngredientTable(ingredients, options = {}) {
 }
 
 function renderWorkstationPill(station) {
-  const stationEntry = findEntryByMention(station.label, { allowPartial: false });
+  const stationEntry = findEntryByMention(station.label, { allowPartial: false })
+    || (station.lookup ?? []).map((label) => findEntryByMention(label, { allowPartial: false })).find(Boolean)
+    || null;
   const stationAsset = stationEntry ? getEntryDisplayAsset(stationEntry) : null;
-  const vanillaAsset = !stationEntry ? (getExternalAsset(station.label) || getExternalAsset(station.id)) : null;
+  const vanillaAsset = !stationEntry ? resolveWorkstationExternalAsset(station) : null;
+  const stationLabel = stationEntry
+    ? getEntryDisplayTitle(stationEntry)
+    : vanillaAsset?.label
+      ? humanizeIdentifier(vanillaAsset.label)
+      : humanizeIdentifier(station.label);
   const stationImage = stationAsset?.sourceType && stationAsset.sourceType !== "default"
     ? stationAsset.imageUrl
     : "";
 
   if (!stationEntry && !vanillaAsset) {
-    ensureExternalAsset(station.label);
-    ensureExternalAsset(station.id);
+    getWorkstationLookupLabels(station).forEach((label) => ensureExternalAsset(label));
   }
 
   return `
-    <${stationEntry || vanillaAsset ? "a" : "div"} class="workstation-pill" title="${escapeHtml(station.label)}" ${stationEntry
+    <${stationEntry || vanillaAsset ? "a" : "div"} class="workstation-pill" title="${escapeHtml(stationLabel)}" ${stationEntry
         ? `href="${buildPageUrl("entry", { entry: stationEntry.id })}"`
         : vanillaAsset
           ? `href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer"`
           : ""}>
       ${stationEntry && stationImage
-        ? `<img class="workstation-pill__image" src="${escapeHtml(stationImage)}" alt="${escapeHtml(station.label)}">`
+        ? `<img class="workstation-pill__image" src="${escapeHtml(stationImage)}" alt="${escapeHtml(stationLabel)}">`
         : vanillaAsset?.imageUrl
-          ? `<img class="workstation-pill__image" src="${escapeHtml(vanillaAsset.imageUrl)}" alt="${escapeHtml(station.label)}">`
+          ? `<img class="workstation-pill__image" src="${escapeHtml(vanillaAsset.imageUrl)}" alt="${escapeHtml(stationLabel)}">`
         : `<span class="workstation-pill__icon">${escapeHtml(station.short)}</span>`}
-      <span>${escapeHtml(station.label)}</span>
+      <span>${escapeHtml(stationLabel)}</span>
     </${stationEntry || vanillaAsset ? "a" : "div"}>
   `;
 }
@@ -2967,15 +3307,20 @@ function renderRecipeIngredient(ingredient) {
   const image = entryAsset?.sourceType && entryAsset.sourceType !== "default"
     ? entryAsset.imageUrl
     : vanillaAsset?.imageUrl;
+  const displayLabel = ingredient.entry
+    ? getEntryDisplayTitle(ingredient.entry)
+    : vanillaAsset?.label
+      ? humanizeIdentifier(vanillaAsset.label)
+      : humanizeIdentifier(ingredient.label);
   const labelMarkup = ingredient.entry
-    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(ingredient.label)}</a>`
+    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(displayLabel)}</a>`
     : vanillaAsset
-      ? `<a class="entry-title-link" href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer">${escapeHtml(ingredient.label)}</a>`
-    : `<span>${escapeHtml(ingredient.label)}</span>`;
+      ? `<a class="entry-title-link" href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer">${escapeHtml(displayLabel)}</a>`
+    : `<span>${escapeHtml(displayLabel)}</span>`;
 
   return `
     <div class="recipe-entry">
-      ${image ? `<img class="recipe-entry__image" src="${escapeHtml(image)}" alt="${escapeHtml(ingredient.label)}">` : `<span class="recipe-entry__fallback">${escapeHtml((ingredient.label || "?").slice(0, 2).toUpperCase())}</span>`}
+      ${image ? `<img class="recipe-entry__image" src="${escapeHtml(image)}" alt="${escapeHtml(displayLabel)}">` : `<span class="recipe-entry__fallback">${escapeHtml((displayLabel || "?").slice(0, 2).toUpperCase())}</span>`}
       <div class="recipe-entry__body">
         ${labelMarkup}
         ${ingredient.amount ? `<small>x${escapeHtml(ingredient.amount)}</small>` : ""}
@@ -2994,17 +3339,22 @@ function renderRecipeIngredientRow(ingredient) {
   const image = entryAsset?.sourceType && entryAsset.sourceType !== "default"
     ? entryAsset.imageUrl
     : vanillaAsset?.imageUrl;
+  const displayLabel = ingredient.entry
+    ? getEntryDisplayTitle(ingredient.entry)
+    : vanillaAsset?.label
+      ? humanizeIdentifier(vanillaAsset.label)
+      : humanizeIdentifier(ingredient.label);
   const labelMarkup = ingredient.entry
-    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(ingredient.label)}</a>`
+    ? `<a class="entry-title-link" href="${buildPageUrl("entry", { entry: ingredient.entry.id })}">${escapeHtml(displayLabel)}</a>`
     : vanillaAsset
-      ? `<a class="entry-title-link" href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer">${escapeHtml(ingredient.label)}</a>`
-      : `<span>${escapeHtml(ingredient.label)}</span>`;
+      ? `<a class="entry-title-link" href="${escapeHtml(vanillaAsset.pageUrl)}" target="_blank" rel="noreferrer">${escapeHtml(displayLabel)}</a>`
+      : `<span>${escapeHtml(displayLabel)}</span>`;
 
   return `
     <tr>
       <td>
         <div class="table-entry">
-          ${image ? `<img class="table-entry__image" src="${escapeHtml(image)}" alt="${escapeHtml(ingredient.label)}">` : `<span class="table-entry__fallback">${escapeHtml((ingredient.label || "?").slice(0, 2).toUpperCase())}</span>`}
+          ${image ? `<img class="table-entry__image" src="${escapeHtml(image)}" alt="${escapeHtml(displayLabel)}">` : `<span class="table-entry__fallback">${escapeHtml((displayLabel || "?").slice(0, 2).toUpperCase())}</span>`}
           <div class="table-entry__copy">
             ${labelMarkup}
           </div>
@@ -3013,6 +3363,21 @@ function renderRecipeIngredientRow(ingredient) {
       <td>${ingredient.amount ? `x${escapeHtml(ingredient.amount)}` : "-"}</td>
     </tr>
   `;
+}
+
+function getWorkstationLookupLabels(station) {
+  return [...new Set([
+    station.label,
+    station.id,
+    ...(station.lookup ?? [])
+  ].map((value) => String(value ?? "").trim()).filter(Boolean))];
+}
+
+function resolveWorkstationExternalAsset(station) {
+  return getWorkstationLookupLabels(station)
+    .map((label) => getExternalAsset(label))
+    .find(Boolean)
+    ?? null;
 }
 
 function renderProgressionCard(entry) {
@@ -3089,7 +3454,7 @@ function renderInfoTableRow(item) {
     const value = text.slice(separatorIndex + 1).trim();
     return `
       <div class="info-table__row">
-        <div class="info-table__label">${escapeHtml(label)}</div>
+        <div class="info-table__label">${escapeHtml(humanizeIdentifier(label))}</div>
         <div class="info-table__value">${renderLinkedText(value)}</div>
       </div>
     `;
@@ -3380,11 +3745,29 @@ function getLocalizedEntry(entry) {
     return {};
   }
 
-  return entry.content?.[state.language]
+  const localizedEntry = entry.content?.[state.language]
     ?? entry.content?.[siteConfig.defaultLanguage]
     ?? entry.content?.en
     ?? getEntryLanguageContents(entry)[0]
     ?? {};
+
+  if (String(localizedEntry.title ?? "").trim()) {
+    return localizedEntry;
+  }
+
+  return {
+    ...localizedEntry,
+    title: humanizeIdentifier(entry.id)
+  };
+}
+
+function getEntryDisplayTitle(entry) {
+  if (!entry) {
+    return "";
+  }
+
+  const localizedEntry = getLocalizedEntry(entry);
+  return String(localizedEntry.title ?? "").trim() || humanizeIdentifier(entry.id);
 }
 
 function getCategoryLabel(category) {
@@ -3834,9 +4217,9 @@ function buildLocalizedContentPayload(baseEntry, draft) {
   return nextContent;
 }
 
-function parseRecipeModel(entry) {
+function parseRecipeModel(entry, options = {}) {
   const content = getLocalizedEntry(entry);
-  const lines = content.crafting ?? [];
+  const lines = [...(content.crafting ?? [])];
   const stations = extractWorkstations(lines);
   const ingredients = [];
   const recipes = [];
@@ -3868,6 +4251,58 @@ function parseRecipeModel(entry) {
       });
     }
   });
+
+  const allowDerived = options.allowDerived !== false;
+  if (allowDerived && lines.length === 0 && entry?.category === "armor") {
+    const relatedArmorEntries = (entry.related ?? [])
+      .map((entryId) => getEntryById(entryId))
+      .filter((relatedEntry) => relatedEntry?.category === "armor" && relatedEntry.id !== entry.id);
+
+    const seenStations = new Set(stations.map((station) => station.id));
+    relatedArmorEntries.forEach((relatedEntry) => {
+      const relatedRecipe = parseRecipeModel(relatedEntry, { allowDerived: false });
+      const pieceTitle = getEntryDisplayTitle(relatedEntry);
+      relatedRecipe.stations.forEach((station) => {
+        if (!seenStations.has(station.id)) {
+          seenStations.add(station.id);
+          stations.push(station);
+        }
+      });
+
+      ingredients.push(...relatedRecipe.ingredients);
+
+      if (relatedRecipe.recipes.length > 0) {
+        relatedRecipe.recipes
+          .filter((group) => group.ingredients.length > 0)
+          .forEach((group) => {
+            recipes.push({
+              ...group,
+              label: pieceTitle,
+              groupKey: getArmorGroupKey(pieceTitle),
+              entry: relatedEntry,
+              stations: group.stations?.length ? group.stations : relatedRecipe.stations
+            });
+          });
+      }
+      else if (relatedRecipe.ingredients.length > 0) {
+        recipes.push({
+          raw: pieceTitle,
+          label: pieceTitle,
+          groupKey: getArmorGroupKey(pieceTitle),
+          entry: relatedEntry,
+          stations: relatedRecipe.stations,
+          ingredients: relatedRecipe.ingredients
+        });
+      }
+
+      if (relatedRecipe.lines.length > 0) {
+        relatedRecipe.lines.forEach((line) => {
+          const stripped = stripStationClause(line);
+          lines.push(`${pieceTitle}: ${stripped || line}`);
+        });
+      }
+    });
+  }
 
   return {
     lines,
@@ -3910,7 +4345,7 @@ function getRecipeGroupKey(label) {
   }
 
   if (/(^|\s)(helm|helms|helmet|helmets)(\s|$)/.test(normalizedLabel)) {
-    return "helm";
+    return "helmet";
   }
 
   return normalizedLabel;
@@ -3927,31 +4362,47 @@ function getRecipeGroupLabel(groupKey, entry) {
       "pt-BR": "Greaves",
       en: "Greaves"
     },
-    helm: {
-      "pt-BR": "Helms",
-      en: "Helms"
+    helmet: {
+      "pt-BR": "Capacete",
+      en: "Helmet"
     }
   };
 
-  return labels[groupKey]?.[language] ?? (getLocalizedEntry(entry).title ?? entry.id);
+  return labels[groupKey]?.[language] ?? getEntryDisplayTitle(entry);
 }
 
 function buildRecipeDisplayGroups(entry, recipe, options = {}) {
-  const structuredRecipes = recipe.recipes?.filter((group) => group.ingredients.length > 0 && group.label) ?? [];
-  if (structuredRecipes.length === 0 || entry.category !== "armor") {
+  const recipeGroups = recipe.recipes?.filter((group) => group.ingredients.length > 0) ?? [];
+  if (recipeGroups.length === 0) {
     return [];
   }
 
+  const forceSingleGroup = Boolean(options.forceSingleGroup);
+  if (forceSingleGroup) {
+    return recipeGroups.map((group) => {
+      const targetEntry = group.entry ?? options.entry ?? entry ?? null;
+      return createRecipeDisplayGroup(targetEntry ?? entry, group, {
+        title: options.fallbackTitle ?? group.label ?? getEntryDisplayTitle(targetEntry ?? entry),
+        entry: targetEntry
+      });
+    });
+  }
+
+  if (entry.category !== "armor") {
+    return [];
+  }
+
+  const structuredRecipes = recipeGroups.filter((group) => group.label);
   const expandArmorVariants = Boolean(options.expandArmorVariants);
   const armorVariants = getArmorRecipeVariants(entry);
   const output = [];
 
   structuredRecipes.forEach((group) => {
-    if (group.groupKey === "helm" && armorVariants.length > 0) {
+    if ((group.groupKey === "helmet" || group.groupKey === "helm") && armorVariants.length > 0 && !group.entry) {
       if (expandArmorVariants) {
         armorVariants.forEach((variant) => {
           output.push(createRecipeDisplayGroup(entry, group, {
-            title: getLocalizedEntry(variant).title ?? variant.id,
+            title: getEntryDisplayTitle(variant),
             entry: variant
           }));
         });
@@ -3967,7 +4418,8 @@ function buildRecipeDisplayGroups(entry, recipe, options = {}) {
     }
 
     output.push(createRecipeDisplayGroup(entry, group, {
-      title: group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : group.label || getLocalizedEntry(entry).title || entry.id
+      title: group.entry ? getEntryDisplayTitle(group.entry) : (group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : group.label || getEntryDisplayTitle(entry)),
+      entry: group.entry ?? null
     }));
   });
 
@@ -3980,7 +4432,7 @@ function createRecipeDisplayGroup(entry, group, options = {}) {
 
   return {
     ...group,
-    title: options.title ?? group.label ?? getLocalizedEntry(entry).title ?? entry.id,
+    title: options.title ?? group.label ?? getEntryDisplayTitle(entry),
     groupLabel: group.groupKey ? getRecipeGroupLabel(group.groupKey, entry) : "",
     shortLabel: options.title ?? group.label ?? group.groupKey,
     entry: variantEntry,
@@ -4020,7 +4472,7 @@ function getRecipeDisplayGroupAsset(entry, group, variantEntry, variantEntries =
     return getEntryDisplayAsset(entry);
   }
 
-  if (group.groupKey === "helm" && variantEntries.length > 0) {
+  if ((group.groupKey === "helmet" || group.groupKey === "helm") && variantEntries.length > 0) {
     return getRecipeDisplayGroupAsset(entry, group, variantEntries[0], []);
   }
 
@@ -4442,6 +4894,24 @@ function canonicalizeLookupLabel(value) {
       .replace(/^the\s+/, "")
       .trim()
   );
+}
+
+function humanizeIdentifier(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) {
+    return "";
+  }
+
+  return raw
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[_/\\-]+/g, " ")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .replace(/\s+x\d+(?:-\d+)?$/i, " ")
+    .replace(/^\d+(?:-\d+)?\s+/, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function buildLookupLabelCandidates(value) {

@@ -508,6 +508,8 @@ export const generatedReferenceEntries = [
           "valor: 2 gold",
           "material central do tier Crystaline",
           "dropado em grande quantidade pelo Crystaline Devourer",
+          "visualmente e o recurso-simbolo do pos-Moon Lord atual do mod",
+          "ele e o material que mais comunica ao jogador que o encontro Crystaline Devourer foi superado com sucesso",
         ],
       }
     }
@@ -802,6 +804,7 @@ export const generatedReferenceEntries = [
           "Status atual: item e tile existem em codigo",
           "Status atual: recipes que dependem dela ja estao prontas",
           "Status atual: a rota de aquisicao natural ainda precisa do gancho final de boss/drop",
+          "Status atual: a estacao agora ja possui apresentacao visual propria no projeto, tanto para o item quanto para a versao colocada no mundo",
           "Status atual: estacao placeable",
           "Status atual: raridade: Red",
           "Status atual: valor: 2 platinum",
@@ -1405,6 +1408,9 @@ export const generatedReferenceEntries = [
           "Quebra: requer 180 pick power",
           "Quebra: MineResist = 3.4",
           "Mensagem ao nascer: Seu mundo foi abencoado com Minerio de Rosalita!",
+          "Leitura de progressao: RosalitaOre e o elo entre o hardmode vanilla alto e o late game proprio do mod",
+          "Leitura de progressao: ela prepara o jogador para receitas que ja comecam a conversar com materiais Shadow",
+          "Leitura de progressao: o minerio tambem ja tem sprite propria no projeto para reforcar a identidade do tier",
           "Mensagem do ShadowOre: Seu mundo foi abencoado com Minerio de Sombra!",
         ],
       }
@@ -1782,18 +1788,19 @@ export const generatedReferenceEntries = [
           "bloco base do solo do ShadowBiome",
           "dropado ao minerar ShadowGrassTile",
           "hit sound de terra",
+          "item e tile possuem identidade visual propria dentro do projeto atual",
         ],
       }
     }
   },
   {
     id: "shadow-eye",
-    category: "accessories",
+    category: "mobs",
     content: {
       "pt-BR": {
         title: "Shadow Eye",
-        summary: "Shadow Eye e um acessorio documentado na referencia atual, com efeitos, condicoes de uso e papel claro dentro do mod.",
-        overview: "Shadow Eye e um acessorio documentado na referencia atual, com efeitos, condicoes de uso e papel claro dentro do mod.",
+        summary: "Shadow Eye ja existe em codigo e tem comportamento, stats, spawn e drops descritos na referencia oficial do mod.",
+        overview: "Shadow Eye ja existe em codigo e tem comportamento, stats, spawn e drops descritos na referencia oficial do mod.",
         notes: [
           "vida: 620",
           "dano: 82",
@@ -1833,6 +1840,7 @@ export const generatedReferenceEntries = [
           "versao coberta de grama do ShadowBiome",
           "se houver bloco solido acima, volta para ShadowDirtTile",
           "espalha horizontalmente para ShadowDirtTile exposto",
+          "serve como leitura visual imediata de superficie corrompida pelo ShadowBiome",
         ],
       }
     }
@@ -1920,6 +1928,9 @@ export const generatedReferenceEntries = [
           "Stats do tile: conta como minerio real",
           "Stats do tile: pode ser rastreado por Spelunker",
           "Stats do tile: fadas podem puxar o jogador ate ele",
+          "Observacao visual e de uso: o minerio possui item e presenca de mundo separados",
+          "Observacao visual e de uso: o objetivo e fazer ShadowOre parecer um recurso de tier final do ShadowBiome, e nao so um recolor de minerio vanilla",
+          "Observacao visual e de uso: ele e tratado como o metal-base da ascensao Shadow",
         ],
       }
     }
@@ -2012,10 +2023,11 @@ export const generatedReferenceEntries = [
       "pt-BR": {
         title: "Shadow Stone Block / Shadow Stone Tile",
         summary: "Shadow Stone Block / Shadow Stone Tile faz parte da estrutura de blocos, tiles ou estacoes ja descritas na referencia atual do mod.",
-        overview: "Shadow Stone Block / Shadow Stone Tile faz parte da estrutura de blocos, tiles ou estacoes ja descritas na referencia atual do mod.",
+        overview: "Shadow Stone Block / Shadow Stone Tile faz parte da estrutura de blocos, tiles ou estacoes ja descritas na referencia atual do mod. foi pensada para vender a sensacao de camada mineral morta/escurecida do bioma",
         notes: [
           "pedra base do ShadowBiome",
           "dropa o item placeable correspondente",
+          "foi pensada para vender a sensacao de camada mineral morta/escurecida do bioma",
         ],
       }
     }
@@ -2118,10 +2130,12 @@ export const generatedReferenceEntries = [
       "pt-BR": {
         title: "Shadow Wood / Shadow Wood Tile",
         summary: "Shadow Wood / Shadow Wood Tile faz parte da estrutura de blocos, tiles ou estacoes ja descritas na referencia atual do mod.",
-        overview: "Shadow Wood / Shadow Wood Tile faz parte da estrutura de blocos, tiles ou estacoes ja descritas na referencia atual do mod.",
+        overview: "Shadow Wood / Shadow Wood Tile faz parte da estrutura de blocos, tiles ou estacoes ja descritas na referencia atual do mod. funciona tanto como material de ambientacao quanto como bloco utilitario placeable",
         notes: [
           "madeira roxa/morta do bioma",
           "usada para arvores do ShadowBiome",
+          "funciona tanto como material de ambientacao quanto como bloco utilitario placeable",
+          "item e tile ja possuem arte dedicada para manter coerencia entre mundo e inventario",
         ],
       }
     }

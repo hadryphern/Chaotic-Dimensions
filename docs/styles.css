@@ -2227,6 +2227,149 @@ h3 {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+.entry-inline-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.entry-inline-row strong {
+  line-height: 1.35;
+}
+
+.entry-inline-row__subtitle,
+.entry-inline-row__summary {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.entry-inline-row__summary {
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+.content-block--armor,
+.content-block--armor-notes {
+  display: grid;
+  gap: 18px;
+}
+
+.armor-piece-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.armor-piece-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-medium);
+  background-image: var(--theme-panel-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.armor-piece-card__head {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+
+.armor-piece-card__media {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.armor-piece-card__image,
+.armor-piece-card__fallback {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.armor-piece-card__fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.armor-piece-card__copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.armor-piece-card__copy h4 {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.3;
+}
+
+.armor-piece-card__eyebrow {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.armor-piece-card__stats {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(124, 99, 170, 0.45);
+  border-radius: var(--radius-small);
+  background: rgba(9, 7, 19, 0.34);
+}
+
+.recipe-stations--inline {
+  margin-top: 2px;
+}
+
+.recipe-stations--inline strong {
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.armor-note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.armor-note-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-medium);
+  background-image: var(--theme-panel-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.armor-note-card h4 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 @media (max-width: 1180px) {
   .home-hero,
   .catalog-layout,
