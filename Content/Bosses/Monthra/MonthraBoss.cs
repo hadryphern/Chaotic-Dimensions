@@ -52,7 +52,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			NPC.noGravity = true;
 			NPC.noTileCollide = true;
 			NPC.netAlways = true;
-			Music = MusicID.Boss3;
+			Music = MusicID.Boss2;
 		}
 
 		public override void ApplyDifficultyAndPlayerScaling(int numPlayers, float balance, float bossAdjustment) {

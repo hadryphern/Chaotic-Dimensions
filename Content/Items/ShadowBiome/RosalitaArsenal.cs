@@ -170,8 +170,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/RosalitaWand";
 
 		public override void SetDefaults() {
-			Item.width = 32;
-			Item.height = 48;
+			Item.width = 42;
+			Item.height = 40;
 			Item.damage = 118;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 12;
@@ -334,8 +334,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/EclipsedMonthraBow";
 
 		public override void SetDefaults() {
-			Item.width = 34;
-			Item.height = 58;
+			Item.width = 18;
+			Item.height = 40;
 			Item.damage = 480;
 			Item.DamageType = DamageClass.Ranged;
 			Item.useStyle = ItemUseStyleID.Shoot;
@@ -370,7 +370,7 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 
 		public override void SetDefaults() {
 			Item.width = 34;
-			Item.height = 54;
+			Item.height = 34;
 			Item.damage = 500;
 			Item.DamageType = DamageClass.Magic;
 			Item.mana = 18;

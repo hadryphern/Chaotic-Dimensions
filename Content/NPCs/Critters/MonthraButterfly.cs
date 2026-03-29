@@ -1,9 +1,8 @@
 using ChaoticDimensions.Content.Bosses.Monthra;
+using ChaoticDimensions.Common.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.Chat;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace ChaoticDimensions.Content.NPCs.Critters
@@ -81,22 +80,17 @@ namespace ChaoticDimensions.Content.NPCs.Critters
 		}
 
 		public override void OnKill() {
-			if (NPC.AnyNPCs(ModContent.NPCType<MonthraBoss>()) || Main.netMode == NetmodeID.MultiplayerClient) {
+			if (NPC.AnyNPCs(ModContent.NPCType<MonthraBoss>()) || MonthraIntroSystem.IsActive) {
 				return;
 			}
 
 			int targetPlayer = Player.FindClosest(NPC.position, NPC.width, NPC.height);
-			int bossIndex = NPC.NewNPC(NPC.GetSource_Death(), (int)NPC.Center.X, (int)NPC.Center.Y - 320, ModContent.NPCType<MonthraBoss>(), Target: targetPlayer);
-			if (bossIndex < Main.maxNPCs) {
-				Main.npc[bossIndex].TargetClosest();
-				Main.npc[bossIndex].netUpdate = true;
+			if (Main.netMode == NetmodeID.Server) {
+				return;
 			}
 
-			if (Main.netMode == NetmodeID.Server) {
-				ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("Monthra desce do crepusculo..."), new Color(110, 225, 150));
-			}
-			else {
-				Main.NewText("Monthra desce do crepusculo...", 110, 225, 150);
+			if (Main.myPlayer == targetPlayer) {
+				MonthraIntroSystem.StartIntro(Main.player[targetPlayer]);
 			}
 		}
 	}

@@ -10,7 +10,7 @@ namespace ChaoticDimensions.Content.Scenes
 	{
 		public override SceneEffectPriority Priority => SceneEffectPriority.BossHigh;
 
-		public override int Music => MusicLoader.GetMusicSlot(Mod, "Sounds/Music/CrystalineWorm");
+		public override int Music => MusicLoader.GetMusicSlot(Mod, "Sounds/Music/CrystalineDevour");
 
 		public override bool IsSceneEffectActive(Player player) {
 			if (!player.active || player.dead) {

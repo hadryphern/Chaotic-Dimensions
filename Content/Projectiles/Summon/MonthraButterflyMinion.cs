@@ -74,8 +74,10 @@ namespace ChaoticDimensions.Content.Projectiles.Summon
 				}
 			}
 
-			Projectile.rotation = Projectile.velocity.X * 0.06f;
-			Projectile.spriteDirection = Projectile.velocity.X >= 0f ? 1 : -1;
+			// The butterfly sprite faces the opposite direction from Terraria's usual projectile convention.
+			Projectile.rotation = Projectile.velocity.X * -0.06f;
+			Projectile.direction = Projectile.velocity.X >= 0f ? -1 : 1;
+			Projectile.spriteDirection = Projectile.direction;
 		}
 
 		private void Animate() {
