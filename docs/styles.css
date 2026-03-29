@@ -2375,6 +2375,120 @@ h3 {
   text-transform: uppercase;
 }
 
+.progress-card--timeline,
+.guide-boss-section {
+  gap: 18px;
+}
+
+.guide-boss-head {
+  display: grid;
+  gap: 16px;
+}
+
+.timeline-card-head,
+.guide-boss-title {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.timeline-card-copy,
+.guide-boss-copy,
+.guide-stack,
+.guide-reference-table {
+  display: grid;
+  gap: 12px;
+}
+
+.timeline-card-copy h3,
+.guide-boss-copy h2 {
+  margin: 0;
+  line-height: 1.08;
+}
+
+.guide-visual {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 12px;
+}
+
+.guide-visual--fallback {
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.guide-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.guide-overview-grid--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guide-class-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.guide-reference-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.guide-reference-row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.guide-reference-label {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.guide-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.guide-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(24, 20, 39, 0.88);
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.guide-chip:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
 @media (max-width: 1180px) {
   .home-hero,
   .catalog-layout,
@@ -2382,7 +2496,9 @@ h3 {
   .content-grid,
   .summary-grid,
   .feature-grid--index,
-  .progress-detail-grid {
+  .progress-detail-grid,
+  .guide-overview-grid,
+  .guide-class-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2422,5 +2538,11 @@ h3 {
   .table-entry__fallback {
     width: 36px;
     height: 36px;
+  }
+
+  .timeline-card-head,
+  .guide-boss-title,
+  .guide-reference-row {
+    grid-template-columns: 1fr;
   }
 }

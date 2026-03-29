@@ -3,6 +3,7 @@ import { generatedCodeEntries } from "./generated-code-entries.js";
 import { generatedMinecraftLegacyEntries } from "./generated-minecraft-legacy-data.js";
 import { generatedReferenceEntries } from "./generated-reference-overrides.js";
 import { generatedTerrariaAssets } from "./generated-terraria-assets.js";
+import { bossGuideEntries, guidePhaseOrder, guideSetupPresets } from "./guide-data.js";
 import { entryOverrides } from "./wiki-overrides.js";
 import {
   backendState,
@@ -26,6 +27,7 @@ const PAGE_FILES = {
   entry: "entry.html",
   crafting: "crafting.html",
   progression: "progression.html",
+  guide: "guide.html",
   feedback: "feedback.html",
   admin: "admin.html"
 };
@@ -60,15 +62,13 @@ const ENTRY_TAGS = {
   "crystaline-devourer": "boss"
 };
 
-const PROGRESSION_GROUPS = [
-  { key: "pre_hardmode" },
-  { key: "pre_moonlord" },
-  { key: "post_moonlord" }
-];
+const PROGRESSION_GROUPS = guidePhaseOrder.map((key) => ({ key }));
 
 const PROGRESSION_ENTRY_IDS = {
   pre_hardmode: ["monthra"],
-  pre_moonlord: [],
+  early_hardmode: [],
+  late_hardmode: [],
+  celestial: [],
   post_moonlord: ["crystaline-devourer"]
 };
 
@@ -130,6 +130,7 @@ const pageCopy = {
       library: "Biblioteca",
       crafting: "Crafting",
       progression: "Progressao",
+      guide: "Guide",
       feedback: "Feedback",
       admin: "Admin"
     },
@@ -147,6 +148,7 @@ const pageCopy = {
         { page: "library", title: "Biblioteca", body: "A Biblioteca reune as paginas principais da wiki em um catalogo pesquisavel, com filtros por categoria e acesso rapido para itens, mobs, bosses, materiais e sistemas." },
         { page: "crafting", title: "Crafting", body: "A area de Crafting foi separada para mostrar receitas com mais clareza, destacando estacoes de trabalho, ingredientes, sprites e relacoes entre os itens usados." },
         { page: "progression", title: "Progressao", body: "A pagina de Progressao organiza a rota do mod por etapas, encontros e marcos importantes, facilitando entender quando cada boss, mob ou sistema entra em cena." },
+        { page: "guide", title: "Guide", body: "A Guide organiza preparacao por boss e por classe, sugerindo armaduras, armas, acessorios e buffs mais fortes para cada janela da progressao." },
         { page: "feedback", title: "Feedback", body: "Feedback concentra comentarios, contas e retorno da comunidade sem poluir a parte enciclopedica da wiki, deixando o restante do site mais limpo e focado." }
       ],
       categoryTitle: "Categorias ativas",
@@ -198,24 +200,58 @@ const pageCopy = {
     },
     progression: {
       title: "Progressao",
-      body: "Acompanhe apenas os bosses e mini-bosses reais do mod, separados pela etapa em que entram na progressao.",
+      body: "Acompanhe a linha completa do vanilla e veja exatamente onde os bosses do Chaotic Dimensions entram na rota.",
       open: "Abrir pagina",
+      guide: "Abrir guide",
       summon: "Invocacao",
       crafting: "Como chamar",
       curiosities: "Curiosidades",
       groups: {
         pre_hardmode: {
           title: "Pre-Hardmode",
-          body: "Encontros oficiais do inicio do mod, antes do hardmode."
+          body: "Toda a rota vanilla antes do hardmode, incluindo o encaixe da Monthra."
         },
-        pre_moonlord: {
-          title: "Pre-Moon Lord",
-          body: "Faixa reservada para futuros bosses e mini-bosses do hardmode."
+        early_hardmode: {
+          title: "Early Hardmode",
+          body: "Abertura do hardmode, Queen Slime e trio dos mechs."
+        },
+        late_hardmode: {
+          title: "Late Hardmode",
+          body: "Plantera, Golem e os bosses opcionais que moldam o endgame vanilla."
+        },
+        celestial: {
+          title: "Celestial",
+          body: "Cultist, pilares e Moon Lord, a reta final do vanilla."
         },
         post_moonlord: {
           title: "Post-Moon Lord",
-          body: "Bosses oficiais do endgame atual, depois do Moon Lord."
+          body: "A entrada do late game proprio do Chaotic Dimensions."
         }
+      }
+    },
+    guide: {
+      title: "Guide de classes",
+      body: "Uma pagina de setups por boss, separada por Melee, Ranged, Magic e Summoner, para voce saber o melhor ponto de entrada de cada luta.",
+      browse: "Bosses da guide",
+      when: "Quando lutar",
+      arena: "Arena e posicionamento",
+      focus: "Foco da luta",
+      armor: "Armadura",
+      weapons: "Armas",
+      accessories: "Acessorios",
+      buffs: "Buffs",
+      notes: "Notas da classe",
+      sourceVanilla: "Vanilla",
+      sourceMod: "Chaotic Dimensions",
+      optional: "Opcional",
+      main: "Principal",
+      openWiki: "Abrir wiki",
+      openGuide: "Abrir secao",
+      classes: {
+        melee: "Melee",
+        ranged: "Ranged",
+        magic: "Magic",
+        summoner: "Summoner"
       }
     },
     feedback: {
@@ -344,6 +380,7 @@ const pageCopy = {
       library: "Library",
       crafting: "Crafting",
       progression: "Progression",
+      guide: "Guide",
       feedback: "Feedback",
       admin: "Admin"
     },
@@ -361,6 +398,7 @@ const pageCopy = {
         { page: "library", title: "Library", body: "The Library gathers the main wiki pages in a searchable catalogue with category filters and cleaner access to items, mobs, bosses, materials and systems." },
         { page: "crafting", title: "Crafting", body: "Crafting has its own space so recipes can breathe, with workstations, ingredients, sprites and item relationships displayed more clearly." },
         { page: "progression", title: "Progression", body: "The Progression page arranges the mod by stages, encounters and milestones so it is easier to understand when each boss, mob or system enters the journey." },
+        { page: "guide", title: "Guide", body: "Guide turns every boss into a class setup checkpoint, suggesting armor, weapons, accessories and buffs for melee, ranged, magic and summoner." },
         { page: "feedback", title: "Feedback", body: "Feedback centralizes comments, accounts and community notes without cluttering the encyclopedic side of the wiki." }
       ],
       categoryTitle: "Active categories",
@@ -412,24 +450,58 @@ const pageCopy = {
     },
     progression: {
       title: "Progression",
-      body: "Track only the mod's real bosses and minibosses, grouped by the stage where they enter progression.",
+      body: "Track the full vanilla route and see exactly where Chaotic Dimensions bosses fit in that order.",
       open: "Open page",
+      guide: "Open guide",
       summon: "Summon",
       crafting: "How to call it",
       curiosities: "Notes",
       groups: {
         pre_hardmode: {
           title: "Pre-Hardmode",
-          body: "Official early-mod encounters that happen before hardmode."
+          body: "The full vanilla route before Hardmode, including Monthra's place in it."
         },
-        pre_moonlord: {
-          title: "Pre-Moon Lord",
-          body: "Reserved for future hardmode bosses and minibosses."
+        early_hardmode: {
+          title: "Early Hardmode",
+          body: "Hardmode opening, Queen Slime, and the mech trio."
+        },
+        late_hardmode: {
+          title: "Late Hardmode",
+          body: "Plantera, Golem, and the optional bosses that shape late vanilla progression."
+        },
+        celestial: {
+          title: "Celestial",
+          body: "Cultist, pillars, and Moon Lord, the final vanilla run."
         },
         post_moonlord: {
           title: "Post-Moon Lord",
-          body: "Official endgame bosses that come after Moon Lord."
+          body: "The point where Chaotic Dimensions begins its own late game."
         }
+      }
+    },
+    guide: {
+      title: "Class guide",
+      body: "A boss-by-boss setup page split into Melee, Ranged, Magic and Summoner so you can see the cleanest loadout window for each fight.",
+      browse: "Guide bosses",
+      when: "When to fight",
+      arena: "Arena and positioning",
+      focus: "Fight focus",
+      armor: "Armor",
+      weapons: "Weapons",
+      accessories: "Accessories",
+      buffs: "Buffs",
+      notes: "Class notes",
+      sourceVanilla: "Vanilla",
+      sourceMod: "Chaotic Dimensions",
+      optional: "Optional",
+      main: "Main",
+      openWiki: "Open wiki",
+      openGuide: "Open section",
+      classes: {
+        melee: "Melee",
+        ranged: "Ranged",
+        magic: "Magic",
+        summoner: "Summoner"
       }
     },
     feedback: {
@@ -707,6 +779,9 @@ function renderPage() {
       return;
     case "progression":
       renderProgressionPage();
+      return;
+    case "guide":
+      renderGuidePage();
       return;
     case "feedback":
       renderFeedbackPage();
@@ -2471,8 +2546,8 @@ function renderCraftingPage() {
 function renderProgressionPage() {
   const copy = getCopy();
   const groupMarkup = PROGRESSION_GROUPS.map((group) => {
-    const entriesForGroup = getProgressionEntries(group.key);
-    if (entriesForGroup.length === 0) {
+    const bossesForGroup = getGuideBossEntries(group.key);
+    if (bossesForGroup.length === 0) {
       return "";
     }
 
@@ -2485,7 +2560,7 @@ function renderProgressionPage() {
           </div>
         </div>
         <div class="progression-stack progression-stack--grouped">
-          ${entriesForGroup.map((entry) => renderProgressionCard(entry)).join("")}
+          ${bossesForGroup.map((boss) => renderProgressionTimelineCard(boss)).join("")}
         </div>
       </section>
     `;
@@ -2499,6 +2574,61 @@ function renderProgressionPage() {
     </section>
 
     ${groupMarkup}
+  `;
+}
+
+function renderGuidePage() {
+  const copy = getCopy();
+  const bossLinks = bossGuideEntries.map((boss) => `
+    <a class="catalog-chip" href="#guide-${boss.id}">
+      <strong>${escapeHtml(getGuideBossTitle(boss))}</strong>
+      <span>${escapeHtml(getGuideBossSourceLabel(boss))}</span>
+    </a>
+  `).join("");
+
+  const sectionsMarkup = guidePhaseOrder.map((phaseKey) => {
+    const bosses = getGuideBossEntries(phaseKey);
+    if (bosses.length === 0) {
+      return "";
+    }
+
+    return `
+      <section class="page-section guide-phase">
+        <div class="section-head">
+          <div>
+            <h2>${copy.progression.groups[phaseKey].title}</h2>
+            <p>${copy.progression.groups[phaseKey].body}</p>
+          </div>
+        </div>
+        <div class="guide-stack">
+          ${bosses.map((boss) => renderGuideBossSection(boss)).join("")}
+        </div>
+      </section>
+    `;
+  }).join("");
+
+  elements.main.innerHTML = `
+    <section class="page-hero page-hero--compact">
+      <p class="eyebrow">${copy.nav.guide}</p>
+      <h1>${copy.guide.title}</h1>
+      <p class="hero-lead">${copy.guide.body}</p>
+    </section>
+
+    <section class="page-section">
+      <div class="catalog-layout guide-layout">
+        <aside class="catalog-sidebar guide-sidebar">
+          <article class="panel-card panel-card--nested">
+            <h2>${copy.guide.browse}</h2>
+            <div class="catalog-chip-list">
+              ${bossLinks}
+            </div>
+          </article>
+        </aside>
+        <div class="catalog-results">
+          ${sectionsMarkup}
+        </div>
+      </div>
+    </section>
   `;
 }
 
@@ -3581,6 +3711,228 @@ function renderProgressionCard(entry) {
   `;
 }
 
+function getGuideBossEntries(phaseKey) {
+  return bossGuideEntries.filter((boss) => boss.phase === phaseKey);
+}
+
+function getGuideBossTitle(boss) {
+  return boss?.title?.[state.language] ?? boss?.title?.en ?? boss?.id ?? "";
+}
+
+function getGuideBossField(boss, field) {
+  return boss?.[field]?.[state.language] ?? boss?.[field]?.en ?? "";
+}
+
+function getGuideBossSourceLabel(boss) {
+  const copy = getCopy();
+  return boss?.source === "mod" ? copy.guide.sourceMod : copy.guide.sourceVanilla;
+}
+
+function resolveGuideBossEntry(boss) {
+  return boss?.entryId ? getEntryById(boss.entryId) : null;
+}
+
+function getGuideBossHref(boss) {
+  const entry = resolveGuideBossEntry(boss);
+  if (entry) {
+    return {
+      href: buildPageUrl("entry", { entry: entry.id }),
+      external: false
+    };
+  }
+
+  const href = buildTerrariaWikiPageUrl(boss?.wikiTitle ?? getGuideBossTitle(boss));
+  return href
+    ? { href, external: true }
+    : { href: "", external: false };
+}
+
+function resolveGuideVisual(boss) {
+  const entry = resolveGuideBossEntry(boss);
+  if (entry) {
+    const asset = getEntryDisplayAsset(entry, { ensure: false });
+    return {
+      imageUrl: asset.imageUrl,
+      alt: getGuideBossTitle(boss),
+      fallback: getGuideBossMonogram(boss)
+    };
+  }
+
+  const external = getExternalAsset(boss?.wikiTitle ?? getGuideBossTitle(boss));
+  if (external?.imageUrl) {
+    return {
+      imageUrl: external.imageUrl,
+      alt: getGuideBossTitle(boss),
+      fallback: getGuideBossMonogram(boss)
+    };
+  }
+
+  return {
+    imageUrl: "",
+    alt: getGuideBossTitle(boss),
+    fallback: getGuideBossMonogram(boss)
+  };
+}
+
+function getGuideBossMonogram(boss) {
+  return (getGuideBossTitle(boss) || "?")
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function renderGuideVisualMarkup(boss) {
+  const visual = resolveGuideVisual(boss);
+  return visual.imageUrl
+    ? `<img class="guide-visual" src="${escapeHtml(visual.imageUrl)}" alt="${escapeHtml(visual.alt)}" loading="lazy">`
+    : `<span class="guide-visual guide-visual--fallback" aria-hidden="true">${escapeHtml(visual.fallback)}</span>`;
+}
+
+function renderProgressionTimelineCard(boss) {
+  const copy = getCopy();
+  const wiki = getGuideBossHref(boss);
+  const guideHref = `${buildPageUrl("guide")}#guide-${boss.id}`;
+
+  return `
+    <article class="progress-card progress-card--timeline">
+      <div class="timeline-card-head">
+        <div class="timeline-card-visual">${renderGuideVisualMarkup(boss)}</div>
+        <div class="timeline-card-copy">
+          <div class="tag-row">
+            <span class="inline-tag">${escapeHtml(getGuideBossSourceLabel(boss))}</span>
+            <span class="inline-tag inline-tag--subtle">${boss.optional ? copy.guide.optional : copy.guide.main}</span>
+          </div>
+          <h3>${escapeHtml(getGuideBossTitle(boss))}</h3>
+          <p>${escapeHtml(getGuideBossField(boss, "summary"))}</p>
+        </div>
+      </div>
+      <div class="guide-overview-grid guide-overview-grid--compact">
+        <article class="panel-card panel-card--nested">
+          <strong>${copy.guide.when}</strong>
+          <p>${escapeHtml(getGuideBossField(boss, "when"))}</p>
+        </article>
+        <article class="panel-card panel-card--nested">
+          <strong>${copy.guide.focus}</strong>
+          <p>${escapeHtml(getGuideBossField(boss, "focus"))}</p>
+        </article>
+      </div>
+      <div class="button-row">
+        <a class="header-link header-link--button" href="${guideHref}">${copy.progression.guide}</a>
+        ${wiki.href ? `<a class="header-link header-link--button" href="${wiki.href}"${wiki.external ? ' target="_blank" rel="noreferrer"' : ""}>${copy.guide.openWiki}</a>` : ""}
+      </div>
+    </article>
+  `;
+}
+
+function renderGuideBossSection(boss) {
+  const copy = getCopy();
+  const wiki = getGuideBossHref(boss);
+  const classOrder = ["melee", "ranged", "magic", "summoner"];
+
+  return `
+    <article class="panel-card guide-boss-section" id="guide-${boss.id}">
+      <div class="guide-boss-head">
+        <div class="guide-boss-title">
+          ${renderGuideVisualMarkup(boss)}
+          <div class="guide-boss-copy">
+            <div class="tag-row">
+              <span class="inline-tag">${escapeHtml(getGuideBossSourceLabel(boss))}</span>
+              <span class="inline-tag inline-tag--subtle">${boss.optional ? copy.guide.optional : copy.guide.main}</span>
+            </div>
+            <h2>${escapeHtml(getGuideBossTitle(boss))}</h2>
+            <p>${escapeHtml(getGuideBossField(boss, "summary"))}</p>
+          </div>
+        </div>
+        <div class="button-row">
+          ${wiki.href ? `<a class="header-link header-link--button" href="${wiki.href}"${wiki.external ? ' target="_blank" rel="noreferrer"' : ""}>${copy.guide.openWiki}</a>` : ""}
+        </div>
+      </div>
+
+      <div class="guide-overview-grid">
+        <article class="panel-card panel-card--nested">
+          <strong>${copy.guide.when}</strong>
+          <p>${escapeHtml(getGuideBossField(boss, "when"))}</p>
+        </article>
+        <article class="panel-card panel-card--nested">
+          <strong>${copy.guide.arena}</strong>
+          <p>${escapeHtml(getGuideBossField(boss, "arena"))}</p>
+        </article>
+        <article class="panel-card panel-card--nested">
+          <strong>${copy.guide.focus}</strong>
+          <p>${escapeHtml(getGuideBossField(boss, "focus"))}</p>
+        </article>
+      </div>
+
+      <div class="guide-class-grid">
+        ${classOrder.map((classKey) => renderGuideClassCard(boss, classKey)).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderGuideClassCard(boss, classKey) {
+  const copy = getCopy();
+  const preset = guideSetupPresets[boss.setupKey]?.[classKey];
+  if (!preset) {
+    return "";
+  }
+
+  return `
+    <article class="content-block guide-class-card">
+      <div class="content-block-head">
+        <h3>${copy.guide.classes[classKey]}</h3>
+      </div>
+      <div class="guide-reference-table">
+        ${renderGuideReferenceRow(copy.guide.armor, preset.armor)}
+        ${renderGuideReferenceRow(copy.guide.weapons, preset.weapons)}
+        ${renderGuideReferenceRow(copy.guide.accessories, preset.accessories)}
+        ${renderGuideReferenceRow(copy.guide.buffs, preset.buffs)}
+      </div>
+      <div class="entry-narrative">
+        <strong>${copy.guide.notes}</strong>
+        <ul class="content-list">
+          ${(preset.notes?.[state.language] ?? preset.notes?.en ?? []).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}
+        </ul>
+      </div>
+    </article>
+  `;
+}
+
+function renderGuideReferenceRow(label, items) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return "";
+  }
+
+  return `
+    <div class="guide-reference-row">
+      <div class="guide-reference-label">${escapeHtml(label)}</div>
+      <div class="guide-chip-list">
+        ${items.map((item) => renderGuideChip(item)).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderGuideChip(label) {
+  const clean = String(label ?? "").trim();
+  if (!clean) {
+    return "";
+  }
+
+  const entry = findEntryByMention(clean, { allowPartial: false });
+  if (entry) {
+    const title = getLocalizedEntry(entry).title ?? clean;
+    return `<a class="guide-chip" href="${buildPageUrl("entry", { entry: entry.id })}">${escapeHtml(title)}</a>`;
+  }
+
+  const external = getExternalAsset(clean);
+  const href = external?.pageUrl || buildTerrariaWikiPageUrl(clean);
+  return href
+    ? `<a class="guide-chip" href="${href}" target="_blank" rel="noreferrer">${escapeHtml(clean)}</a>`
+    : `<span class="guide-chip">${escapeHtml(clean)}</span>`;
+}
+
 function renderContentBlock(label, items) {
   if (!label || !items || items.length === 0) {
     return "";
@@ -3696,6 +4048,7 @@ function syncMetadata() {
     entry: getLocalizedEntry(getEntryById(state.entryId))?.title ?? copy.nav.library,
     crafting: copy.nav.crafting,
     progression: copy.nav.progression,
+    guide: copy.nav.guide,
     feedback: copy.nav.feedback,
     admin: copy.nav.admin
   };
