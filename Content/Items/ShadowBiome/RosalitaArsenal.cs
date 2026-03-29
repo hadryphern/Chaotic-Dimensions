@@ -34,8 +34,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/RosalitaPickaxe";
 
 		public override void SetDefaults() {
-			Item.width = 42;
-			Item.height = 42;
+			Item.width = 44;
+			Item.height = 44;
 			Item.damage = 66;
 			Item.DamageType = DamageClass.Melee;
 			Item.useStyle = ItemUseStyleID.Swing;
@@ -60,8 +60,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/RosalitaAxe";
 
 		public override void SetDefaults() {
-			Item.width = 42;
-			Item.height = 42;
+			Item.width = 44;
+			Item.height = 44;
 			Item.damage = 72;
 			Item.DamageType = DamageClass.Melee;
 			Item.useStyle = ItemUseStyleID.Swing;
@@ -86,8 +86,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/RosalitaHammer";
 
 		public override void SetDefaults() {
-			Item.width = 44;
-			Item.height = 44;
+			Item.width = 78;
+			Item.height = 78;
 			Item.damage = 84;
 			Item.DamageType = DamageClass.Melee;
 			Item.useStyle = ItemUseStyleID.Swing;
@@ -112,8 +112,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/RosalitaBlade";
 
 		public override void SetDefaults() {
-			Item.width = 48;
-			Item.height = 48;
+			Item.width = 70;
+			Item.height = 70;
 			Item.damage = 108;
 			Item.DamageType = DamageClass.Melee;
 			Item.useStyle = ItemUseStyleID.Swing;
@@ -137,8 +137,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/RosalitaBow";
 
 		public override void SetDefaults() {
-			Item.width = 32;
-			Item.height = 56;
+			Item.width = 20;
+			Item.height = 50;
 			Item.damage = 92;
 			Item.DamageType = DamageClass.Ranged;
 			Item.useStyle = ItemUseStyleID.Shoot;
@@ -199,6 +199,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 
 		public override void SetDefaults() {
 			Item.DefaultToWhip(ModContent.ProjectileType<RosalitaWhipProjectile>(), 72, 3f, 6);
+			Item.width = 38;
+			Item.height = 34;
 			Item.rare = ItemRarityID.Yellow;
 			Item.channel = true;
 			Item.value = Item.buyPrice(gold: 24);
@@ -216,8 +218,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/EclipsedMonthraPickaxe";
 
 		public override void SetDefaults() {
-			Item.width = 46;
-			Item.height = 46;
+			Item.width = 36;
+			Item.height = 36;
 			Item.damage = 220;
 			Item.DamageType = DamageClass.Melee;
 			Item.useStyle = ItemUseStyleID.Swing;
@@ -242,8 +244,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/EclipsedMonthraAxe";
 
 		public override void SetDefaults() {
-			Item.width = 46;
-			Item.height = 46;
+			Item.width = 64;
+			Item.height = 64;
 			Item.damage = 240;
 			Item.DamageType = DamageClass.Melee;
 			Item.useStyle = ItemUseStyleID.Swing;
@@ -268,8 +270,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/EclipsedMonthraHammer";
 
 		public override void SetDefaults() {
-			Item.width = 48;
-			Item.height = 48;
+			Item.width = 38;
+			Item.height = 38;
 			Item.damage = 270;
 			Item.DamageType = DamageClass.Melee;
 			Item.useStyle = ItemUseStyleID.Swing;
@@ -294,8 +296,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 		public override string Texture => "ChaoticDimensions/Content/Items/ShadowBiome/EclipsedMonthraBlade";
 
 		public override void SetDefaults() {
-			Item.width = 48;
-			Item.height = 48;
+			Item.width = 74;
+			Item.height = 74;
 			Item.useStyle = ItemUseStyleID.Shoot;
 			Item.useAnimation = 18;
 			Item.useTime = 18;
@@ -396,6 +398,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 
 		public override void SetDefaults() {
 			Item.DefaultToWhip(ModContent.ProjectileType<EclipsedMonthraWhipProjectile>(), 360, 4f, 7);
+			Item.width = 38;
+			Item.height = 34;
 			Item.rare = ItemRarityID.Cyan;
 			Item.channel = true;
 			Item.value = Item.buyPrice(gold: 44);

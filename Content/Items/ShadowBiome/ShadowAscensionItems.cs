@@ -277,6 +277,8 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 
 		public override void SetDefaults() {
 			Item.DefaultToWhip(ModContent.ProjectileType<ShadowWhipProjectile>(), 750, 4f, 8);
+			Item.width = 36;
+			Item.height = 56;
 			Item.rare = ItemRarityID.Red;
 			Item.channel = true;
 			Item.value = Item.buyPrice(platinum: 2);

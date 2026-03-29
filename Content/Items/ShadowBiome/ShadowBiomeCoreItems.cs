@@ -44,17 +44,23 @@ namespace ChaoticDimensions.Content.Items.ShadowBiome
 	public sealed class ShadowDirtBlock : ShadowBiomePlaceableItemBase
 	{
 		protected override int PlaceTileType => ModContent.TileType<ShadowDirtTile>();
+		protected override int ItemWidth => 16;
+		protected override int ItemHeight => 16;
 	}
 
 	public sealed class ShadowStoneBlock : ShadowBiomePlaceableItemBase
 	{
 		protected override int PlaceTileType => ModContent.TileType<ShadowStoneTile>();
+		protected override int ItemWidth => 16;
+		protected override int ItemHeight => 16;
 		protected override int ItemRarity => ItemRarityID.Orange;
 	}
 
 	public sealed class ShadowWood : ShadowBiomePlaceableItemBase
 	{
 		protected override int PlaceTileType => ModContent.TileType<ShadowWoodTile>();
+		protected override int ItemWidth => 24;
+		protected override int ItemHeight => 22;
 		protected override int ItemRarity => ItemRarityID.Orange;
 	}
 

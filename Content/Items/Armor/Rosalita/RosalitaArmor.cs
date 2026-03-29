@@ -34,7 +34,7 @@ namespace ChaoticDimensions.Content.Items.Armor.Rosalita
 		public override string Texture => "ChaoticDimensions/Content/Items/Armor/Rosalita/RosalitaHelmet";
 
 		public override void SetDefaults() {
-			Item.width = 30;
+			Item.width = 22;
 			Item.height = 22;
 			Item.value = Item.buyPrice(gold: 16);
 			Item.rare = ItemRarityID.Yellow;
@@ -69,7 +69,7 @@ namespace ChaoticDimensions.Content.Items.Armor.Rosalita
 
 		public override void SetDefaults() {
 			Item.width = 34;
-			Item.height = 24;
+			Item.height = 20;
 			Item.value = Item.buyPrice(gold: 22);
 			Item.rare = ItemRarityID.Yellow;
 			Item.defense = 34;
@@ -92,8 +92,8 @@ namespace ChaoticDimensions.Content.Items.Armor.Rosalita
 		public override string Texture => "ChaoticDimensions/Content/Items/Armor/Rosalita/RosalitaGreaves";
 
 		public override void SetDefaults() {
-			Item.width = 30;
-			Item.height = 20;
+			Item.width = 22;
+			Item.height = 18;
 			Item.value = Item.buyPrice(gold: 18);
 			Item.rare = ItemRarityID.Yellow;
 			Item.defense = 24;

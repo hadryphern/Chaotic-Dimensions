@@ -40,8 +40,8 @@ namespace ChaoticDimensions.Content.Items.Armor.Shadow
 		public override string Texture => "ChaoticDimensions/Content/Items/Armor/Shadow/ShadowHelmet";
 
 		public override void SetDefaults() {
-			Item.width = 32;
-			Item.height = 24;
+			Item.width = 22;
+			Item.height = 22;
 			Item.value = Item.buyPrice(platinum: 1);
 			Item.rare = ItemRarityID.Red;
 			Item.defense = 52;
@@ -72,7 +72,7 @@ namespace ChaoticDimensions.Content.Items.Armor.Shadow
 		public override string Texture => "ChaoticDimensions/Content/Items/Armor/Shadow/ShadowBreastplate";
 
 		public override void SetDefaults() {
-			Item.width = 34;
+			Item.width = 30;
 			Item.height = 26;
 			Item.value = Item.buyPrice(platinum: 1);
 			Item.rare = ItemRarityID.Red;
@@ -97,8 +97,8 @@ namespace ChaoticDimensions.Content.Items.Armor.Shadow
 		public override string Texture => "ChaoticDimensions/Content/Items/Armor/Shadow/ShadowGreaves";
 
 		public override void SetDefaults() {
-			Item.width = 32;
-			Item.height = 22;
+			Item.width = 26;
+			Item.height = 18;
 			Item.value = Item.buyPrice(platinum: 1);
 			Item.rare = ItemRarityID.Red;
 			Item.defense = 46;

@@ -17,6 +17,9 @@ namespace ChaoticDimensions.Content.Projectiles.Melee
 		protected abstract Color LineColor { get; }
 		protected abstract Rectangle HandleFrame { get; }
 		protected abstract Rectangle SegmentFrame { get; }
+		protected virtual Rectangle EarlySegmentFrame => SegmentFrame;
+		protected virtual Rectangle MidSegmentFrame => SegmentFrame;
+		protected virtual Rectangle LateSegmentFrame => SegmentFrame;
 		protected abstract Rectangle TipFrame { get; }
 
 		public override void SetStaticDefaults() {
@@ -69,8 +72,16 @@ namespace ChaoticDimensions.Content.Projectiles.Melee
 					frame = TipFrame;
 					origin = new Vector2(frame.Width / 2f, 10f);
 				}
+				else if (i > 10) {
+					frame = LateSegmentFrame;
+					origin = new Vector2(frame.Width / 2f, frame.Height / 2f);
+				}
+				else if (i > 5) {
+					frame = MidSegmentFrame;
+					origin = new Vector2(frame.Width / 2f, frame.Height / 2f);
+				}
 				else if (i > 0) {
-					frame = SegmentFrame;
+					frame = EarlySegmentFrame;
 					origin = new Vector2(frame.Width / 2f, frame.Height / 2f);
 				}
 
@@ -92,9 +103,12 @@ namespace ChaoticDimensions.Content.Projectiles.Melee
 		protected override float RangeMultiplier => 1.35f;
 		protected override int TagBuffType => ModContent.BuffType<RosalitaTagBuff>();
 		protected override Color LineColor => new Color(255, 120, 200);
-		protected override Rectangle HandleFrame => new Rectangle(0, 0, 14, 24);
-		protected override Rectangle SegmentFrame => new Rectangle(0, 24, 14, 18);
-		protected override Rectangle TipFrame => new Rectangle(0, 42, 14, 24);
+		protected override Rectangle HandleFrame => new Rectangle(0, 0, 10, 26);
+		protected override Rectangle SegmentFrame => new Rectangle(0, 42, 10, 16);
+		protected override Rectangle EarlySegmentFrame => new Rectangle(0, 26, 10, 16);
+		protected override Rectangle MidSegmentFrame => new Rectangle(0, 42, 10, 16);
+		protected override Rectangle LateSegmentFrame => new Rectangle(0, 58, 10, 16);
+		protected override Rectangle TipFrame => new Rectangle(0, 74, 10, 18);
 	}
 
 	public sealed class EclipsedMonthraWhipProjectile : ShadowWhipProjectileBase
@@ -104,9 +118,12 @@ namespace ChaoticDimensions.Content.Projectiles.Melee
 		protected override float RangeMultiplier => 1.7f;
 		protected override int TagBuffType => ModContent.BuffType<EclipsedMonthraTagBuff>();
 		protected override Color LineColor => new Color(170, 90, 255);
-		protected override Rectangle HandleFrame => new Rectangle(0, 0, 14, 24);
-		protected override Rectangle SegmentFrame => new Rectangle(0, 24, 14, 18);
-		protected override Rectangle TipFrame => new Rectangle(0, 42, 14, 24);
+		protected override Rectangle HandleFrame => new Rectangle(0, 0, 10, 26);
+		protected override Rectangle SegmentFrame => new Rectangle(0, 42, 10, 16);
+		protected override Rectangle EarlySegmentFrame => new Rectangle(0, 26, 10, 16);
+		protected override Rectangle MidSegmentFrame => new Rectangle(0, 42, 10, 16);
+		protected override Rectangle LateSegmentFrame => new Rectangle(0, 58, 10, 16);
+		protected override Rectangle TipFrame => new Rectangle(0, 74, 10, 18);
 	}
 
 	public sealed class ShadowWhipProjectile : ShadowWhipProjectileBase

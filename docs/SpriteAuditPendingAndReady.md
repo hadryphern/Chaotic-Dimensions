@@ -158,6 +158,13 @@ Esses ja entraram no mod e hoje nao sao prioridade visual.
 | `⚠️` | Rosalita Greaves item | `Content/Items/Armor/Rosalita/RosalitaGreaves.png` | `32x32` | `32x32` | `1` | Placeholder |
 | `⚠️` | Rosalita Greaves legs | `Content/Items/Armor/Rosalita/RosalitaGreaves_Legs.png` | `40x56` | `40x56` | `1` | Placeholder |
 
+**Atualizacao 2026-03-29**
+
+- `RosalitaHelmet.png` ja foi substituido por sprite nova de inventario em `22x22`.
+- `RosalitaBreastplate.png` ja foi substituido por sprite nova de inventario em `34x20`.
+- `RosalitaGreaves.png` ja foi substituido por sprite nova de inventario em `22x18`.
+- O que continua faltando no set Rosalita sao apenas as sprites equipaveis: `_Head`, `_Body`, `_Arms`, `_FemaleBody` e `_Legs`.
+
 ### Shadow
 
 | Status | Asset | Arquivo | Total recomendado | Frame recomendado | Frames | Estado atual |
@@ -170,6 +177,13 @@ Esses ja entraram no mod e hoje nao sao prioridade visual.
 | `⚠️` | Shadow Breastplate female | `Content/Items/Armor/Shadow/ShadowBreastplate_FemaleBody.png` | `40x56` | `40x56` | `1` | Placeholder |
 | `⚠️` | Shadow Greaves item | `Content/Items/Armor/Shadow/ShadowGreaves.png` | `32x32` | `32x32` | `1` | Placeholder |
 | `⚠️` | Shadow Greaves legs | `Content/Items/Armor/Shadow/ShadowGreaves_Legs.png` | `40x56` | `40x56` | `1` | Placeholder |
+
+**Atualizacao 2026-03-29**
+
+- `ShadowHelmet.png` ja foi substituido por sprite nova de inventario em `22x22`.
+- `ShadowBreastplate.png` ja foi substituido por sprite nova de inventario em `30x26`.
+- `ShadowGreaves.png` ja foi substituido por sprite nova de inventario em `26x18`.
+- O que continua faltando no set Shadow sao apenas as sprites equipaveis: `_Head`, `_Body`, `_Arms`, `_FemaleBody` e `_Legs`.
 
 ### Acessorio/equip extra
 
