@@ -4513,6 +4513,9 @@ function parseRecipeModel(entry, options = {}) {
     const labelMatch = cleanedLine.match(/^([^:]+):\s*(.+)$/);
     const groupLabel = labelMatch?.[1]?.trim() ?? "";
     const ingredientSource = labelMatch?.[2]?.trim() ?? cleanedLine;
+    const groupEntry = entry?.category === "armor" && groupLabel
+      ? findEntryByMention(groupLabel, { allowPartial: true })
+      : null;
     const lineIngredients = ingredientSource
       .split("+")
       .map((segment) => segment.trim())
@@ -4526,6 +4529,7 @@ function parseRecipeModel(entry, options = {}) {
         label: groupLabel,
         groupKey: getRecipeGroupKey(groupLabel),
         resultAmount: 1,
+        entry: groupEntry,
         stations: lineStations.length > 0 ? lineStations : stations,
         ingredients: lineIngredients
       });
