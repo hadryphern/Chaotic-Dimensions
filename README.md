@@ -3,77 +3,116 @@
 </div>
 
 <div align="center">
-  <img src=".github/readme/gallery/crystaline-devour-title.png" alt="Crystaline Devour title card" width="100%" />
+  <img src=".github/readme/gallery/crystaline-devour-title.png" alt="Crystaline Devourer title card" width="100%" />
 </div>
 
 <p align="center">
-  <img src=".github/readme/gallery/crystaline-devour-ring.png" alt="Crystaline Devour arena showcase" width="49%" />
-  <img src=".github/readme/gallery/crystaline-devour-blaster.png" alt="Crystaline Devour sky blaster showcase" width="49%" />
+  <img src=".github/readme/gallery/crystaline-devour-ring.png" alt="Crystaline Devourer arena showcase" width="49%" />
+  <img src=".github/readme/gallery/crystaline-devour-blaster.png" alt="Crystaline Devourer sky beam showcase" width="49%" />
 </p>
 
 <p align="center">
-  <strong>Chaotic Dimensions</strong> e um mod autoral para <strong>Terraria / tModLoader</strong>, criado como projeto de TCC em Portugal e pensado para crescer como um universo proprio, com varios bosses, progressoes, biomas, dimensoes e encounters com identidade forte.
+  <strong>Chaotic Dimensions</strong> é um mod autoral para <strong>Terraria / tModLoader</strong>, desenvolvido como projeto de PAP e pensado como um universo próprio dentro do jogo, com bosses, biomas, progressão, sprites e documentação em crescimento constante.
   <br />
-  <em>Chaotic Dimensions is an original Terraria / tModLoader project designed to grow into its own universe, with multiple bosses, handcrafted progression, new biomes, dimensions and high-identity encounters.</em>
+  <em>Chaotic Dimensions is an original Terraria / tModLoader mod project built as a long-term custom universe with its own bosses, biomes, progression, art pipeline and documentation.</em>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/tModLoader-Mod-7c3aed?style=for-the-badge" alt="tModLoader Mod" />
   <img src="https://img.shields.io/badge/Terraria-Original%20Content-a855f7?style=for-the-badge" alt="Original Content" />
-  <img src="https://img.shields.io/badge/Vision-Multi--Boss-c084fc?style=for-the-badge" alt="Multi Boss Vision" />
-  <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-9333ea?style=for-the-badge" alt="Status Em Desenvolvimento" />
-  <img src="https://img.shields.io/badge/Idioma-PT%20%2F%20EN-7e22ce?style=for-the-badge" alt="Idioma PT EN" />
+  <img src="https://img.shields.io/badge/Status-Active%20Development-9333ea?style=for-the-badge" alt="Active Development" />
+  <img src="https://img.shields.io/badge/Wiki-Live-7e22ce?style=for-the-badge" alt="Wiki Live" />
 </p>
 
-## Sobre o Projeto
+## Visão Geral
 
-Chaotic Dimensions nasceu para ser mais do que um unico boss ou um unico arco de conteudo. A ideia do projeto e construir uma linha propria dentro do universo de Terraria: direcao visual forte, atmosfera cosmica e cristalina, bosses marcantes, progressao autoral e uma sensacao de expansao continua.
+Chaotic Dimensions nasceu para ser mais do que um único boss ou um único bioma. A proposta do projeto é construir uma linha própria dentro do universo de Terraria, com encontros memoráveis, identidade visual forte, progressão autoral, documentação viva e espaço para expansão contínua.
 
-O `Crystaline Devour` e apenas o primeiro boss oficial dessa fundacao. Ele representa o inicio da identidade do mod, nao o unico foco dela.
+O repositório já não representa apenas um protótipo. Hoje ele concentra:
 
-## Visao
+- bosses jogáveis com apresentação própria
+- biomas com worldgen dedicado
+- tiers de progressão próprios
+- armaduras, armas, acessórios, consumíveis, blocos e minérios originais
+- pipeline de sprites e substituição de placeholders
+- wiki pública sincronizada com o conteúdo do mod
 
-- Criar varios bosses com apresentacao, mecanicas e ambientacao proprias.
-- Expandir o mod com itens, armas, armaduras, acessorios e sistemas originais.
-- Construir encounters com intro, musica, boss bar, sky e arena personalizados.
-- Misturar fantasia cristalina, escala cosmica e estilo autoral em uma progressao pos-Moon Lord.
+## Conteúdo Atual
 
-## Fundacoes Ja Implementadas
+### Bosses principais
 
-Atualmente o projeto ja possui a primeira base jogavel do universo `Chaotic Dimensions`:
+- `Monthra`
+  - boss de progressão pré-hardmode
+  - invocada através da `MonthraButterfly`
+  - possui intro cinematográfica e música própria
 
-- Primeiro boss oficial: `Crystaline Devour / Crystaline Devourer`.
-- Intro/cutscene para invocacao do encounter.
-- Boss bar customizada.
-- Musica propria da luta.
-- Sky e coloracao tematica durante o combate.
-- Arena cristalina para controlar o encontro.
-- Arsenal cristalino inicial com armas para classes diferentes.
-- Acessorios e consumiveis exclusivos.
-- Armadura modular `Crystaline Devour Armor`.
-- Sistemas de buffs e efeitos especiais ligados a equipamentos.
+- `Crystaline Devourer`
+  - boss pós-`Moon Lord`
+  - intro com title card, música própria, arena forçada e scene dedicada
+  - abre o tier `Shadow`
 
-## Primeiro Marco Oficial
+### Progressão
 
-O `Crystaline Devour` e o primeiro boss oficial do projeto e funciona como a primeira grande demonstracao da direcao que o mod quer seguir:
+- `Monthra`
+  - introduz `MonthraScale`
+  - abre a primeira linha de armas próprias do mod
 
-- Presenca visual forte.
-- Encounter estilizado.
-- Ambiente proprio.
-- Progressao baseada em drops e equipamentos exclusivos.
-- Base tecnica para os proximos bosses, dimensoes e sistemas do mod.
+- `Rosalita`
+  - desbloqueada após os três mecânicos
+  - adiciona minério, gema, arsenal e armadura acima do tier vanilla correspondente
 
-## Direcao Visual
+- `Shadow`
+  - ligada ao `ShadowBiome` e ao `Crystaline Devourer`
+  - representa o tier mais forte atualmente implementado em código
 
-Chaotic Dimensions esta sendo construido com foco em identidade. Isso inclui:
+### Biomas e worldgen
 
-- Menu proprio.
-- Backgrounds e skies personalizados.
-- Title cards para encounters importantes.
-- Armaduras e itens com linha visual dedicada.
-- Apresentacao pensada para parecer parte de um universo maior.
+- `ShadowBiome`
+  - substitui o segmento evil esquerdo do mundo
+  - possui superfície e cavidades próprias
+  - aplica trevas, drenagem de vida e redução de mobilidade sem o `ShadowTotem`
+  - contém `ShadowOre`
 
-## Estrutura do Repositorio
+- worldgen adicional para:
+  - `RosalitaOre`
+  - `ShadowOre`
+  - blocos, tiles e estruturas ligadas ao conteúdo atual
+
+### Itens e sistemas em destaque
+
+- `CrystalineSigil`
+- `ChaosCrystalPickaxe`
+- `HeartOfTheGod`
+- `ShadowTotem`
+- `GodnessAnvil`
+- linhas completas `Rosalita`, `Shadow` e `Eclipsed Monthra`
+- scenes, músicas, title cards e auditoria de sprites
+
+## Direção do Projeto
+
+O foco atual do mod está em quatro pilares:
+
+1. Criar bosses com presença forte, apresentação própria e leitura clara.
+2. Expandir a progressão com tiers originais em vez de depender apenas de reskins.
+3. Manter um pipeline visual consistente, mesmo quando parte do conteúdo ainda usa placeholder.
+4. Documentar tudo publicamente na wiki para que o estado real do projeto seja sempre visível.
+
+## Wiki Oficial
+
+A wiki pública do projeto está aqui:
+
+- [Chaotic Dimensions Wiki](https://hadryphern.github.io/Chaotic-Dimensions/?lang=pt-BR)
+
+Ela faz parte do fluxo normal de desenvolvimento. Conteúdo novo no mod deve refletir-se também na wiki, mesmo quando a sprite final ainda não existe.
+
+Documentação local importante:
+
+- [ChaoticDimensionsWikiReference.md](docs/ChaoticDimensionsWikiReference.md)
+- [WikiMaintenanceWorkflow.md](docs/WikiMaintenanceWorkflow.md)
+- [SpriteAuditPendingAndReady.md](docs/SpriteAuditPendingAndReady.md)
+- [ShadowBiomeSpriteRequirements.md](docs/ShadowBiomeSpriteRequirements.md)
+
+## Estrutura do Repositório
 
 ```text
 ChaoticDimensions/
@@ -82,35 +121,80 @@ ChaoticDimensions/
 |  |- Bosses/
 |  |- Buffs/
 |  |- Items/
+|  |- NPCs/
 |  |- Players/
 |  |- Projectiles/
-|  `- Scenes/
+|  |- Scenes/
+|  `- Tiles/
 |- Common/
+|  |- GlobalNPCs/
 |  |- Graphics/
 |  |- Menus/
+|  |- Progression/
 |  |- Systems/
 |  `- Tiles/
 |- Assets/
-|- .github/readme/
-`- tools/
+|- Sounds/
+|- docs/
+|- tools/
+`- .github/readme/
 ```
 
-## Compilacao Local
+## Build Local
 
 ```powershell
 dotnet build ChaoticDimensions.csproj
 ```
 
-O projeto foi pensado para desenvolvimento dentro de `tModLoader ModSources`, entao o fluxo mais pratico e compilar e abrir o mod diretamente pelo ambiente do Terraria / tModLoader.
+O projeto foi pensado para desenvolvimento dentro de `tModLoader/ModSources`, por isso o fluxo normal é:
+
+1. editar código e assets no repositório
+2. compilar
+3. abrir o mod no tModLoader
+4. validar in-game
+5. atualizar a wiki e a documentação auxiliar
+
+## Fluxo de Assets e Wiki
+
+Quando há conteúdo novo:
+
+1. adicionar ou atualizar classes no mod
+2. integrar sprites definitivas ou placeholders válidos
+3. alinhar tamanho real dos sprites no código
+4. atualizar documentação local
+5. sincronizar imagens da wiki
+
+Sincronização de assets da wiki:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\wiki\Sync-WikiAssets.ps1
+```
+
+## Estado Atual do Projeto
+
+O projeto está em desenvolvimento ativo. Isso significa que:
+
+- parte do conteúdo já está totalmente jogável
+- parte já existe em código, mas ainda depende de sprite final ou balanceamento fino
+- a wiki pode documentar conteúdo com placeholder, desde que isso fique claro
+- sistemas experimentais que não se mostraram estáveis foram removidos em vez de forçados
+
+Essa abordagem mantém o repositório mais honesto e mais útil para desenvolvimento contínuo.
 
 ## English Snapshot
 
-Chaotic Dimensions is an original Terraria / tModLoader mod project built to become a much larger custom universe over time. The goal is not to center everything around a single boss, but to create a broader identity with multiple bosses, handcrafted progression, original visuals and memorable encounters.
+Chaotic Dimensions is an original Terraria / tModLoader mod focused on building a custom universe rather than a one-off content pack. The current build already includes:
 
-The `Crystaline Devour` is the first official boss of that vision, not the final centerpiece of the whole mod.
+- the pre-hardmode boss `Monthra`
+- the post-Moon Lord boss `Crystaline Devourer`
+- the hostile `ShadowBiome`
+- custom progression through `Rosalita` and `Shadow` tiers
+- an active documentation workflow with a public wiki
 
-## Creditos
+The repository is meant to reflect the real state of the project, including placeholders, technical audits and ongoing content expansion.
+
+## Créditos
 
 - **Projeto:** `blueDev`
 - **Plataforma:** `Terraria / tModLoader`
-- **README:** organizado para apresentar o projeto de forma mais ampla, sem prender o repositorio a um unico boss ou a uma lista de itens temporaria.
+- **Documentação e wiki:** mantidas em paralelo com o desenvolvimento do mod
