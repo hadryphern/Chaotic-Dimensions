@@ -1,6 +1,4 @@
-<div align="center">
-  <img src=".github/readme/banner.png" alt="Chaotic Dimensions banner" width="100%" />
-</div>
+
 
 <div align="center">
   <img src=".github/readme/gallery/crystaline-devour-title.png" alt="Crystaline Devourer title card" width="100%" />
