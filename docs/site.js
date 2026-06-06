@@ -59,7 +59,8 @@ const CATEGORY_ORDER = [
 ];
 
 const ENTRY_TAGS = {
-  "crystaline-devourer": "boss"
+  "crystaline-devourer": "boss",
+  "kraken": "boss"
 };
 
 const PROGRESSION_GROUPS = guidePhaseOrder.map((key) => ({ key }));
@@ -69,7 +70,7 @@ const PROGRESSION_ENTRY_IDS = {
   early_hardmode: [],
   late_hardmode: [],
   celestial: [],
-  post_moonlord: ["crystaline-devourer"]
+  post_moonlord: ["crystaline-devourer", "kraken"]
 };
 
 const PROGRESSION_ENTRY_GROUP_LOOKUP = Object.entries(PROGRESSION_ENTRY_IDS)

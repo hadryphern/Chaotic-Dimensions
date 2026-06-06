@@ -12,9 +12,13 @@
 
 	<ItemGroup>
 		<Compile Remove=".analysis\**\*" />
+		<Compile Remove="tmp\**\*" />
 		<Content Remove=".analysis\**\*" />
+		<Content Remove="tmp\**\*" />
 		<EmbeddedResource Remove=".analysis\**\*" />
+		<EmbeddedResource Remove="tmp\**\*" />
 		<None Remove=".analysis\**\*" />
+		<None Remove="tmp\**\*" />
 	</ItemGroup>
 
 </Project>

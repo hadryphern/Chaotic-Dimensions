@@ -4,6 +4,16 @@ Items: {
 		Tooltip: Summons the Crystaline Devourer
 	}
 
+	KrakenSummonItem: {
+		DisplayName: Alien Kraken Signal
+		Tooltip:
+			'''
+			Opens a signal beyond the edge of the blue galaxy
+			Summons the Alien Kraken
+			Requires the Crystaline Devourer to be defeated
+			'''
+	}
+
 	MonthraScale: {
 		DisplayName: Monthra Scale
 		Tooltip: Warm scales shed by a wandering omen
@@ -483,6 +493,11 @@ NPCs: {
 	ShadowSlime.DisplayName: Shadow Slime
 	ShadowWorm.DisplayName: Shadow Worm
 	KrakenSquid.DisplayName: Kraken Squid
+	KrakenBoss.DisplayName: The Alien Kraken
+	KrakenTentacle.DisplayName: Alien Tendril
+	KrakenClone.DisplayName: Astral Kraken Clone
+	KrakenMinion.DisplayName: Alien Kraken Spawn
+	KrakenCrystalTurret.DisplayName: Alien Crystal Sentinel
 }
 
 Projectiles: {
@@ -514,6 +529,17 @@ Projectiles: {
 	ShadowBoltProjectile.DisplayName: Shadow Bolt
 	ShadowZenithProjectile.DisplayName: Shadow Zenith
 	ShadowWhipProjectile.DisplayName: Shadow Whip
+	KrakenLightningStrike.DisplayName: Kraken Lightning Strike
+	KrakenAbyssTether.DisplayName: Kraken Abyss Tether
+	KrakenAbyssVortex.DisplayName: Kraken Abyss Vortex
+	KrakenHomingLightning.DisplayName: Kraken Homing Lightning
+	KrakenSkyBeam.DisplayName: Kraken Sky Beam
+	KrakenWaterJet.DisplayName: Kraken Water Jet
+	KrakenWaterDrop.DisplayName: Kraken Water Drop
+	KrakenRotatingLaser.DisplayName: Kraken Rotating Laser
+	KrakenTrackingLaser.DisplayName: Expanding Alien Laser
+	KrakenRedBolt.DisplayName: Alien Crystal Bolt
+	KrakenHypnosisVortex.DisplayName: Alien Hypnosis Vortex
 }
 
 Buffs: {
@@ -585,6 +611,16 @@ Buffs: {
 	ShadowCrystalMinionBuff: {
 		DisplayName: Shadow Crystals
 		Description: Shadow crystals orbit nearby and annihilate foes
+	}
+
+	KrakenAbyssBreathBuff: {
+		DisplayName: Abyssal Breath
+		Description: Alien pressure lets you breathe and move freely
+	}
+
+	KrakenCrushingDepthDebuff: {
+		DisplayName: Crushing Depth
+		Description: Alien gravity crushes your movement and endurance
 	}
 }
 

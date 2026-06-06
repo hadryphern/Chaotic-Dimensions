@@ -916,7 +916,8 @@ export const generatedReferenceEntries = [
     }
   },
   {
-    id: "kraken",
+    id: "legacy-kraken-concept",
+    isPublished: false,
     category: "minibosses",
     related: ["kraken-tear", "squid-kraken", "squid-kraken-staff", "kraken-blade"],
     content: {

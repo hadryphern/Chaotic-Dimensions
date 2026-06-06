@@ -6,7 +6,7 @@ This project is being built as a larger custom universe over time, with multiple
 
 [h2]Current Content[/h2]
 
-The current public version introduces [b]Crystaline Devour[/b], the first official boss of the project.
+The current version includes [b]Monthra[/b], [b]Crystaline Devour[/b] and the new [b]Alien Kraken[/b].
 
 Included in this release:
 
@@ -17,6 +17,10 @@ Included in this release:
 - Arena-based fight structure
 - Original weapons, accessories and progression rewards
 - Crystaline Devour modular armor set
+- Three-phase Alien Kraken encounter
+- Custom Kraken music, cosmic sky and cinematic title sequence
+- Coordinated lasers, lightning, projectile walls, clones, ruby sentinels and minions
+- Singleplayer and multiplayer encounter synchronization
 
 [h2]Project Direction[/h2]
 
@@ -31,6 +35,6 @@ More bosses, items, mechanics and content expansions are planned for future upda
 
 [b]Chaotic Dimensions[/b] e um mod original para Terraria / tModLoader focado em conteudo autoral pos-Moon Lord, atmosfera cristalina cosmica e encontros com apresentacao cinematica.
 
-A versao atual introduz o [b]Crystaline Devour[/b], o primeiro boss oficial do projeto, junto com equipamentos, recompensas e uma luta completa com identidade propria.
+A versão atual inclui [b]Monthra[/b], [b]Crystaline Devour[/b] e o [b]Alien Kraken[/b]. O novo Kraken é um encontro pós-Crystaline com três fases, música própria, cenário cósmico, lasers, relâmpagos, clones, sentinelas de rubi e minions.
 
 O projeto esta em desenvolvimento ativo e foi planejado para crescer com novos bosses, itens, sistemas e conteudo original ao longo do tempo.

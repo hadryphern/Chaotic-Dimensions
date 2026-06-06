@@ -513,11 +513,72 @@ export const entryOverrides = [
     }
   },
   {
-    id: "kraken",
+    id: "legacy-kraken-concept",
     isPublished: false,
     content: {
       "pt-BR": {
-        title: "Kraken"
+        title: "Protótipo Oceânico Arquivado"
+      },
+      en: {
+        title: "Archived Ocean Prototype"
+      }
+    }
+  },
+  {
+    id: "kraken",
+    category: "bosses",
+    image: "./assets/images/content/NPCs/Kraken/KrakenBoss_Head_Boss.png",
+    related: ["alien-kraken-signal", "crystaline-tear", "soul-of-shadow"],
+    sortOrder: 920,
+    isPublished: true,
+    content: {
+      "pt-BR": {
+        title: "O Kraken Alienígena",
+        subtitle: "Boss pós-Crystaline Devourer",
+        summary: "Boss cósmico de três fases construído em torno de controlo de espaço, mobilidade e pressão coordenada.",
+        overview: "O Alien Kraken é a implementação oficial do Kraken no Chaotic Dimensions. O encontro usa música e céu próprios, uma introdução com title card e uma IA que combina padrões coordenados em vez de disparos puramente aleatórios.",
+        facts: [
+          "85.000.000 de vida base",
+          "60 de defesa na primeira fase, 90 na segunda e 117 na terceira",
+          "Muda de fase aos 50% e aos 15% de vida",
+          "A velocidade, a defesa e a frequência dos ataques aumentam em cada fase",
+          "O estado da luta e o progresso do mundo são sincronizados em multiplayer"
+        ],
+        obtain: [
+          "Derrote primeiro o Crystaline Devourer.",
+          "Crie e use o Sinal do Kraken Alienígena numa Godness Anvil.",
+          "Receita: 60 Crystaline Tears, 30 Souls of Shadow e 20 Luminite Bars."
+        ],
+        tactics: [
+          "As paredes de gotas deixam três aberturas; identifique a rota antes de atravessar.",
+          "Destrua clones e sentinelas de rubi para reduzir a pressão acumulada.",
+          "Durante lasers e vórtices, priorize posicionamento e mobilidade em vez de dano contínuo.",
+          "A terceira fase começa aos 15% de vida e exige espaço livre para as correntes de dash."
+        ]
+      },
+      en: {
+        title: "The Alien Kraken",
+        subtitle: "Post-Crystaline Devourer boss",
+        summary: "A three-phase cosmic boss built around space control, mobility and coordinated pressure.",
+        overview: "The Alien Kraken is the official Kraken implementation in Chaotic Dimensions. The encounter uses custom music and sky, a title-card introduction, and an AI that combines coordinated patterns rather than relying on purely random projectile spam.",
+        facts: [
+          "85,000,000 base life",
+          "60 defense in phase one, 90 in phase two and 117 in phase three",
+          "Changes phase at 50% and 15% life",
+          "Movement, defense and attack frequency increase in each phase",
+          "Encounter state and world progression synchronize in multiplayer"
+        ],
+        obtain: [
+          "Defeat Crystaline Devourer first.",
+          "Craft and use the Alien Kraken Signal at a Godness Anvil.",
+          "Recipe: 60 Crystaline Tears, 30 Souls of Shadow and 20 Luminite Bars."
+        ],
+        tactics: [
+          "Drop walls preserve three openings; identify a route before crossing.",
+          "Destroy clones and ruby sentinels to reduce accumulated pressure.",
+          "During lasers and vortices, prioritize positioning and mobility over continuous damage.",
+          "Phase three begins at 15% life and demands open space for its dash chains."
+        ]
       }
     }
   },

@@ -372,5 +372,18 @@ export const bossGuideEntries = [
     when: t("Entre logo depois do Moon Lord com setup vanilla completo de endgame.", "Fight it right after Moon Lord with a full vanilla endgame setup."),
     arena: t("Use uma arena muito larga e com leitura visual limpa.", "Use a very wide arena with clean visual readability."),
     focus: t("Sobreviva aos ciclos longos enquanto mantem dano alto e constante.", "Survive the long cycles while maintaining high, steady damage.")
+  },
+  {
+    id: "kraken",
+    phase: "post_moonlord",
+    setupKey: "post_moonlord",
+    source: "mod",
+    optional: false,
+    entryId: "kraken",
+    title: t("O Kraken Alienígena", "The Alien Kraken"),
+    summary: t("Encontro cósmico de três fases que sucede o Crystaline Devourer.", "A three-phase cosmic encounter fought after Crystaline Devourer."),
+    when: t("Enfrente-o depois de derrotar o Crystaline Devourer e preparar equipamento do tier Shadow.", "Fight it after defeating Crystaline Devourer and preparing Shadow-tier equipment."),
+    arena: t("Use uma área aberta com espaço vertical e lateral para atravessar paredes de projéteis.", "Use an open area with enough vertical and horizontal room to cross projectile walls."),
+    focus: t("Leia as aberturas das paredes, destrua clones e sentinelas e guarde mobilidade para lasers e correntes de dash.", "Read the wall openings, destroy clones and sentinels, and preserve mobility for lasers and dash chains.")
   }
 ];
