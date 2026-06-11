@@ -49,6 +49,12 @@ O repositório já não representa apenas um protótipo. Hoje ele concentra:
   - intro com title card, música própria, arena forçada e scene dedicada
   - abre o tier `Shadow`
 
+- `Alien Kraken`
+  - boss pós-`Crystaline Devourer`
+  - encontro cósmico com três fases, música própria, sky dedicado e apresentação cinematográfica
+  - combina lasers, paredes de projéteis, relâmpagos, clones, sentinelas de rubi, minions e ataques de controlo de espaço
+  - possui sincronização própria para singleplayer e multiplayer
+
 ### Progressão
 
 - `Monthra`
@@ -61,7 +67,12 @@ O repositório já não representa apenas um protótipo. Hoje ele concentra:
 
 - `Shadow`
   - ligada ao `ShadowBiome` e ao `Crystaline Devourer`
-  - representa o tier mais forte atualmente implementado em código
+  - prepara os materiais necessários para invocar o `Alien Kraken`
+
+- `Alien Kraken`
+  - invocado com o `Alien Kraken Signal` depois de derrotar o `Crystaline Devourer`
+  - representa o encontro mais avançado atualmente implementado
+  - regista progresso próprio no mundo para futuros tiers pós-Kraken
 
 ### Biomas e worldgen
 
@@ -187,6 +198,7 @@ Chaotic Dimensions is an original Terraria / tModLoader mod focused on building 
 - the post-Moon Lord boss `Crystaline Devourer`
 - the hostile `ShadowBiome`
 - custom progression through `Rosalita` and `Shadow` tiers
+- the post-Crystaline `Alien Kraken`, a three-phase cosmic encounter with custom music, sky, attacks and multiplayer synchronization
 - an active documentation workflow with a public wiki
 
 The repository is meant to reflect the real state of the project, including placeholders, technical audits and ongoing content expansion.

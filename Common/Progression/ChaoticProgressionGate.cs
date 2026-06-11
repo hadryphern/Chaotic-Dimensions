@@ -16,6 +16,7 @@ namespace ChaoticDimensions.Common.Progression
 		PostCultist,
 		PostMoonLord,
 		PostCrystalineDevourer,
+		PostKraken,
 		PostChaoticApexOne,
 		PostChaoticApexTwo,
 		PostChaoticApexThree,

@@ -1,0 +1,45 @@
+Items: {
+	KrakenSummonItem: {
+		DisplayName: Sinal do Kraken Alienígena
+		Tooltip:
+			'''
+			Abre um sinal para além da orla da galáxia azul
+			Invoca o Kraken Alienígena
+			Requer que o Devorador Cristalino tenha sido derrotado
+			'''
+	}
+}
+
+NPCs: {
+	KrakenBoss.DisplayName: O Kraken Alienígena
+	KrakenTentacle.DisplayName: Tentáculo Alienígena
+	KrakenClone.DisplayName: Clone Astral do Kraken
+	KrakenMinion.DisplayName: Cria do Kraken Alienígena
+	KrakenCrystalTurret.DisplayName: Sentinela de Cristal Alienígena
+}
+
+Projectiles: {
+	KrakenLightningStrike.DisplayName: Relâmpago do Kraken
+	KrakenAbyssTether.DisplayName: Laço Abissal do Kraken
+	KrakenAbyssVortex.DisplayName: Vórtice Abissal do Kraken
+	KrakenHomingLightning.DisplayName: Relâmpago Guiado do Kraken
+	KrakenSkyBeam.DisplayName: Feixe Celeste do Kraken
+	KrakenWaterJet.DisplayName: Jacto de Água do Kraken
+	KrakenWaterDrop.DisplayName: Gota de Água do Kraken
+	KrakenRotatingLaser.DisplayName: Laser Giratório do Kraken
+	KrakenTrackingLaser.DisplayName: Laser Alienígena Expansivo
+	KrakenRedBolt.DisplayName: Disparo de Cristal Alienígena
+	KrakenHypnosisVortex.DisplayName: Vórtice Hipnótico Alienígena
+}
+
+Buffs: {
+	KrakenAbyssBreathBuff: {
+		DisplayName: Respiração Abissal
+		Description: A pressão alienígena permite respirar e mover-se livremente
+	}
+
+	KrakenCrushingDepthDebuff: {
+		DisplayName: Profundidade Esmagadora
+		Description: A gravidade alienígena esmaga o movimento e a resistência
+	}
+}

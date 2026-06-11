@@ -12,6 +12,7 @@ namespace ChaoticDimensions.Common.Systems
 		public static bool downedChaoticApexTwo;
 		public static bool downedChaoticApexThree;
 		public static bool downedCrystalineDevourer;
+		public static bool downedKraken;
 
 		public override void ClearWorld() {
 			downedMonthra = false;
@@ -19,6 +20,7 @@ namespace ChaoticDimensions.Common.Systems
 			downedChaoticApexTwo = false;
 			downedChaoticApexThree = false;
 			downedCrystalineDevourer = false;
+			downedKraken = false;
 		}
 
 		public override void SaveWorldData(TagCompound tag) {
@@ -41,6 +43,10 @@ namespace ChaoticDimensions.Common.Systems
 			if (downedCrystalineDevourer) {
 				tag["downedCrystalineDevourer"] = true;
 			}
+
+			if (downedKraken) {
+				tag["downedKraken"] = true;
+			}
 		}
 
 		public override void LoadWorldData(TagCompound tag) {
@@ -49,6 +55,7 @@ namespace ChaoticDimensions.Common.Systems
 			downedChaoticApexTwo = tag.ContainsKey("downedChaoticApexTwo");
 			downedChaoticApexThree = tag.ContainsKey("downedChaoticApexThree");
 			downedCrystalineDevourer = tag.ContainsKey("downedCrystalineDevourer");
+			downedKraken = tag.ContainsKey("downedKraken");
 		}
 
 		public override void NetSend(BinaryWriter writer) {
@@ -57,7 +64,8 @@ namespace ChaoticDimensions.Common.Systems
 				downedChaoticApexOne,
 				downedChaoticApexTwo,
 				downedChaoticApexThree,
-				downedCrystalineDevourer);
+				downedCrystalineDevourer,
+				downedKraken);
 		}
 
 		public override void NetReceive(BinaryReader reader) {
@@ -66,7 +74,8 @@ namespace ChaoticDimensions.Common.Systems
 				out downedChaoticApexOne,
 				out downedChaoticApexTwo,
 				out downedChaoticApexThree,
-				out downedCrystalineDevourer);
+				out downedCrystalineDevourer,
+				out downedKraken);
 		}
 	}
 }

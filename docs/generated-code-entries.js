@@ -49,6 +49,81 @@ export const generatedCodeEntries = [
     }
   },
   {
+    "id": "alien-kraken-signal",
+    "category": "summons",
+    "image": "./assets/images/content/Items/Summons/KrakenSummonItem.png",
+    "sortOrder": 0,
+    "isPublished": true,
+    "content": {
+      "_meta": {
+        "codePresent": true,
+        "codeClassName": "KrakenSummonItem",
+        "codeSourcePath": "Content/Items/Summons/KrakenSummonItem.cs",
+        "codeTexturePath": "ChaoticDimensions/Content/Items/Summons/KrakenSummonItem",
+        "codeTitles": {
+          "en": "Alien Kraken Signal",
+          "pt-BR": "Alien Kraken Signal"
+        },
+        "codeAliases": [
+          "KrakenSummonItem",
+          "Alien Kraken Signal"
+        ],
+        "codeRecipes": [
+          {
+            "resultAmount": 1,
+            "ingredients": [
+              {
+                "label": "Crystaline Tear",
+                "amount": 60,
+                "entryId": "crystaline-tear"
+              },
+              {
+                "label": "Soul of Shadow",
+                "amount": 30,
+                "entryId": "soul-of-shadow"
+              },
+              {
+                "label": "Lunar Bar",
+                "amount": 20
+              }
+            ],
+            "stations": [
+              {
+                "id": "godness-anvil",
+                "label": "Godness Anvil"
+              }
+            ]
+          }
+        ],
+        "codeCategory": "summons"
+      },
+      "pt-BR": {
+        "title": "Alien Kraken Signal",
+        "subtitle": "Invocacao sincronizada do codigo",
+        "summary": "Alien Kraken Signal foi sincronizado automaticamente a partir do codigo do mod e ja usa a receita real do projeto.",
+        "overview": "Esta pagina usa o codigo do Chaotic Dimensions como fonte de verdade para ingredientes, estacoes e quantidade da receita, evitando divergencia entre o jogo e a wiki.",
+        "obtain": [
+          "Criado pela receita real extraida do codigo do mod."
+        ],
+        "crafting": [
+          "Crystaline Tear x60 + Soul of Shadow x30 + Lunar Bar x20 em Godness Anvil"
+        ]
+      },
+      "en": {
+        "title": "Alien Kraken Signal",
+        "subtitle": "Code-synced summon entry",
+        "summary": "Alien Kraken Signal was synced directly from the mod code and already uses the live in-game recipe.",
+        "overview": "This page uses the Chaotic Dimensions source code as its single source of truth for ingredients, stations and recipe counts.",
+        "obtain": [
+          "Crafted using the live recipe extracted from the mod source."
+        ],
+        "crafting": [
+          "Crystaline Tear x60 + Soul of Shadow x30 + Lunar Bar x20 at Godness Anvil"
+        ]
+      }
+    }
+  },
+  {
     "id": "bedrock-stick",
     "category": "materials",
     "sortOrder": 346,

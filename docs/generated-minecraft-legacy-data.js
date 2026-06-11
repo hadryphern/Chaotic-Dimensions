@@ -1158,7 +1158,7 @@ export const generatedMinecraftLegacyEntries = [
     }
   },
   {
-    "id": "kraken",
+    "id": "legacy-kraken-concept",
     "category": "minibosses",
     "image": "./assets/images/content/NPCs/MinecraftLegacy/Kraken.png",
     "related": [
@@ -1167,7 +1167,7 @@ export const generatedMinecraftLegacyEntries = [
       "kraken-blade"
     ],
     "sortOrder": 195,
-    "isPublished": true,
+    "isPublished": false,
     "content": {
       "_meta": {
         "featureInProgression": true,
