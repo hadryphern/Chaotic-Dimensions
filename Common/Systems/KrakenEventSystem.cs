@@ -33,7 +33,7 @@ namespace ChaoticDimensions.Common.Systems
 		public const int BattleStart = IntroTitleEnd;
 		public const int Phase2Start = 9999 * 60;
 		public const int MusicLoop = IntroTitleEnd + 222 * 60;
-		private const int SilhouetteFrameCount = KrakenBoss.AnimationFrames;
+		private const int SilhouetteFrameCount = KrakenBoss.LoopAnimationFrames;
 
 		public bool Active;
 		public bool SpawnedKraken;
@@ -448,9 +448,7 @@ namespace ChaoticDimensions.Common.Systems
 			float sink = MathHelper.Lerp(-8f, 18f, progress);
 			Vector2 center = new Vector2(Main.screenWidth * 0.5f + sway, Main.screenHeight * 0.43f + sink);
 			Texture2D forwardTexture = ModContent.Request<Texture2D>("ChaoticDimensions/Content/NPCs/Kraken/KrakenBoss").Value;
-			Texture2D loopBackTexture = KrakenBoss.ForwardAnimationFrames >= KrakenBoss.AnimationFrames
-				? forwardTexture
-				: ModContent.Request<Texture2D>(KrakenBoss.LoopBackTexturePath).Value;
+			Texture2D loopBackTexture = ModContent.Request<Texture2D>(KrakenBoss.LoopBackTexturePath).Value;
 			int frame = (Timer / 18) % SilhouetteFrameCount;
 			KrakenBoss.GetAnimationFrame(forwardTexture, loopBackTexture, frame, out Texture2D silhouette, out Rectangle source);
 			Vector2 origin = source.Size() * 0.5f;

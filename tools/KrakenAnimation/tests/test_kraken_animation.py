@@ -18,6 +18,9 @@ from tools.KrakenAnimation.kraken_animation import (
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 RIG_PATH = PROJECT_ROOT / "tools" / "KrakenAnimation" / "kraken_rig.json"
 SOURCE_DIR = PROJECT_ROOT / "Assets" / "Source" / "Kraken"
+KRAKEN_BOSS_PATH = PROJECT_ROOT / "Content" / "NPCs" / "Kraken" / "KrakenBoss.cs"
+KRAKEN_CLONE_PATH = PROJECT_ROOT / "Content" / "NPCs" / "Kraken" / "KrakenClone.cs"
+KRAKEN_EVENT_PATH = PROJECT_ROOT / "Common" / "Systems" / "KrakenEventSystem.cs"
 
 
 class RigTests(unittest.TestCase):
@@ -182,6 +185,37 @@ class AtlasTests(unittest.TestCase):
         ]
         boundary = delta(alphas[-1], alphas[0])
         self.assertLessEqual(boundary, max(internal) * 1.15)
+
+
+class RuntimeIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.boss_source = KRAKEN_BOSS_PATH.read_text(encoding="utf-8-sig")
+        cls.clone_source = KRAKEN_CLONE_PATH.read_text(encoding="utf-8-sig")
+        cls.event_source = KRAKEN_EVENT_PATH.read_text(encoding="utf-8-sig")
+
+    def test_runtime_uses_forward_and_return_atlases(self) -> None:
+        self.assertIn("public const int LoopAnimationFrames = 72;", self.boss_source)
+        self.assertIn(
+            "int safeFrame = frame % LoopAnimationFrames;",
+            self.boss_source,
+        )
+        self.assertIn(
+            "% KrakenBoss.LoopAnimationFrames",
+            self.clone_source,
+        )
+        self.assertIn(
+            "SilhouetteFrameCount = KrakenBoss.LoopAnimationFrames",
+            self.event_source,
+        )
+
+    def test_ruby_uses_one_stable_body_anchor(self) -> None:
+        self.assertNotIn("RubyFrameOffsetX", self.boss_source)
+        self.assertNotIn("RubyFrameOffsetY", self.boss_source)
+        self.assertIn(
+            "private static readonly Vector2 RubyFrameOffset = new Vector2(-31f, -388f);",
+            self.boss_source,
+        )
 
 
 if __name__ == "__main__":

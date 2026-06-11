@@ -56,7 +56,7 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 			NPC.Center = Vector2.Lerp(NPC.Center, desiredPosition, 0.16f);
 			NPC.velocity = Vector2.Zero;
 			NPC.rotation = (float)System.Math.Sin(angle) * 0.08f;
-			NPC.frameCounter = (NPC.frameCounter + 0.34f) % KrakenBoss.AnimationFrames;
+			NPC.frameCounter = (NPC.frameCounter + 0.34f) % KrakenBoss.LoopAnimationFrames;
 
 			if (Main.netMode != NetmodeID.MultiplayerClient) {
 				if (Timer % 116f == 30f) {
@@ -90,9 +90,7 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 
 		public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor) {
 			Texture2D forwardTexture = TextureAssets.Npc[Type].Value;
-			Texture2D loopBackTexture = KrakenBoss.ForwardAnimationFrames >= KrakenBoss.AnimationFrames
-				? forwardTexture
-				: ModContent.Request<Texture2D>(KrakenBoss.LoopBackTexturePath).Value;
+			Texture2D loopBackTexture = ModContent.Request<Texture2D>(KrakenBoss.LoopBackTexturePath).Value;
 			KrakenBoss.GetAnimationFrame(forwardTexture, loopBackTexture, (int)NPC.frameCounter, out Texture2D texture, out Rectangle source);
 			Vector2 origin = source.Size() * 0.5f;
 			float scale = KrakenBoss.BaseVisualScale * MathHelper.Clamp(NPC.ai[1], 0.42f, 0.82f);

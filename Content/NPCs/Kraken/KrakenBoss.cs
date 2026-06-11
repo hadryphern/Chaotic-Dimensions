@@ -26,6 +26,7 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 		private const int VisualMotionUp = 2;
 		public const int AnimationFrames = 36;
 		public const int ForwardAnimationFrames = 36;
+		public const int LoopAnimationFrames = 72;
 		public const int AtlasColumns = 6;
 		public const int AtlasRows = 6;
 		public const string LoopBackTexturePath = "ChaoticDimensions/Content/NPCs/Kraken/KrakenBossLoopBack";
@@ -34,22 +35,7 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 		public const float Phase3VisualScale = 1.62f;
 		public const float VisualDrawOffsetY = 82f;
 		private const float RubySourceScale = 0.95f;
-		private static readonly float[] RubyFrameOffsetX = {
-			-29.22f, -29.03f, -28.99f, -28.86f, -28.63f, -28.73f,
-			-28.78f, -28.68f, -28.73f, -28.64f, -28.66f, -28.64f,
-			-28.46f, -28.21f, -28.06f, -27.74f, -27.44f, -27.21f,
-			-26.9f, -26.89f, -26.65f, -26.49f, -26.49f, -26.36f,
-			-26.37f, -26.44f, -26.55f, -26.93f, -27.05f, -27.07f,
-			-27.43f, -27.6f, -27.81f, -27.96f, -28.25f, -28.8f
-		};
-		private static readonly float[] RubyFrameOffsetY = {
-			-383.57f, -383.26f, -380.81f, -379.27f, -376.6f, -374.65f,
-			-372.84f, -370.17f, -369.61f, -367.62f, -362.68f, -361.87f,
-			-358.01f, -351.86f, -349.26f, -345.57f, -342.29f, -340.18f,
-			-339.56f, -339.06f, -338.91f, -338.91f, -339.5f, -342.46f,
-			-344.12f, -344.35f, -349.48f, -352.61f, -353.25f, -356.4f,
-			-360.5f, -363.2f, -366.39f, -369.44f, -372.82f, -380.14f
-		};
+		private static readonly Vector2 RubyFrameOffset = new Vector2(-31f, -388f);
 
 		private int visualMotion;
 		private int previousVisualMotion;
@@ -100,9 +86,8 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 			return npc.lifeMax > 0 && npc.life <= npc.lifeMax * 0.5f ? Phase2VisualScale : BaseVisualScale;
 		}
 
-		public static Vector2 GetRubyFrameOffset(int frame) {
-			int safeFrame = (frame % AnimationFrames + AnimationFrames) % AnimationFrames;
-			return new Vector2(RubyFrameOffsetX[safeFrame], RubyFrameOffsetY[safeFrame]);
+		public static Vector2 GetRubyFrameOffset() {
+			return RubyFrameOffset;
 		}
 
 		public override void SetStaticDefaults() {
@@ -213,8 +198,8 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 
 			float frameStep = State == StateLaserSpin || State == StateTrackingLaser || State == StateHypnosis ? 0.19f : Phase3 ? 0.36f : Phase2 ? 0.29f : 0.24f;
 			NPC.frameCounter += frameStep;
-			if (NPC.frameCounter >= AnimationFrames) {
-				NPC.frameCounter -= AnimationFrames;
+			if (NPC.frameCounter >= LoopAnimationFrames) {
+				NPC.frameCounter -= LoopAnimationFrames;
 			}
 
 			NPC.frame.Y = 0;
@@ -1225,9 +1210,14 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 				: motion == VisualMotionUp
 					? "ChaoticDimensions/Content/NPCs/Kraken/KrakenBossMoveUp"
 					: Texture;
-			texture = motion == VisualMotionIdle
-				? TextureAssets.Npc[Type].Value
-				: ModContent.Request<Texture2D>(texturePath).Value;
+			if (motion == VisualMotionIdle) {
+				Texture2D forwardTexture = TextureAssets.Npc[Type].Value;
+				Texture2D loopBackTexture = ModContent.Request<Texture2D>(LoopBackTexturePath).Value;
+				GetAnimationFrame(forwardTexture, loopBackTexture, frame, out texture, out source);
+				return;
+			}
+
+			texture = ModContent.Request<Texture2D>(texturePath).Value;
 			source = GetAtlasFrameSource(texture, frame % AnimationFrames);
 		}
 
@@ -1241,10 +1231,9 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 		private void DrawRubyOnBody(SpriteBatch spriteBatch, Vector2 center, float scale) {
 			Texture2D ruby = GetRubyHeadTexture();
 			Vector2 origin = ruby.Size() * 0.5f;
-			float phase = MathHelper.TwoPi * (float)NPC.frameCounter / AnimationFrames;
+			float phase = MathHelper.TwoPi * (float)NPC.frameCounter / LoopAnimationFrames;
 			float pulse = RubyOff ? 1f : 1f + 0.045f * (float)System.Math.Sin(phase * 2f);
-			int frame = ((int)NPC.frameCounter % AnimationFrames + AnimationFrames) % AnimationFrames;
-			Vector2 localOffset = GetRubyFrameOffset(frame) * scale;
+			Vector2 localOffset = GetRubyFrameOffset() * scale;
 			if (visualEffects == SpriteEffects.FlipHorizontally) {
 				localOffset.X *= -1f;
 			}
@@ -1274,9 +1263,9 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 		}
 
 		public static void GetAnimationFrame(Texture2D forwardTexture, Texture2D loopBackTexture, int frame, out Texture2D texture, out Rectangle source) {
-			int safeFrame = frame % AnimationFrames;
+			int safeFrame = frame % LoopAnimationFrames;
 			if (safeFrame < 0) {
-				safeFrame += AnimationFrames;
+				safeFrame += LoopAnimationFrames;
 			}
 
 			if (safeFrame < ForwardAnimationFrames) {

@@ -116,7 +116,7 @@ namespace ChaoticDimensions.Content.Projectiles
 
 		public static Vector2 GetKrakenHead(NPC owner) {
 			float scale = KrakenBoss.GetVisualScaleForLife(owner);
-			Vector2 localOffset = KrakenBoss.GetRubyFrameOffset((int)owner.frameCounter) * scale;
+			Vector2 localOffset = KrakenBoss.GetRubyFrameOffset() * scale;
 			return owner.Center + new Vector2(0f, KrakenBoss.VisualDrawOffsetY) + localOffset.RotatedBy(owner.rotation);
 		}
 
