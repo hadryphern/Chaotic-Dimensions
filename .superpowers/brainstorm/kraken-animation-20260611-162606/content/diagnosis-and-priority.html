@@ -1,0 +1,112 @@
+<style>
+  .visual-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin: 22px 0 28px;
+  }
+  .visual-panel {
+    padding: 14px;
+    border: 1px solid #34435f;
+    border-radius: 8px;
+    background: #090f20;
+  }
+  .visual-panel img {
+    width: 100%;
+    height: 440px;
+    object-fit: contain;
+    image-rendering: auto;
+    background:
+      linear-gradient(45deg, #11192c 25%, transparent 25%),
+      linear-gradient(-45deg, #11192c 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #11192c 75%),
+      linear-gradient(-45deg, transparent 75%, #11192c 75%);
+    background-size: 22px 22px;
+    background-position: 0 0, 0 11px, 11px -11px, -11px 0;
+  }
+  .visual-panel h3 { margin: 12px 0 5px; }
+  .finding {
+    padding: 14px 16px;
+    border-left: 4px solid #ffbe4a;
+    background: #171628;
+    margin: 18px 0 26px;
+  }
+  @media (max-width: 850px) {
+    .visual-grid { grid-template-columns: 1fr; }
+    .visual-panel img { height: 360px; }
+  }
+</style>
+
+<h2>Diagnóstico da animação do Kraken</h2>
+<p class="subtitle">Os dois defeitos vêm do próprio atlas, não da velocidade usada pelo jogo.</p>
+
+<div class="visual-grid">
+  <div class="visual-panel">
+    <img src="/files/current-atlas.gif" alt="Animação atualmente usada pelo mod">
+    <h3>Atlas atual no jogo</h3>
+    <p>O corpo foi limpo e ampliado, mas conserva o lineart escuro apenas na cabeça.</p>
+  </div>
+  <div class="visual-panel">
+    <img src="/files/reference-ai.gif" alt="Animação de referência criada anteriormente">
+    <h3>Referência recebida</h3>
+    <p>A fluidez geral é boa, mas os frames mudam a anatomia dos tentáculos centrais.</p>
+  </div>
+</div>
+
+<hr style="margin:42px 0 28px;border:0;border-top:1px solid #34435f">
+
+<h2>Protótipo da opção B</h2>
+<p class="subtitle">Estudo feito diretamente com as camadas originais do Kraken. Ainda não é o atlas final.</p>
+
+<div class="visual-grid">
+  <div class="visual-panel">
+    <img src="/files/current-atlas.gif" alt="Animação atualmente usada pelo mod">
+    <h3>Antes</h3>
+    <p>Os frames substituem a anatomia completa. As raízes e a quantidade aparente dos tentáculos mudam durante o ciclo.</p>
+  </div>
+  <div class="visual-panel" style="border-color:#4d78d4">
+    <img src="/files/option-b-preview.gif" alt="Protótipo da opção B com tentáculos ligados">
+    <h3>Opção B: deformação contínua</h3>
+    <p>As mesmas peças permanecem ligadas ao corpo. A onda aumenta gradualmente da raiz até à ponta e fecha em loop.</p>
+  </div>
+</div>
+
+<div class="finding" style="border-left-color:#4d78d4;background:#0e1932">
+  <strong>O que será melhorado na versão final:</strong> movimento mais amplo e cartoon, atraso físico das pontas, compressão do corpo, poses direcionais para subir e deslocar-se lateralmente, além de lineart azul-marinho consistente em toda a silhueta. Este protótipo demonstra principalmente a estabilidade anatómica.
+</div>
+
+<div class="finding">
+  <strong>Causa encontrada:</strong> a cabeça mantém linhas internas e contorno escuro, enquanto o corpo e os tentáculos foram reconstruídos com massas de cor sem o mesmo acabamento. Além disso, cada frame da animação de referência redesenha os tentáculos pequenos com raízes, comprimentos e quantidades diferentes. Eles não estão realmente deformados como um único corpo; são desenhos diferentes colocados em sequência.
+</div>
+
+<div class="visual-panel" style="max-width:760px;margin:0 auto 28px">
+  <img src="/files/annotated-problem.png" alt="Áreas problemáticas assinaladas">
+  <h3>Áreas que precisam de reconstrução</h3>
+</div>
+
+<h2>Qual prioridade devo usar na reconstrução?</h2>
+<p class="subtitle">Esta decisão define até onde posso alterar a silhueta para obter movimento realmente fluido.</p>
+
+<div class="options">
+  <div class="option" data-choice="preservar" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Preservar exatamente</h3>
+      <p>Mantenho todas as formas atuais e corrijo contorno e saltos. É a opção mais fiel, mas alguns movimentos continuam limitados pela anatomia dos frames existentes.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="fluidez" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Priorizar fluidez</h3>
+      <p>Mantenho cabeça, cores e identidade, mas reorganizo discretamente as raízes dos tentáculos e uso uma deformação contínua. É a opção recomendada.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="redesenho" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Redesenho completo</h3>
+      <p>Uso a arte apenas como referência e reconstruo corpo e tentáculos com lineart e volumes uniformes. Maior liberdade e maior alteração visual.</p>
+    </div>
+  </div>
+</div>

@@ -5,3 +5,6 @@ obj/
 tools/KrakenAnimation/output/
 __pycache__/
 *.pyc
+.superpowers/brainstorm/current-session.txt
+.superpowers/brainstorm/*/state/
+tmp/report_backups/
