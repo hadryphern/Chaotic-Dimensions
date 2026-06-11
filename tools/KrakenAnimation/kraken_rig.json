@@ -1,0 +1,187 @@
+{
+  "source_size": [570, 990],
+  "frame_size": [640, 1024],
+  "atlas_grid": [6, 6],
+  "frame_count": 36,
+  "working_scale": 2,
+  "outline": {
+    "color": [7, 19, 52, 255],
+    "radius": 2.25
+  },
+  "body_anchor": [284.0, 158.0],
+  "ruby_anchor": [284.0, 84.0],
+  "layers": [
+    {
+      "index": 0,
+      "name": "tentaculo_longo_esquerdo",
+      "role": "long_tentacle",
+      "root": [250.0, 307.0],
+      "phase_offset": 0.0,
+      "direction": -1.0,
+      "z": 10
+    },
+    {
+      "index": 1,
+      "name": "tentaculo_longo_direito",
+      "role": "long_tentacle",
+      "root": [334.0, 298.0],
+      "phase_offset": 2.05,
+      "direction": 1.0,
+      "z": 11
+    },
+    {
+      "index": 2,
+      "name": "tentaculo_longo_central",
+      "role": "long_tentacle",
+      "root": [285.0, 304.0],
+      "phase_offset": 4.1,
+      "direction": -1.0,
+      "z": 12
+    },
+    {
+      "index": 3,
+      "name": "tentaculo_central_esquerdo",
+      "role": "central_tentacle",
+      "root": [238.0, 305.0],
+      "phase_offset": 0.35,
+      "direction": -1.0,
+      "z": 31
+    },
+    {
+      "index": 4,
+      "name": "tentaculo_central_direito",
+      "role": "central_tentacle",
+      "root": [319.0, 304.0],
+      "phase_offset": 1.25,
+      "direction": 1.0,
+      "z": 32
+    },
+    {
+      "index": 5,
+      "name": "franja_central_externa",
+      "role": "central_tentacle",
+      "root": [284.0, 304.0],
+      "phase_offset": 2.15,
+      "direction": -1.0,
+      "z": 33
+    },
+    {
+      "index": 6,
+      "name": "franja_central_media",
+      "role": "central_tentacle",
+      "root": [284.0, 305.0],
+      "phase_offset": 3.05,
+      "direction": 1.0,
+      "z": 34
+    },
+    {
+      "index": 7,
+      "name": "franja_central_interna",
+      "role": "central_tentacle",
+      "root": [284.0, 308.0],
+      "phase_offset": 3.95,
+      "direction": -1.0,
+      "z": 35
+    },
+    {
+      "index": 8,
+      "name": "franja_central_fina",
+      "role": "central_tentacle",
+      "root": [284.0, 308.0],
+      "phase_offset": 4.85,
+      "direction": 1.0,
+      "z": 36
+    },
+    {
+      "index": 9,
+      "name": "franja_central_nucleo",
+      "role": "central_tentacle",
+      "root": [284.0, 311.0],
+      "phase_offset": 5.75,
+      "direction": -1.0,
+      "z": 37
+    },
+    {
+      "index": 10,
+      "name": "cabeca_e_tronco",
+      "role": "body",
+      "root": null,
+      "phase_offset": 0.0,
+      "direction": 1.0,
+      "z": 20
+    },
+    {
+      "index": 11,
+      "name": "ruby_normal",
+      "role": "ruby",
+      "root": null,
+      "phase_offset": 0.0,
+      "direction": 1.0,
+      "z": 50
+    },
+    {
+      "index": 12,
+      "name": "ruby_desligada",
+      "role": "ruby",
+      "root": null,
+      "phase_offset": 0.0,
+      "direction": 1.0,
+      "z": 50
+    },
+    {
+      "index": 13,
+      "name": "ruby_partida",
+      "role": "ruby",
+      "root": null,
+      "phase_offset": 0.0,
+      "direction": 1.0,
+      "z": 50
+    }
+  ],
+  "motion_profiles": {
+    "idle": {
+      "long_amplitude": 38.0,
+      "central_amplitude": 10.0,
+      "frequency": 1.8,
+      "tip_lag": 0.42,
+      "vertical_amplitude": 7.0,
+      "body_bob": 4.5,
+      "body_breathe": 0.012,
+      "drag_x": 0.0,
+      "drag_y": 0.0
+    },
+    "loop_back": {
+      "long_amplitude": 30.0,
+      "central_amplitude": 8.0,
+      "frequency": 1.65,
+      "tip_lag": 0.34,
+      "vertical_amplitude": 5.0,
+      "body_bob": 3.0,
+      "body_breathe": 0.008,
+      "drag_x": 0.0,
+      "drag_y": 0.0
+    },
+    "horizontal": {
+      "long_amplitude": 34.0,
+      "central_amplitude": 9.0,
+      "frequency": 1.7,
+      "tip_lag": 0.48,
+      "vertical_amplitude": 5.0,
+      "body_bob": 3.0,
+      "body_breathe": 0.008,
+      "drag_x": -52.0,
+      "drag_y": 5.0
+    },
+    "up": {
+      "long_amplitude": 28.0,
+      "central_amplitude": 8.0,
+      "frequency": 1.9,
+      "tip_lag": 0.38,
+      "vertical_amplitude": 4.0,
+      "body_bob": 2.0,
+      "body_breathe": -0.008,
+      "drag_x": 0.0,
+      "drag_y": 48.0
+    }
+  }
+}

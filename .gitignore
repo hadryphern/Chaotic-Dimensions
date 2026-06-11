@@ -2,3 +2,6 @@
 .vs/
 bin/
 obj/
+tools/KrakenAnimation/output/
+__pycache__/
+*.pyc
