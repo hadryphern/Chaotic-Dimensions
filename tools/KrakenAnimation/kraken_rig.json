@@ -4,6 +4,7 @@
   "atlas_grid": [6, 6],
   "frame_count": 36,
   "working_scale": 2,
+  "source_placement": [5.0, 40.0],
   "outline": {
     "color": [7, 19, 52, 255],
     "radius": 2.25
@@ -140,48 +141,48 @@
   ],
   "motion_profiles": {
     "idle": {
-      "long_amplitude": 38.0,
-      "central_amplitude": 10.0,
-      "frequency": 1.8,
-      "tip_lag": 0.42,
-      "vertical_amplitude": 7.0,
+      "long_amplitude": 62.0,
+      "central_amplitude": 15.0,
+      "frequency": 1.65,
+      "tip_lag": 0.62,
+      "vertical_amplitude": 10.0,
       "body_bob": 4.5,
       "body_breathe": 0.012,
       "drag_x": 0.0,
       "drag_y": 0.0
     },
     "loop_back": {
-      "long_amplitude": 30.0,
-      "central_amplitude": 8.0,
-      "frequency": 1.65,
-      "tip_lag": 0.34,
-      "vertical_amplitude": 5.0,
+      "long_amplitude": 55.0,
+      "central_amplitude": 13.0,
+      "frequency": 1.6,
+      "tip_lag": 0.58,
+      "vertical_amplitude": 8.0,
       "body_bob": 3.0,
       "body_breathe": 0.008,
       "drag_x": 0.0,
       "drag_y": 0.0
     },
     "horizontal": {
-      "long_amplitude": 34.0,
-      "central_amplitude": 9.0,
+      "long_amplitude": 50.0,
+      "central_amplitude": 14.0,
       "frequency": 1.7,
-      "tip_lag": 0.48,
-      "vertical_amplitude": 5.0,
+      "tip_lag": 0.64,
+      "vertical_amplitude": 7.0,
       "body_bob": 3.0,
       "body_breathe": 0.008,
-      "drag_x": -52.0,
+      "drag_x": -70.0,
       "drag_y": 5.0
     },
     "up": {
-      "long_amplitude": 28.0,
-      "central_amplitude": 8.0,
-      "frequency": 1.9,
-      "tip_lag": 0.38,
-      "vertical_amplitude": 4.0,
+      "long_amplitude": 45.0,
+      "central_amplitude": 13.0,
+      "frequency": 1.85,
+      "tip_lag": 0.56,
+      "vertical_amplitude": 6.0,
       "body_bob": 2.0,
       "body_breathe": -0.008,
       "drag_x": 0.0,
-      "drag_y": 48.0
+      "drag_y": 32.0
     }
   }
 }
