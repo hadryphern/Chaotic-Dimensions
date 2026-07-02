@@ -1,4 +1,0 @@
-displayName = Chaotic Dimensions
-author = blueDev
-version = 0.2
-buildIgnore = tmp/*, docs/*, Assets/Fonts/*, Assets/Source/*, tools/*

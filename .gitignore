@@ -2,9 +2,14 @@
 .vs/
 bin/
 obj/
-tools/KrakenAnimation/output/
+**/bin/
+**/obj/
+ChaoticDimensions Assets/Tools/ProjectTools/KrakenAnimation/output/
 __pycache__/
+**/__pycache__/
 *.pyc
-.superpowers/brainstorm/current-session.txt
-.superpowers/brainstorm/*/state/
-tmp/report_backups/
+.pytest_cache/
+*.tmp
+*.log
+.~lock.*#
+ChaoticDimensions Assets/Archive/TemporaryFiles/tmp/report_backups/

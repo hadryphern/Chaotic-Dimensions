@@ -1,0 +1,35 @@
+{
+  "csharp.experimental.debug.hotReload": true,
+  "csharp.debug.hotReloadOnSave": true,
+  "dotnet.defaultSolution": "ChaoticDimensions Mod/ChaoticDimensions.sln",
+  "dotnetAcquisitionExtension.sharedExistingDotnetPath": "/home/hadrykkxd/.dotnet/dotnet",
+  "dotnetAcquisitionExtension.existingDotnetPath": [
+    {
+      "extensionId": "ms-dotnettools.csharp",
+      "path": "/home/hadrykkxd/.dotnet/dotnet"
+    },
+    {
+      "extensionId": "ms-dotnettools.csdevkit",
+      "path": "/home/hadrykkxd/.dotnet/dotnet"
+    }
+  ],
+  "dotnet.useLegacyDotnetResolution": true,
+  "dotnet.suppressSdkInstallView": true,
+  "dotnet.server.environmentVariables": {
+    "DOTNET_ROOT": "/home/hadrykkxd/.dotnet",
+    "PATH": "/home/hadrykkxd/.dotnet:/home/hadrykkxd/.dotnet/tools:/home/hadrykkxd/.local/bin:/app/bin:/usr/bin"
+  },
+  "omnisharp.dotnetPath": "/home/hadrykkxd/.dotnet",
+  "omnisharp.sdkPath": "/home/hadrykkxd/.dotnet/sdk/8.0.422",
+  "cSpell.language": "en,pt,pt-BR",
+  "files.associations": {
+    "*.hjson": "hjson",
+    "build.txt": "properties"
+  },
+  "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor",
+    "{hexdiff}:/**/*.*": "hexEditor.hexedit",
+    "*.sprite": "d2rmodding.spriteViewer"
+  },
+  "tmodloader.rootNamespace": "ChaoticDimensions"
+}

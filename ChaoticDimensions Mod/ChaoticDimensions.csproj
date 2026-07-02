@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Import tModLoader mod properties.
+	     The first path works when the folder is linked inside ModSources.
+	     The second path keeps direct builds from this repository working. -->
+	<Import Project="..\tModLoader.targets" Condition="Exists('..\tModLoader.targets')" />
+	<Import Project="$(HOME)\.local\share\Terraria\tModLoader\ModSources\tModLoader.targets" Condition="!Exists('..\tModLoader.targets') And Exists('$(HOME)\.local\share\Terraria\tModLoader\ModSources\tModLoader.targets')" />
+
+	<!-- General -->
+	<PropertyGroup>
+		<AssemblyName>ChaoticDimensions</AssemblyName>
+		<RootNamespace>ChaoticDimensions</RootNamespace>
+	</PropertyGroup>
+
+	<!-- References -->
+
+	<ItemGroup>
+		<Compile Remove=".analysis\**\*" />
+		<Compile Remove="tmp\**\*" />
+		<Content Remove=".analysis\**\*" />
+		<Content Remove="tmp\**\*" />
+		<EmbeddedResource Remove=".analysis\**\*" />
+		<EmbeddedResource Remove="tmp\**\*" />
+		<None Remove=".analysis\**\*" />
+		<None Remove="tmp\**\*" />
+	</ItemGroup>
+
+</Project>

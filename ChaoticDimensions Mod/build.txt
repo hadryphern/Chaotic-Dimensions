@@ -1,0 +1,4 @@
+displayName = Chaotic Dimensions
+author = blueDev
+version = 0.2
+buildIgnore = *.docx, *.pdf, *.zip, tmp/*, tmp/**, bin/*, bin/**, obj/*, obj/**
