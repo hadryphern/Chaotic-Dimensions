@@ -12,7 +12,6 @@ Documentos da PAP:
 - modelo do relatório
 - normas oficiais
 - relatórios antigos/base
-- backups, anexos e scripts usados para gerar/atualizar o documento
 
 ## [ChaoticDimensions Assets](ChaoticDimensions%20Assets)
 
@@ -20,7 +19,6 @@ Arquivos de apoio do projeto:
 
 - sprites antigas, testes e versões alternativas
 - concepts, ideias planejadas e bosses ainda arquivados
-- ferramentas internas de geração/validação
 - wiki local, imagens de referência e materiais de apresentação
 - backups e arquivos temporários preservados por histórico do projeto
 
@@ -53,10 +51,8 @@ ChaoticDimensions Mod/
 
 ## Wiki
 
-A wiki pública continua ligada ao conteúdo em:
+A wiki pública continua preservada em:
 
 ```text
 ChaoticDimensions Assets/Documentation/WikiSite/
 ```
-
-O workflow do GitHub Pages já aponta para essa pasta.

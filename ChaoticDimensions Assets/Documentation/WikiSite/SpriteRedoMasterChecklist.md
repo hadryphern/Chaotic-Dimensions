@@ -192,8 +192,8 @@ This file lists every current PNG asset in the mod so the full visual pass can b
 - Armor equipment textures use Terraria suffixes like `_Head`, `_Body`, `_Arms`, `_FemaleBody`, and `_Legs`.
 - Boss head icons use the `_Head_Boss` suffix.
 
-## Workflow
+## Replacement Notes
 
 1. Replace the PNG while keeping the same filename.
-2. Tell Codex the total sheet size, frame size, frame count, and whether animation is vertical or horizontal.
-3. Codex updates the code if any frame count, draw scale, or hitbox changes are needed.
+2. Keep a note of the total sheet size, frame size, frame count, and whether animation is vertical or horizontal.
+3. Update the code if any frame count, draw scale, or hitbox changes are needed.

@@ -10,7 +10,7 @@ Aqui ficam arquivos que pertencem ao desenvolvimento do **Chaotic Dimensions**, 
 - `WorkingAssets/`: previews, spritesheets experimentais, testes visuais e material em progresso.
 - `DesignDocuments/`: conceitos, bosses planejados e esboços técnicos.
 - `Documentation/WikiSite/`: site/wiki pública do projeto.
-- `Tools/`: scripts usados para gerar sprites, documentação, anexos e progressão.
+- `Tools/`: utilitários técnicos de sprites e assets.
 - `RepositoryMedia/`: imagens usadas pelo README e pela apresentação do repositório.
 - `Archive/`: backups e temporários preservados por histórico.
 

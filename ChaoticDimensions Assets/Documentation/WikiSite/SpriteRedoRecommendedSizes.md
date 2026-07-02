@@ -2,7 +2,7 @@
 
 This file is the production guide for redoing every sprite in the mod.
 
-These are recommended sizes, not hard requirements. If you prefer a different canvas size for a specific asset, that is fine. Just keep the same filename and tell Codex the new total sheet size, frame size, frame count, and whether the sheet is vertical or horizontal.
+These are recommended sizes, not hard requirements. If you prefer a different canvas size for a specific asset, that is fine. Just keep the same filename and record the new total sheet size, frame size, frame count, and whether the sheet is vertical or horizontal.
 
 ## Global Rules
 
@@ -367,10 +367,10 @@ These are recommended sizes, not hard requirements. If you prefer a different ca
 
 1. Redo the PNG and keep the same filename.
 2. Save it into the same folder.
-3. Send Codex:
+3. Record:
    - file path
    - total sheet size
    - per-frame size
    - frame count
    - vertical or horizontal
-4. Codex updates the animation code, hitbox, and draw scale if needed.
+4. Update the animation code, hitbox, and draw scale if needed.
