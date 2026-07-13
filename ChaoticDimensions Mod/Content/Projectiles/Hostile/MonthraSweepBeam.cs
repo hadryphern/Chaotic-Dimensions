@@ -27,7 +27,7 @@ namespace ChaoticDimensions.Content.Projectiles.Hostile
 
 		// Define os valores iniciais usados pelo tModLoader.
 		public override void SetDefaults() {
-			Projectile.width = 120;
+			Projectile.width = 150;
 			Projectile.height = 16000;
 			Projectile.hostile = true;
 			Projectile.friendly = false;
@@ -53,14 +53,14 @@ namespace ChaoticDimensions.Content.Projectiles.Hostile
 			}
 
 			if (Active) {
-				float speed = MathHelper.Lerp(2.4f, 16.5f, ActiveProgress * ActiveProgress);
+				float speed = MathHelper.Lerp(2.2f, 15.8f, ActiveProgress * ActiveProgress);
 				Vector2 center = Projectile.Center;
 				center.X += -SpawnSide * speed;
 				center.Y = MathHelper.Lerp(center.Y, GetTargetY(), 0.035f);
 				Projectile.Center = center;
 
 				if (!Main.dedServ && Age % 12 == 0) {
-					float strength = MathHelper.Lerp(5f, 18f, ActiveProgress);
+					float strength = MathHelper.Lerp(4.5f, 15f, ActiveProgress);
 					PunchCameraModifier modifier = new(Projectile.Center, Main.rand.NextVector2Unit(), strength, 7f, 5, 2600f, $"{nameof(MonthraSweepBeam)}_{Projectile.identity}_{Age}");
 					Main.instance.CameraModifiers.Add(modifier);
 				}
@@ -89,7 +89,7 @@ namespace ChaoticDimensions.Content.Projectiles.Hostile
 			Vector2 start = Projectile.Center - Vector2.UnitY * BeamHalfHeight;
 			Vector2 end = Projectile.Center + Vector2.UnitY * BeamHalfHeight;
 			float collisionPoint = 0f;
-			float width = MathHelper.Lerp(92f, 138f, ActiveProgress);
+			float width = MathHelper.Lerp(96f, 148f, ActiveProgress);
 			return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, width, ref collisionPoint);
 		}
 
@@ -105,19 +105,19 @@ namespace ChaoticDimensions.Content.Projectiles.Hostile
 
 			if (!Active) {
 				Color warning = new Color(255, 42, 220) * (0.18f + telegraph * 0.28f);
-				DrawLine(pixel, top, bottom, warning, 18f + telegraph * 18f);
-				DrawLine(pixel, top + new Vector2(-46f, 0f), bottom + new Vector2(-46f, 0f), warning * 0.45f, 2f);
-				DrawLine(pixel, top + new Vector2(46f, 0f), bottom + new Vector2(46f, 0f), warning * 0.45f, 2f);
+				DrawLine(pixel, top, bottom, warning, 20f + telegraph * 26f);
+				DrawLine(pixel, top + new Vector2(-58f, 0f), bottom + new Vector2(-58f, 0f), warning * 0.5f, 2f);
+				DrawLine(pixel, top + new Vector2(58f, 0f), bottom + new Vector2(58f, 0f), warning * 0.5f, 2f);
 				return false;
 			}
 
-			float width = MathHelper.Lerp(72f, 128f, ActiveProgress) * fadeOut;
-			Color outer = new Color(255, 18, 205) * (0.32f * fadeOut * pulse);
-			Color middle = new Color(255, 88, 230) * (0.58f * fadeOut);
-			Color core = new Color(255, 236, 252) * (0.93f * fadeOut);
-			DrawLine(pixel, top, bottom, outer, width * 1.55f);
-			DrawLine(pixel, top, bottom, middle, width * 0.58f);
-			DrawLine(pixel, top, bottom, core, 14f + 10f * pulse);
+			float width = MathHelper.Lerp(84f, 138f, ActiveProgress) * fadeOut;
+			Color outer = new Color(255, 12, 196) * (0.34f * fadeOut * pulse);
+			Color middle = new Color(255, 35, 214) * (0.72f * fadeOut);
+			Color core = new Color(255, 150, 238) * (0.62f * fadeOut);
+			DrawLine(pixel, top, bottom, outer, width * 1.35f);
+			DrawLine(pixel, top, bottom, middle, width * 0.74f);
+			DrawLine(pixel, top, bottom, core, 10f + 5f * pulse);
 
 			for (int i = -3; i <= 3; i++) {
 				if (i == 0) {
@@ -125,7 +125,7 @@ namespace ChaoticDimensions.Content.Projectiles.Hostile
 				}
 
 				float offset = i * 18f + (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 9f + i) * 7f;
-				DrawLine(pixel, top + new Vector2(offset, 0f), bottom + new Vector2(offset, 0f), new Color(255, 160, 244) * (0.18f * fadeOut), 1.6f);
+				DrawLine(pixel, top + new Vector2(offset, 0f), bottom + new Vector2(offset, 0f), new Color(255, 100, 232) * (0.16f * fadeOut), 1.4f);
 			}
 
 			return false;

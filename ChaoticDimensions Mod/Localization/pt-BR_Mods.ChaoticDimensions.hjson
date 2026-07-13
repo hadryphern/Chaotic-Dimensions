@@ -1728,7 +1728,6 @@ NPCs: {
 
 Projectiles: {
 	// MonthraFireball.DisplayName: Monthra Fireball
-	// MonthraFireballHoming.DisplayName: Homing Monthra Fireball
 	// MonthraMagicFireball.DisplayName: Monthra Ember
 	// MonthraBladeProjectile.DisplayName: Monthra Blade
 	// MonthraButterflyMinion.DisplayName: Monthra Butterfly
@@ -1767,11 +1766,10 @@ Projectiles: {
 	KrakenRedBolt.DisplayName: Disparo de Cristal Alienígena
 	KrakenHypnosisVortex.DisplayName: Vórtice Hipnótico Alienígena
 	// MonthraLightBand.DisplayName: Monthra Light Band
-	// MonthraPrismaticRay.DisplayName: Monthra Prismatic Ray
 	// ProgressionMinionProjectile.DisplayName: Progression Minion Projectile
 	// ProgressionWeaponProjectile.DisplayName: Progression Weapon Projectile
 	// ProgressionWhipProjectile.DisplayName: Progression Whip Projectile
-	// MonthraPrismaticLance.DisplayName: Monthra Prismatic Lance
+	// MonthraSweepBeam.DisplayName: Monthra Sweep Beam
 }
 
 Buffs: {

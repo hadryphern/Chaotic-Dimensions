@@ -1,4 +1,4 @@
-// Implementa os dois padrões principais de combate e a progressao de raiva da Monthra.
+// Implementa o padrão principal de escudo e raio lateral da Monthra.
 
 using System.IO;
 using ChaoticDimensions.Common.Systems;
@@ -15,19 +15,12 @@ using Terraria.ModLoader;
 
 namespace ChaoticDimensions.Content.Bosses.Monthra
 {
-	internal enum MonthraAttackState
-	{
-		ShieldSweep,
-		HaloNeedleBarrage
-	}
-
 	[AutoloadBossHead]
 	public sealed class MonthraBoss : ModNPC
 	{
 		private const float DrawScale = 0.82f;
 		private const int ShieldSweepDuration = 1620;
-		private const int HaloNeedleDuration = 520;
-		private ref float State => ref NPC.ai[0];
+		private const int SweepBeamCastTime = 72;
 		private ref float StateTimer => ref NPC.ai[1];
 		private ref float HoverSide => ref NPC.ai[2];
 
@@ -35,9 +28,8 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		private float Rage => 1f - LifeRatio;
 		private bool PhaseTwo => LifeRatio < 0.5f;
 		private bool FinalPhase => LifeRatio < 0.2f;
-		private bool LowerShieldActive => StateTimer >= 18f
-			&& ((MonthraAttackState)(int)State == MonthraAttackState.ShieldSweep && StateTimer <= ShieldSweepDuration - 70f
-				|| (MonthraAttackState)(int)State == MonthraAttackState.HaloNeedleBarrage && StateTimer <= HaloNeedleDuration - 45f);
+		private bool LowerShieldActive => StateTimer >= 18f && StateTimer <= ShieldSweepDuration - 70f;
+		private int SweepCycleDuration => (int)MathHelper.Lerp(2220f, 1720f, Rage);
 
 		// Regista metadados que nao mudam durante a execucao.
 		public override void SetStaticDefaults() {
@@ -70,7 +62,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			NPC.damage = (int)(NPC.damage * 0.92f);
 		}
 
-		// Atualiza a raiva pela vida perdida e executa um dos dois estados novos.
+		// Atualiza a raiva pela vida perdida e executa o padrão novo.
 		public override void AI() {
 			if (!TargetOrDespawn()) {
 				return;
@@ -84,14 +76,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			StateTimer++;
 			NPC.damage = (int)MathHelper.Lerp(270f, 350f, Rage);
 
-			switch ((MonthraAttackState)(int)State) {
-				case MonthraAttackState.HaloNeedleBarrage:
-					RunHaloNeedleBarrage(player);
-					break;
-				default:
-					RunShieldSweep(player);
-					break;
-			}
+			RunShieldSweep(player);
 
 			NPC.spriteDirection = NPC.velocity.X >= 0f ? -1 : 1;
 			NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.009f, -0.36f, 0.36f);
@@ -114,60 +99,24 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 
 		// Mantem a boss protegida por baixo enquanto um raio lateral fecha a arena.
 		private void RunShieldSweep(Player player) {
-			Vector2 offset = new(HoverSide * 210f * (float)System.Math.Sin(StateTimer * 0.018f), -385f);
-			SteerTowards(player.Center + offset, 16f + Rage * 8f, 0.08f);
+			bool resting = StateTimer > ShieldSweepDuration;
+			Vector2 offset = resting
+				? new Vector2(HoverSide * 520f, -420f + (float)System.Math.Sin(StateTimer * 0.035f) * 60f)
+				: new Vector2(HoverSide * 180f * (float)System.Math.Sin(StateTimer * 0.018f), -385f);
+			float speed = resting ? 19f + Rage * 8f : 15f + Rage * 7f;
+			float turn = resting ? 0.12f : 0.075f;
+			SteerTowards(player.Center + offset, speed, turn);
 			NPC.velocity *= 0.96f;
 
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer == 48f) {
+			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer == SweepBeamCastTime) {
 				SpawnShieldSweepBeam(player);
 			}
 
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer > 170f && StateTimer < ShieldSweepDuration - 160f && (int)StateTimer % GetNeedleInterval(92) == 0) {
-				SpawnHaloNeedleWave(player, PhaseTwo ? 3 : 2, 0.38f);
-			}
-
-			if (StateTimer >= ShieldSweepDuration) {
+			if (StateTimer >= SweepCycleDuration) {
 				HoverSide *= -1f;
-				SwitchState(MonthraAttackState.HaloNeedleBarrage);
+				StateTimer = 0f;
+				NPC.netUpdate = true;
 			}
-		}
-
-		// Dispara ondas de agulhas finas a partir do halo inferior da boss.
-		private void RunHaloNeedleBarrage(Player player) {
-			Vector2 orbit = new Vector2(360f + Rage * 140f, -335f).RotatedBy(StateTimer * (0.022f + Rage * 0.012f) * HoverSide);
-			SteerTowards(player.Center + orbit, 22f + Rage * 12f, 0.12f + Rage * 0.035f);
-
-			int interval = GetNeedleInterval(56);
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer >= 38f && StateTimer <= HaloNeedleDuration - 70f && (int)StateTimer % interval == 0) {
-				SpawnHaloNeedleWave(player, FinalPhase ? 7 : PhaseTwo ? 6 : 5, 0.82f);
-			}
-
-			if (StateTimer >= HaloNeedleDuration) {
-				HoverSide *= -1f;
-				SwitchState(MonthraAttackState.ShieldSweep);
-			}
-		}
-
-		private int GetNeedleInterval(int baseInterval) {
-			return System.Math.Max(24, (int)MathHelper.Lerp(baseInterval, baseInterval * 0.56f, Rage));
-		}
-
-		private void SpawnHaloNeedleWave(Player player, int count, float spread) {
-			Vector2 predicted = player.Center + player.velocity * MathHelper.Lerp(16f, 30f, Rage);
-			float start = -spread;
-			float end = spread;
-			for (int i = 0; i < count; i++) {
-				float t = count == 1 ? 0.5f : i / (float)(count - 1);
-				float arc = MathHelper.Lerp(start, end, t);
-				Vector2 origin = NPC.Center + new Vector2(arc * 360f, 175f + 42f * (float)System.Math.Sin(StateTimer * 0.07f + i));
-				Vector2 aimPoint = predicted + new Vector2((t - 0.5f) * 180f, Main.rand.NextFloat(-80f, 80f));
-				Vector2 velocity = (aimPoint - origin).SafeNormalize(Vector2.UnitY) * MathHelper.Lerp(19f, 27f, Rage);
-				int damage = PhaseTwo ? 245 : 200;
-				float curve = MathHelper.Lerp(-0.0028f, 0.0028f, t) * HoverSide;
-				Projectile.NewProjectile(NPC.GetSource_FromAI(), origin, velocity, ModContent.ProjectileType<MonthraHaloNeedle>(), damage, 0f, Main.myPlayer, player.whoAmI, curve);
-			}
-
-			SoundEngine.PlaySound(SoundID.Item29 with { Pitch = 0.48f, Volume = 0.9f }, NPC.Center);
 		}
 
 		private void SpawnShieldSweepBeam(Player player) {
@@ -185,13 +134,6 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			if (NPC.velocity.Length() > speed) {
 				NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * speed;
 			}
-		}
-
-		// Muda de ataque e reinicia o temporizador sincronizado.
-		private void SwitchState(MonthraAttackState next) {
-			State = (float)next;
-			StateTimer = 0f;
-			NPC.netUpdate = true;
 		}
 
 		private bool IsProtectedByLowerShield(Vector2 source) {
@@ -244,10 +186,6 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			Vector2 origin = source.Size() * 0.5f;
 			SpriteEffects effects = NPC.spriteDirection == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 			float shieldOpacity = GetShieldOpacity();
-			if (shieldOpacity > 0f) {
-				DrawShieldAura(spriteBatch, NPC.Center - screenPos, shieldOpacity * 0.72f);
-			}
-
 			spriteBatch.Draw(texture, NPC.Center - screenPos, source, NPC.GetAlpha(drawColor), NPC.rotation, origin, DrawScale, effects, 0f);
 			if (shieldOpacity > 0f) {
 				DrawShieldAura(spriteBatch, NPC.Center - screenPos, shieldOpacity);
@@ -262,34 +200,32 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			}
 
 			float fadeIn = Utils.GetLerpValue(0f, 70f, StateTimer, true);
-			float duration = (MonthraAttackState)(int)State == MonthraAttackState.ShieldSweep ? ShieldSweepDuration : HaloNeedleDuration;
-			float fadeOut = 1f - Utils.GetLerpValue(duration - 95f, duration, StateTimer, true);
+			float fadeOut = 1f - Utils.GetLerpValue(ShieldSweepDuration - 95f, ShieldSweepDuration, StateTimer, true);
 			return fadeIn * fadeOut;
 		}
 
 		private static void DrawShieldAura(SpriteBatch spriteBatch, Vector2 center, float opacity) {
 			Texture2D pixel = TextureAssets.MagicPixel.Value;
-			Vector2 radius = new(360f, 290f);
-			Vector2 auraCenter = center + new Vector2(0f, 38f);
-			float pulse = 0.86f + 0.14f * (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 7.5f);
-			Color arcColor = new Color(255, 54, 218) * (0.52f * opacity * pulse);
-			Color coreColor = new Color(255, 214, 249) * (0.68f * opacity);
-			const int segments = 34;
+			Vector2 radius = new(300f, 220f);
+			Vector2 auraCenter = center + new Vector2(0f, 45f);
+			float pulse = 0.82f + 0.18f * (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 7.5f);
+			Color arcColor = new Color(255, 38, 218) * (0.42f * opacity * pulse);
+			Color tickColor = new Color(255, 118, 236) * (0.34f * opacity);
+			const int segments = 30;
 
 			Vector2 previous = Vector2.Zero;
 			for (int i = 0; i <= segments; i++) {
 				float t = i / (float)segments;
-				float angle = MathHelper.Lerp(MathHelper.ToRadians(14f), MathHelper.ToRadians(166f), t);
+				float angle = MathHelper.Lerp(MathHelper.ToRadians(18f), MathHelper.ToRadians(162f), t);
 				Vector2 normal = new((float)System.Math.Cos(angle), (float)System.Math.Sin(angle));
 				Vector2 point = auraCenter + new Vector2(normal.X * radius.X, normal.Y * radius.Y);
 				if (i > 0) {
-					DrawPixelLine(spriteBatch, pixel, previous, point, arcColor, 5f);
-					DrawPixelLine(spriteBatch, pixel, previous, point, coreColor, 1.4f);
+					DrawPixelLine(spriteBatch, pixel, previous, point, arcColor, 2.6f);
 				}
 
 				if (i % 3 == 0) {
-					Vector2 spike = point + normal * (28f + 10f * pulse);
-					DrawPixelLine(spriteBatch, pixel, point, spike, new Color(255, 42, 226) * (0.42f * opacity), 2f);
+					Vector2 spike = point + normal * (22f + 8f * pulse);
+					DrawPixelLine(spriteBatch, pixel, point, spike, tickColor, 1.7f);
 				}
 
 				previous = point;
