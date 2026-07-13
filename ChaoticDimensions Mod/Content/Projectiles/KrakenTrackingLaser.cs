@@ -14,7 +14,7 @@ namespace ChaoticDimensions.Content.Projectiles
 {
 	public class KrakenTrackingLaser : ModProjectile
 	{
-		private const int TelegraphTime = 54;
+		private const int TelegraphTime = 48;
 		private const int Lifetime = 270;
 		private const float LaserLength = 14000f;
 		private int OwnerIndex => (int)Projectile.ai[0];
@@ -60,7 +60,7 @@ namespace ChaoticDimensions.Content.Projectiles
 			Vector2 start = Projectile.Center + direction * 30f;
 			Vector2 end = Projectile.Center + direction * LaserLength;
 			float collisionPoint = 0f;
-			return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, 82f, ref collisionPoint);
+			return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, 94f, ref collisionPoint);
 		}
 
 		// Atualiza o comportamento desta entidade a cada tick.
@@ -117,12 +117,12 @@ namespace ChaoticDimensions.Content.Projectiles
 		public override bool PreDraw(ref Color lightColor) {
 			Texture2D texture = TextureAssets.Projectile[Type].Value;
 			Vector2 origin = new Vector2(0f, texture.Height * 0.5f);
-			float fadeIn = Utils.GetLerpValue(0f, 50f, Projectile.localAI[0], true);
+			float fadeIn = Utils.GetLerpValue(0f, 44f, Projectile.localAI[0], true);
 			float fadeOut = Utils.GetLerpValue(0f, 34f, Projectile.timeLeft, true);
 			float opacity = fadeIn * fadeOut;
 			float telegraph = Projectile.localAI[0] < TelegraphTime ? 0.35f : 1f;
 			float lengthScale = LaserLength / texture.Width;
-			float widthScale = MathHelper.Lerp(0.42f, 1.02f, Utils.GetLerpValue(TelegraphTime, Lifetime, Projectile.localAI[0], true));
+			float widthScale = MathHelper.Lerp(0.5f, 1.18f, Utils.GetLerpValue(TelegraphTime, Lifetime, Projectile.localAI[0], true));
 
 			Vector2 position = Projectile.Center - Main.screenPosition;
 			Color outer = new Color(62, 112, 155, (byte)(96 * opacity * telegraph));

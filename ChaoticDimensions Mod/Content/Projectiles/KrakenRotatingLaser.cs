@@ -54,7 +54,7 @@ namespace ChaoticDimensions.Content.Projectiles
 
 		// Controla em que fase o projetil pode causar dano.
 		public override bool? CanDamage() {
-			return Projectile.localAI[0] >= 64f && Projectile.localAI[0] <= Lifetime - 36;
+			return Projectile.localAI[0] >= 54f && Projectile.localAI[0] <= Lifetime - 36;
 		}
 
 		// Calcula a colisao quando a forma nao e um retangulo simples.
@@ -65,7 +65,7 @@ namespace ChaoticDimensions.Content.Projectiles
 
 			GetEndpoints(out Vector2 start, out Vector2 end);
 			float collisionPoint = 0f;
-			return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, Enraged ? 88f : 76f, ref collisionPoint);
+			return Collision.CheckAABBvLineCollision(targetHitbox.TopLeft(), targetHitbox.Size(), start, end, Enraged ? 102f : 86f, ref collisionPoint);
 		}
 
 		// Atualiza o comportamento desta entidade a cada tick.
@@ -80,7 +80,7 @@ namespace ChaoticDimensions.Content.Projectiles
 			Projectile.Center = GetKrakenHead(owner);
 			Projectile.rotation = AngleOffset + SpinForTime(Projectile.localAI[0], Enraged);
 
-			if (Projectile.localAI[0] >= 64f && Projectile.localAI[0] <= Lifetime && Projectile.localAI[0] % 18f == 0f) {
+			if (Projectile.localAI[0] >= 54f && Projectile.localAI[0] <= Lifetime && Projectile.localAI[0] % 16f == 0f) {
 				KrakenEventSystem.Instance.AddShake(4, Enraged ? 6.5f : 4.5f);
 			}
 
@@ -104,7 +104,7 @@ namespace ChaoticDimensions.Content.Projectiles
 
 			Vector2 midpoint = (start + end) * 0.5f - Main.screenPosition;
 			float lengthScale = Vector2.Distance(start, end) / source.Height;
-			float fadeIn = Utils.GetLerpValue(0f, 64f, Projectile.localAI[0], true);
+			float fadeIn = Utils.GetLerpValue(0f, 54f, Projectile.localAI[0], true);
 			float fadeOut = Utils.GetLerpValue(0f, 42f, Projectile.timeLeft, true);
 			float opacity = fadeIn * fadeOut;
 			float pulse = 0.95f + 0.09f * (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 34f + Projectile.identity);
@@ -112,7 +112,7 @@ namespace ChaoticDimensions.Content.Projectiles
 
 			Color outer = new Color(66, 118, 160, (byte)(90 * opacity));
 			Color inner = new Color(232, 244, 248, (byte)(170 * opacity));
-			Vector2 scale = new Vector2(Enraged ? 0.54f : 0.48f, lengthScale);
+			Vector2 scale = new Vector2(Enraged ? 0.62f : 0.54f, lengthScale);
 			Main.spriteBatch.Draw(texture, midpoint, source, outer, rotation, origin, scale * new Vector2(1.48f, 1f), SpriteEffects.None, 0f);
 			Main.spriteBatch.Draw(texture, midpoint, source, inner, rotation, origin, scale * new Vector2(0.78f * pulse, 1f), SpriteEffects.None, 0f);
 			return false;

@@ -357,7 +357,7 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 			KrakenEventSystem.Instance.FocusCamera(NPC.Center + new Vector2(0f, VisualDrawOffsetY - 100f), 3, 1.05f);
 
 			if (StateTimer == 1f && Main.netMode != NetmodeID.MultiplayerClient) {
-				Projectile.NewProjectile(NPC.GetSource_FromAI(), KrakenRotatingLaser.GetKrakenHead(NPC), Vector2.Zero, ModContent.ProjectileType<KrakenTrackingLaser>(), Phase3 ? 380 : Phase2 ? 320 : 270, 0f, Main.myPlayer, NPC.whoAmI);
+				Projectile.NewProjectile(NPC.GetSource_FromAI(), KrakenRotatingLaser.GetKrakenHead(NPC), Vector2.Zero, ModContent.ProjectileType<KrakenTrackingLaser>(), Phase3 ? 440 : Phase2 ? 370 : 310, 0f, Main.myPlayer, NPC.whoAmI);
 				SoundEngine.PlaySound(SoundID.Item122, NPC.Center);
 			}
 
@@ -457,18 +457,19 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 
 			switch (pattern) {
 				case 0:
-					if (AtPatternTick(42, phase2) || AtPatternTick(132, phase2) || AtPatternTick(222, phase2)) {
+					if (AtPatternTick(36, phase2) || AtPatternTick(108, phase2) || AtPatternTick(180, phase2) || AtPatternTick(252, phase2)) {
 						SpawnLightning(player, phase2);
-						if (AtPatternTick(42, phase2)) {
-						}
 					}
-					if (AtPatternTick(286, phase2)) {
+					if (AtPatternTick(306, phase2)) {
+						SpawnHomingLightning(player, phase2);
+					}
+					if (AtPatternTick(338, phase2)) {
 						SpawnWaterJetVolley(player, phase2);
 					}
-					if (AtPatternTick(326, phase2)) {
+					if (AtPatternTick(370, phase2)) {
 						TryReleaseInk(phase2);
 					}
-					if (AttackTimer >= PatternDuration(390, phase2)) {
+					if (AttackTimer >= PatternDuration(430, phase2)) {
 						AdvanceAttackPattern(phase2);
 					}
 					break;
@@ -506,10 +507,10 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 					if (AtPatternTick(126, phase2)) {
 						SpawnCrystalTurrets();
 					}
-					if (AtPatternTick(262, phase2)) {
+					if (AtPatternTick(198, phase2) || AtPatternTick(306, phase2)) {
 						SpawnLightning(player, phase2);
 					}
-					if (AttackTimer >= PatternDuration(420, phase2)) {
+					if (AttackTimer >= PatternDuration(440, phase2)) {
 						AdvanceAttackPattern(phase2);
 					}
 					break;
@@ -565,7 +566,7 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 					if (AtPatternTick(54, phase2)) {
 						SpawnCrystalTurrets();
 					}
-					if (AtPatternTick(182, phase2)) {
+					if (AtPatternTick(142, phase2) || AtPatternTick(250, phase2)) {
 						SpawnHomingLightning(player, phase2);
 					}
 					if (AtPatternTick(310, phase2)) {
@@ -689,8 +690,8 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 				return;
 			}
 
-			int amount = phase2 ? 5 : 4;
-			int damage = phase2 ? 365 : 295;
+			int amount = Phase3 ? 6 : phase2 ? 5 : 4;
+			int damage = Phase3 ? 455 : phase2 ? 390 : 325;
 			int type = ModContent.ProjectileType<KrakenRotatingLaser>();
 			for (int i = 0; i < amount; i++) {
 				float angle = MathHelper.TwoPi * i / amount;
@@ -861,23 +862,23 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 				return;
 			}
 
-			int lanes = Phase3 ? 11 : phase2 ? 9 : 7;
+			int lanes = Phase3 ? 13 : phase2 ? 11 : 9;
 			int safeLane = Main.rand.Next(1, lanes - 1);
-			float spacing = Phase3 ? 92f : phase2 ? 104f : 156f;
-			Vector2 predicted = PredictPlayer(player, Phase3 ? 34f : phase2 ? 30f : 26f);
+			float spacing = Phase3 ? 86f : phase2 ? 96f : 132f;
+			Vector2 predicted = PredictPlayer(player, Phase3 ? 44f : phase2 ? 38f : 32f);
 			float startX = predicted.X - (lanes - 1) * spacing * 0.5f;
 
 			for (int i = 0; i < lanes; i++) {
-				if (System.Math.Abs(i - safeLane) <= 1) {
+				if (i == safeLane) {
 					continue;
 				}
 
-				Vector2 position = new Vector2(startX + i * spacing + Main.rand.NextFloat(-24f, 24f), predicted.Y - Main.rand.NextFloat(620f, 820f));
-				int damage = Phase3 ? 300 : phase2 ? 255 : 205;
+				Vector2 position = new Vector2(startX + i * spacing + Main.rand.NextFloat(-18f, 18f), predicted.Y - Main.rand.NextFloat(560f, 760f));
+				int damage = Phase3 ? 370 : phase2 ? 310 : 245;
 				Projectile.NewProjectile(NPC.GetSource_FromAI(), position, Vector2.Zero, ModContent.ProjectileType<KrakenLightningStrike>(), damage, 0f, Main.myPlayer);
 			}
 
-			int backgroundAmount = Phase3 ? 4 : phase2 ? 3 : 2;
+			int backgroundAmount = Phase3 ? 5 : phase2 ? 4 : 3;
 			for (int i = 0; i < backgroundAmount; i++) {
 				Vector2 position = new Vector2(predicted.X + Main.rand.NextFloat(-1400f, 1400f), predicted.Y - Main.rand.NextFloat(580f, 900f));
 				Projectile.NewProjectile(NPC.GetSource_FromAI(), position, Vector2.Zero, ModContent.ProjectileType<KrakenLightningStrike>(), 0, 0f, Main.myPlayer, 0f, 1f);
@@ -885,14 +886,14 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 		}
 
 		private void SpawnHomingLightning(Player player, bool phase2) {
-			int amount = Phase3 ? 4 : phase2 ? 3 : 2;
-			int damage = phase2 ? 205 : 155;
+			int amount = Phase3 ? 6 : phase2 ? 5 : 3;
+			int damage = Phase3 ? 285 : phase2 ? 235 : 180;
 			int type = ModContent.ProjectileType<KrakenHomingLightning>();
 			for (int i = 0; i < amount; i++) {
 				float angle = Main.rand.NextFloat(MathHelper.TwoPi);
-				Vector2 radius = new Vector2((float)System.Math.Cos(angle) * Main.rand.NextFloat(620f, 920f), (float)System.Math.Sin(angle) * Main.rand.NextFloat(360f, 620f));
-				Vector2 position = PredictPlayer(player, 22f + i * 8f) + radius;
-				Vector2 velocity = PredictPlayer(player, 38f + i * 10f) - position;
+				Vector2 radius = new Vector2((float)System.Math.Cos(angle) * Main.rand.NextFloat(560f, 840f), (float)System.Math.Sin(angle) * Main.rand.NextFloat(320f, 560f));
+				Vector2 position = PredictPlayer(player, 26f + i * 7f) + radius;
+				Vector2 velocity = PredictPlayer(player, 46f + i * 9f) - position;
 				if (velocity.LengthSquared() < 4f) {
 					velocity = Vector2.UnitY;
 				}
@@ -900,7 +901,7 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 					velocity.Normalize();
 				}
 
-				velocity *= phase2 ? 9.2f : 7.8f;
+				velocity *= Phase3 ? 12.6f : phase2 ? 11.2f : 9.4f;
 				Projectile.NewProjectile(NPC.GetSource_FromAI(), position, velocity, type, damage, 0f, Main.myPlayer, player.whoAmI, i * 0.2f);
 			}
 		}
@@ -960,12 +961,12 @@ namespace ChaoticDimensions.Content.NPCs.Kraken
 				return;
 			}
 
-			int amount = phase2 ? 2 : 1;
-			int damage = phase2 ? 360 : 275;
+			int amount = Phase3 ? 4 : phase2 ? 3 : 2;
+			int damage = Phase3 ? 500 : phase2 ? 420 : 330;
 			int type = ModContent.ProjectileType<KrakenSkyBeam>();
-			Vector2 predicted = PredictPlayer(player, phase2 ? 56f : 44f);
+			Vector2 predicted = PredictPlayer(player, Phase3 ? 66f : phase2 ? 58f : 48f);
 			for (int i = 0; i < amount; i++) {
-				float lane = amount == 1 ? 0f : MathHelper.Lerp(-370f, 370f, i / (float)(amount - 1));
+				float lane = amount == 1 ? 0f : MathHelper.Lerp(-470f, 470f, i / (float)(amount - 1));
 				float x = predicted.X + lane + player.velocity.X * 18f;
 				float y = predicted.Y;
 				float rotation = MathHelper.Clamp(player.velocity.X * 0.005f, -0.36f, 0.36f) + Main.rand.NextFloat(-0.24f, 0.24f);

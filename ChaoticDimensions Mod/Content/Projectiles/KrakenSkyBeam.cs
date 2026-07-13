@@ -13,8 +13,8 @@ namespace ChaoticDimensions.Content.Projectiles
 {
 	public class KrakenSkyBeam : ModProjectile
 	{
-		private const int TelegraphTime = 64;
-		private const int StrikeTime = 18;
+		private const int TelegraphTime = 52;
+		private const int StrikeTime = 22;
 		private const float CollisionHalfLength = 12000f;
 
 		public override string Texture => "ChaoticDimensions/Content/Projectiles/KrakenSkyBeam";
@@ -61,7 +61,7 @@ namespace ChaoticDimensions.Content.Projectiles
 
 			GetBeamEndpoints(out Vector2 start, out Vector2 end);
 			float collisionPoint = 0f;
-			return Collision.CheckAABBvLineCollision(new Vector2(targetHitbox.Left, targetHitbox.Top), new Vector2(targetHitbox.Width, targetHitbox.Height), start, end, 58f, ref collisionPoint);
+			return Collision.CheckAABBvLineCollision(new Vector2(targetHitbox.Left, targetHitbox.Top), new Vector2(targetHitbox.Width, targetHitbox.Height), start, end, 72f, ref collisionPoint);
 		}
 
 		// Atualiza o comportamento desta entidade a cada tick.
@@ -100,16 +100,16 @@ namespace ChaoticDimensions.Content.Projectiles
 
 			if (!Striking) {
 				Color warning = new Color(156, 190, 210, (byte)(36 + 54 * telegraphProgress));
-				Main.spriteBatch.Draw(texture, drawPosition, source, warning, BeamRotation, origin, new Vector2(0.12f, lengthScale), SpriteEffects.None, 0f);
-				Main.spriteBatch.Draw(texture, drawPosition, source, new Color(58, 94, 130, (byte)(28 * telegraphProgress)), BeamRotation, origin, new Vector2(0.26f, lengthScale), SpriteEffects.None, 0f);
+				Main.spriteBatch.Draw(texture, drawPosition, source, warning, BeamRotation, origin, new Vector2(0.16f, lengthScale), SpriteEffects.None, 0f);
+				Main.spriteBatch.Draw(texture, drawPosition, source, new Color(58, 94, 130, (byte)(36 * telegraphProgress)), BeamRotation, origin, new Vector2(0.34f, lengthScale), SpriteEffects.None, 0f);
 				return false;
 			}
 
 			float pulse = 0.94f + 0.12f * (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 28f);
-			Color outer = new Color(92, 148, 185, (byte)(78 * strikeFade));
-			Color inner = new Color(240, 248, 250, (byte)(150 * strikeFade));
-			Main.spriteBatch.Draw(texture, drawPosition, source, outer, BeamRotation, origin, new Vector2(0.46f * pulse, lengthScale), SpriteEffects.None, 0f);
-			Main.spriteBatch.Draw(texture, drawPosition, source, inner, BeamRotation, origin, new Vector2(0.24f * pulse, lengthScale), SpriteEffects.None, 0f);
+			Color outer = new Color(92, 148, 185, (byte)(98 * strikeFade));
+			Color inner = new Color(240, 248, 250, (byte)(180 * strikeFade));
+			Main.spriteBatch.Draw(texture, drawPosition, source, outer, BeamRotation, origin, new Vector2(0.58f * pulse, lengthScale), SpriteEffects.None, 0f);
+			Main.spriteBatch.Draw(texture, drawPosition, source, inner, BeamRotation, origin, new Vector2(0.32f * pulse, lengthScale), SpriteEffects.None, 0f);
 			return false;
 		}
 

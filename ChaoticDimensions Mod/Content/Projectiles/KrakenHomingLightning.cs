@@ -19,26 +19,26 @@ namespace ChaoticDimensions.Content.Projectiles
 
 		// Regista metadados que nao mudam durante a execucao.
 		public override void SetStaticDefaults() {
-			ProjectileID.Sets.TrailCacheLength[Type] = 10;
+			ProjectileID.Sets.TrailCacheLength[Type] = 14;
 			ProjectileID.Sets.TrailingMode[Type] = 2;
 		}
 
 		// Define os valores iniciais usados pelo tModLoader.
 		public override void SetDefaults() {
-			Projectile.width = 34;
-			Projectile.height = 34;
+			Projectile.width = 44;
+			Projectile.height = 44;
 			Projectile.hostile = true;
 			Projectile.friendly = false;
 			Projectile.tileCollide = false;
 			Projectile.ignoreWater = true;
 			Projectile.penetrate = 1;
-			Projectile.timeLeft = 150;
+			Projectile.timeLeft = 170;
 			Projectile.aiStyle = -1;
 		}
 
 		// Controla em que fase o projetil pode causar dano.
 		public override bool? CanDamage() {
-			return Timer >= 34f;
+			return Timer >= 24f;
 		}
 
 		public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI) {
@@ -52,26 +52,26 @@ namespace ChaoticDimensions.Content.Projectiles
 			Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
 
 			if (TryGetTarget(out Player target)) {
-				float leadFrames = MathHelper.Lerp(18f, 4f, Utils.GetLerpValue(0f, 110f, Timer, true));
+				float leadFrames = MathHelper.Lerp(22f, 3f, Utils.GetLerpValue(0f, 110f, Timer, true));
 				Vector2 predicted = target.Center + target.velocity * leadFrames;
 				Vector2 direction = predicted - Projectile.Center;
 				if (direction.LengthSquared() > 4f) {
 					direction.Normalize();
-					float speed = Timer < 34f ? 5.5f : MathHelper.Lerp(11f, 18f, Utils.GetLerpValue(34f, 112f, Timer, true));
-					float turn = Timer < 34f ? 0.026f : MathHelper.Lerp(0.078f, 0.018f, Utils.GetLerpValue(34f, 125f, Timer, true));
+					float speed = Timer < 24f ? 7.2f : MathHelper.Lerp(14f, 24f, Utils.GetLerpValue(24f, 118f, Timer, true));
+					float turn = Timer < 24f ? 0.04f : MathHelper.Lerp(0.105f, 0.024f, Utils.GetLerpValue(24f, 130f, Timer, true));
 					Projectile.velocity = Vector2.Lerp(Projectile.velocity, direction * speed, turn);
 				}
 			}
 
-			if (Timer < 34f) {
-				Projectile.alpha = (int)MathHelper.Lerp(150f, 70f, Timer / 34f);
+			if (Timer < 24f) {
+				Projectile.alpha = (int)MathHelper.Lerp(150f, 60f, Timer / 24f);
 			}
 			else {
 				Projectile.alpha = 0;
 			}
 
-			if (Main.rand.NextBool(Timer < 34f ? 5 : 3)) {
-				Dust dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(18f, 18f), DustID.Electric, -Projectile.velocity * 0.08f, 0, new Color(125, 205, 255), 1.05f);
+			if (Main.rand.NextBool(Timer < 24f ? 4 : 2)) {
+				Dust dust = Dust.NewDustPerfect(Projectile.Center + Main.rand.NextVector2Circular(22f, 22f), DustID.Electric, -Projectile.velocity * 0.08f, 0, new Color(125, 205, 255), 1.18f);
 				dust.noGravity = true;
 			}
 		}
@@ -85,11 +85,11 @@ namespace ChaoticDimensions.Content.Projectiles
 		public override bool PreDraw(ref Color lightColor) {
 			Texture2D texture = TextureAssets.Projectile[Type].Value;
 			Vector2 origin = texture.Size() * 0.5f;
-			float telegraph = Timer < 34f ? 0.38f : 1f;
+			float telegraph = Timer < 24f ? 0.44f : 1f;
 			float pulse = 0.88f + 0.16f * (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 24f + Projectile.ai[1]);
-			Vector2 scale = new Vector2(0.22f, 0.34f * pulse) * telegraph;
-			Color outer = new Color(82, 135, 180, (byte)(120 * telegraph));
-			Color inner = new Color(230, 250, 255, (byte)(225 * telegraph));
+			Vector2 scale = new Vector2(0.32f, 0.46f * pulse) * telegraph;
+			Color outer = new Color(82, 135, 180, (byte)(142 * telegraph));
+			Color inner = new Color(230, 250, 255, (byte)(240 * telegraph));
 
 			for (int i = Projectile.oldPos.Length - 1; i >= 1; i--) {
 				if (Projectile.oldPos[i] == Vector2.Zero) {
