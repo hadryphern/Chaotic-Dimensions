@@ -25,13 +25,15 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		SolarSpiral,
 		ButterflySwarm,
 		PrismRain,
-		ConvergingWings
+		ConvergingWings,
+		ShieldSweep
 	}
 
 	[AutoloadBossHead]
 	public sealed class MonthraBoss : ModNPC
 	{
 		private const float DrawScale = 0.82f;
+		private const int ShieldSweepDuration = 1620;
 		private ref float State => ref NPC.ai[0];
 		private ref float StateTimer => ref NPC.ai[1];
 		private ref float HoverSide => ref NPC.ai[2];
@@ -40,6 +42,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		private float Rage => 1f - LifeRatio;
 		private bool PhaseTwo => LifeRatio < 0.5f;
 		private bool FinalPhase => LifeRatio < 0.2f;
+		private bool ShieldSweepActive => (MonthraAttackState)(int)State == MonthraAttackState.ShieldSweep && StateTimer >= 18f && StateTimer <= ShieldSweepDuration - 70f;
 
 		// Regista metadados que nao mudam durante a execucao.
 		public override void SetStaticDefaults() {
@@ -108,6 +111,9 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 				case MonthraAttackState.ConvergingWings:
 					RunConvergingWings(player);
 					break;
+				case MonthraAttackState.ShieldSweep:
+					RunShieldSweep(player);
+					break;
 				default:
 					RunHoverVolley(player);
 					break;
@@ -147,7 +153,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			}
 
 			if (StateTimer >= Duration(155)) {
-				SwitchState(MonthraAttackState.DashChain);
+				SwitchStateMaybeShield(MonthraAttackState.DashChain);
 			}
 		}
 
@@ -175,7 +181,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 
 			if (StateTimer >= Duration(210)) {
 				HoverSide *= -1f;
-				SwitchState(MonthraAttackState.PrismaticPursuit);
+				SwitchStateMaybeShield(MonthraAttackState.PrismaticPursuit);
 			}
 		}
 
@@ -189,7 +195,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			}
 
 			if (StateTimer >= Duration(205)) {
-				SwitchState(MonthraAttackState.LightLattice);
+				SwitchStateMaybeShield(MonthraAttackState.LightLattice);
 			}
 		}
 
@@ -204,7 +210,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 				FireHomingShot(player, PhaseTwo ? 225 : 185);
 			}
 			if (StateTimer >= Duration(190)) {
-				SwitchState(MonthraAttackState.SolarSpiral);
+				SwitchStateMaybeShield(MonthraAttackState.SolarSpiral);
 			}
 		}
 
@@ -228,7 +234,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			}
 
 			if (StateTimer >= Duration(255)) {
-				SwitchState(MonthraAttackState.ButterflySwarm);
+				SwitchStateMaybeShield(MonthraAttackState.ButterflySwarm);
 			}
 		}
 
@@ -243,7 +249,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 				FireHomingShot(player, PhaseTwo ? 220 : 180);
 			}
 			if (StateTimer >= Duration(185)) {
-				SwitchState(MonthraAttackState.PrismRain);
+				SwitchStateMaybeShield(MonthraAttackState.PrismRain);
 			}
 		}
 
@@ -256,7 +262,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 				SpawnPrismRain(player, FinalPhase ? 3 : 2);
 			}
 			if (StateTimer >= Duration(215)) {
-				SwitchState(MonthraAttackState.ConvergingWings);
+				SwitchStateMaybeShield(MonthraAttackState.ConvergingWings);
 			}
 		}
 
@@ -272,7 +278,27 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			}
 			if (StateTimer >= Duration(190)) {
 				HoverSide *= -1f;
-				SwitchState(MonthraAttackState.HoverVolley);
+				SwitchStateMaybeShield(MonthraAttackState.HoverVolley);
+			}
+		}
+
+		// Ataque raro: escudo inferior ativo e um muro de luz que empurra o jogador.
+		private void RunShieldSweep(Player player) {
+			Vector2 offset = new(HoverSide * 170f * (float)System.Math.Sin(StateTimer * 0.018f), -360f);
+			SteerTowards(player.Center + offset, 15f + Rage * 7f, 0.075f);
+			NPC.velocity *= 0.96f;
+
+			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer == 48f) {
+				SpawnShieldSweepBeam(player);
+			}
+
+			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer > 210f && StateTimer < ShieldSweepDuration - 120f && (int)StateTimer % 180 == 0) {
+				FirePrismaticLanceVolley(player, PhaseTwo ? 4 : 3, 18f + Rage * 3f, 11f, PhaseTwo ? 210 : 175, 0.5f);
+			}
+
+			if (StateTimer >= ShieldSweepDuration) {
+				HoverSide *= -1f;
+				SwitchState(MonthraAttackState.DashChain);
 			}
 		}
 
@@ -353,6 +379,15 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction * 11f, ModContent.ProjectileType<MonthraFireballHoming>(), damage, 0f, Main.myPlayer);
 		}
 
+		private void SpawnShieldSweepBeam(Player player) {
+			float side = Main.rand.NextBool() ? -1f : 1f;
+			float spawnDistance = System.Math.Max(1280f, Main.screenWidth) * 0.5f + 620f;
+			Vector2 spawn = player.Center + new Vector2(side * spawnDistance, -40f);
+			int damage = PhaseTwo ? 330 : 270;
+			Projectile.NewProjectile(NPC.GetSource_FromAI(), spawn, Vector2.Zero, ModContent.ProjectileType<MonthraSweepBeam>(), damage, 0f, Main.myPlayer, side, NPC.whoAmI);
+			SoundEngine.PlaySound(SoundID.Item122 with { Pitch = 0.35f, Volume = 1.05f }, spawn);
+		}
+
 		private void SteerTowards(Vector2 target, float speed, float turnRate) {
 			Vector2 desired = (target - NPC.Center).SafeNormalize(Vector2.UnitY) * speed;
 			NPC.velocity = Vector2.Lerp(NPC.velocity, desired, turnRate);
@@ -366,6 +401,66 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			State = (float)next;
 			StateTimer = 0f;
 			NPC.netUpdate = true;
+		}
+
+		private void SwitchStateMaybeShield(MonthraAttackState next) {
+			if (Main.netMode != NetmodeID.MultiplayerClient && ShouldStartShieldSweep()) {
+				SwitchState(MonthraAttackState.ShieldSweep);
+				return;
+			}
+
+			SwitchState(next);
+		}
+
+		private bool ShouldStartShieldSweep() {
+			if (AnyShieldSweepBeam()) {
+				return false;
+			}
+
+			float chance = MathHelper.Lerp(0.04f, 0.24f, Rage);
+			if (LifeRatio > 0.72f) {
+				chance *= 0.35f;
+			}
+
+			return Main.rand.NextFloat() < chance;
+		}
+
+		private static bool AnyShieldSweepBeam() {
+			int type = ModContent.ProjectileType<MonthraSweepBeam>();
+			for (int i = 0; i < Main.maxProjectiles; i++) {
+				Projectile projectile = Main.projectile[i];
+				if (projectile.active && projectile.type == type) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private bool IsProtectedByLowerShield(Vector2 source) {
+			if (!ShieldSweepActive || source.Y < NPC.Center.Y - 35f) {
+				return false;
+			}
+
+			Vector2 offset = source - NPC.Center;
+			float ellipse = offset.X * offset.X / (430f * 430f) + offset.Y * offset.Y / (330f * 330f);
+			return ellipse <= 1.18f;
+		}
+
+		public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers) {
+			if (IsProtectedByLowerShield(player.Center)) {
+				modifiers.FinalDamage *= 0.35f;
+			}
+		}
+
+		public override void ModifyHitByProjectile(Projectile projectile, ref NPC.HitModifiers modifiers) {
+			if (projectile.hostile || projectile.owner < 0 || projectile.owner >= Main.maxPlayers || !Main.player[projectile.owner].active) {
+				return;
+			}
+
+			if (IsProtectedByLowerShield(projectile.Center)) {
+				modifiers.FinalDamage *= 0.35f;
+			}
 		}
 
 		// Define as recompensas entregues ao derrotar o NPC.
@@ -391,8 +486,65 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			Rectangle source = new(0, NPC.frame.Y, texture.Width, frameHeight);
 			Vector2 origin = source.Size() * 0.5f;
 			SpriteEffects effects = NPC.spriteDirection == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+			float shieldOpacity = GetShieldOpacity();
+			if (shieldOpacity > 0f) {
+				DrawShieldAura(spriteBatch, NPC.Center - screenPos, shieldOpacity * 0.72f);
+			}
+
 			spriteBatch.Draw(texture, NPC.Center - screenPos, source, NPC.GetAlpha(drawColor), NPC.rotation, origin, DrawScale, effects, 0f);
+			if (shieldOpacity > 0f) {
+				DrawShieldAura(spriteBatch, NPC.Center - screenPos, shieldOpacity);
+			}
+
 			return false;
+		}
+
+		private float GetShieldOpacity() {
+			if ((MonthraAttackState)(int)State != MonthraAttackState.ShieldSweep) {
+				return 0f;
+			}
+
+			float fadeIn = Utils.GetLerpValue(0f, 70f, StateTimer, true);
+			float fadeOut = 1f - Utils.GetLerpValue(ShieldSweepDuration - 95f, ShieldSweepDuration, StateTimer, true);
+			return fadeIn * fadeOut;
+		}
+
+		private static void DrawShieldAura(SpriteBatch spriteBatch, Vector2 center, float opacity) {
+			Texture2D pixel = TextureAssets.MagicPixel.Value;
+			Vector2 radius = new(360f, 290f);
+			Vector2 auraCenter = center + new Vector2(0f, 38f);
+			float pulse = 0.86f + 0.14f * (float)System.Math.Sin(Main.GlobalTimeWrappedHourly * 7.5f);
+			Color arcColor = new Color(255, 54, 218) * (0.52f * opacity * pulse);
+			Color coreColor = new Color(255, 214, 249) * (0.68f * opacity);
+			const int segments = 34;
+
+			Vector2 previous = Vector2.Zero;
+			for (int i = 0; i <= segments; i++) {
+				float t = i / (float)segments;
+				float angle = MathHelper.Lerp(MathHelper.ToRadians(14f), MathHelper.ToRadians(166f), t);
+				Vector2 normal = new((float)System.Math.Cos(angle), (float)System.Math.Sin(angle));
+				Vector2 point = auraCenter + new Vector2(normal.X * radius.X, normal.Y * radius.Y);
+				if (i > 0) {
+					DrawPixelLine(spriteBatch, pixel, previous, point, arcColor, 5f);
+					DrawPixelLine(spriteBatch, pixel, previous, point, coreColor, 1.4f);
+				}
+
+				if (i % 3 == 0) {
+					Vector2 spike = point + normal * (28f + 10f * pulse);
+					DrawPixelLine(spriteBatch, pixel, point, spike, new Color(255, 42, 226) * (0.42f * opacity), 2f);
+				}
+
+				previous = point;
+			}
+		}
+
+		private static void DrawPixelLine(SpriteBatch spriteBatch, Texture2D pixel, Vector2 start, Vector2 end, Color color, float width) {
+			Vector2 edge = end - start;
+			if (edge.LengthSquared() <= 0.01f) {
+				return;
+			}
+
+			spriteBatch.Draw(pixel, start, null, color, edge.ToRotation(), new Vector2(0f, 0.5f), new Vector2(edge.Length(), width), SpriteEffects.None, 0f);
 		}
 
 		// Envia o estado adicional necessario no modo multijogador.
