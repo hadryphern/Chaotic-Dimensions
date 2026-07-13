@@ -1,9 +1,8 @@
-// Implementa os seis estados de combate e a progressao de raiva da Monthra.
+// Implementa os dois padrões principais de combate e a progressao de raiva da Monthra.
 
 using System.IO;
 using ChaoticDimensions.Common.Systems;
 using ChaoticDimensions.Content.Items.Materials;
-using ChaoticDimensions.Content.NPCs.Monthra;
 using ChaoticDimensions.Content.Projectiles.Hostile;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,15 +17,8 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 {
 	internal enum MonthraAttackState
 	{
-		HoverVolley,
-		DashChain,
-		PrismaticPursuit,
-		LightLattice,
-		SolarSpiral,
-		ButterflySwarm,
-		PrismRain,
-		ConvergingWings,
-		ShieldSweep
+		ShieldSweep,
+		HaloNeedleBarrage
 	}
 
 	[AutoloadBossHead]
@@ -34,6 +26,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 	{
 		private const float DrawScale = 0.82f;
 		private const int ShieldSweepDuration = 1620;
+		private const int HaloNeedleDuration = 520;
 		private ref float State => ref NPC.ai[0];
 		private ref float StateTimer => ref NPC.ai[1];
 		private ref float HoverSide => ref NPC.ai[2];
@@ -42,7 +35,9 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		private float Rage => 1f - LifeRatio;
 		private bool PhaseTwo => LifeRatio < 0.5f;
 		private bool FinalPhase => LifeRatio < 0.2f;
-		private bool ShieldSweepActive => (MonthraAttackState)(int)State == MonthraAttackState.ShieldSweep && StateTimer >= 18f && StateTimer <= ShieldSweepDuration - 70f;
+		private bool LowerShieldActive => StateTimer >= 18f
+			&& ((MonthraAttackState)(int)State == MonthraAttackState.ShieldSweep && StateTimer <= ShieldSweepDuration - 70f
+				|| (MonthraAttackState)(int)State == MonthraAttackState.HaloNeedleBarrage && StateTimer <= HaloNeedleDuration - 45f);
 
 		// Regista metadados que nao mudam durante a execucao.
 		public override void SetStaticDefaults() {
@@ -75,7 +70,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			NPC.damage = (int)(NPC.damage * 0.92f);
 		}
 
-		// Atualiza a raiva pela vida perdida e executa um dos seis estados.
+		// Atualiza a raiva pela vida perdida e executa um dos dois estados novos.
 		public override void AI() {
 			if (!TargetOrDespawn()) {
 				return;
@@ -90,32 +85,11 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			NPC.damage = (int)MathHelper.Lerp(270f, 350f, Rage);
 
 			switch ((MonthraAttackState)(int)State) {
-				case MonthraAttackState.DashChain:
-					RunDashChain(player);
-					break;
-				case MonthraAttackState.PrismaticPursuit:
-					RunPrismaticPursuit(player);
-					break;
-				case MonthraAttackState.LightLattice:
-					RunLightLattice(player);
-					break;
-				case MonthraAttackState.SolarSpiral:
-					RunSolarSpiral(player);
-					break;
-				case MonthraAttackState.ButterflySwarm:
-					RunButterflySwarm(player);
-					break;
-				case MonthraAttackState.PrismRain:
-					RunPrismRain(player);
-					break;
-				case MonthraAttackState.ConvergingWings:
-					RunConvergingWings(player);
-					break;
-				case MonthraAttackState.ShieldSweep:
-					RunShieldSweep(player);
+				case MonthraAttackState.HaloNeedleBarrage:
+					RunHaloNeedleBarrage(player);
 					break;
 				default:
-					RunHoverVolley(player);
+					RunShieldSweep(player);
 					break;
 			}
 
@@ -138,245 +112,62 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			return false;
 		}
 
-		// Encurta cada estado gradualmente quando a Monthra perde vida.
-		private int Duration(int baseDuration) {
-			return (int)MathHelper.Lerp(baseDuration, baseDuration * 0.62f, Rage);
-		}
-
-		// Mantem voo lateral e dispara pequenos leques de lanças curvas.
-		private void RunHoverVolley(Player player) {
-			Vector2 offset = new(330f * HoverSide, -245f + (float)System.Math.Sin(StateTimer * 0.095f) * 55f);
-			SteerTowards(player.Center + offset, 20f + Rage * 13f, 0.1f + Rage * 0.045f);
-			int interval = System.Math.Max(32, (int)MathHelper.Lerp(52f, 34f, Rage));
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer > 16f && (int)StateTimer % interval == 0) {
-				FirePrismaticLanceVolley(player, PhaseTwo ? 5 : 4, 19f + Rage * 5f, 19f + Rage * 7f, PhaseTwo ? 195 : 160, 0.65f);
-			}
-
-			if (StateTimer >= Duration(155)) {
-				SwitchStateMaybeShield(MonthraAttackState.DashChain);
-			}
-		}
-
-		// Alterna preparação, dash e uma janela curta de recuperação.
-		private void RunDashChain(Player player) {
-			int cycle = System.Math.Max(23, (int)MathHelper.Lerp(38f, 24f, Rage));
-			int tick = (int)StateTimer % cycle;
-			if (tick < 11) {
-				Vector2 staging = player.Center + new Vector2(-HoverSide * 560f, -120f + (float)System.Math.Sin(StateTimer * 0.12f) * 70f);
-				SteerTowards(staging, 25f + Rage * 12f, 0.16f);
-			}
-			else if (tick == 11) {
-				Vector2 predicted = player.Center + player.velocity * MathHelper.Lerp(10f, 18f, Rage);
-				NPC.velocity = (predicted - NPC.Center).SafeNormalize(Vector2.UnitX) * MathHelper.Lerp(48f, 72f, Rage);
-				SoundEngine.PlaySound(SoundID.Item74 with { Pitch = 0.18f, Volume = 0.9f }, NPC.Center);
-				NPC.netUpdate = true;
-			}
-			else if (tick > cycle - 8) {
-				NPC.velocity *= 0.86f;
-			}
-
-			if (Main.netMode != NetmodeID.MultiplayerClient && tick == cycle - 6) {
-				FirePrismaticLanceVolley(player, PhaseTwo ? 4 : 3, 21f + Rage * 4f, 16f, PhaseTwo ? 205 : 170, 0.35f);
-			}
-
-			if (StateTimer >= Duration(210)) {
-				HoverSide *= -1f;
-				SwitchStateMaybeShield(MonthraAttackState.PrismaticPursuit);
-			}
-		}
-
-		// Os raios acompanham o jogador apenas durante o aviso e depois fixam a direção.
-		private void RunPrismaticPursuit(Player player) {
-			Vector2 offset = new(-HoverSide * 390f, -320f);
-			SteerTowards(player.Center + offset, 22f + Rage * 12f, 0.11f);
-			int interval = FinalPhase ? 72 : PhaseTwo ? 84 : 98;
-			if (Main.netMode != NetmodeID.MultiplayerClient && (StateTimer == 24f || (StateTimer > 24f && (int)(StateTimer - 24f) % interval == 0))) {
-				SpawnPrismaticFan(player);
-			}
-
-			if (StateTimer >= Duration(205)) {
-				SwitchStateMaybeShield(MonthraAttackState.LightLattice);
-			}
-		}
-
-		// Cria dois corredores finos de luz com uma zona segura larga.
-		private void RunLightLattice(Player player) {
-			Vector2 watch = player.Center + new Vector2(HoverSide * 430f, -360f);
-			SteerTowards(watch, 18f + Rage * 9f, 0.09f);
-			if (Main.netMode != NetmodeID.MultiplayerClient && (StateTimer == 24f || StateTimer == 112f)) {
-				SpawnLightLattice(player);
-			}
-			if (Main.netMode != NetmodeID.MultiplayerClient && (StateTimer == 76f || StateTimer == 164f)) {
-				FireHomingShot(player, PhaseTwo ? 225 : 185);
-			}
-			if (StateTimer >= Duration(190)) {
-				SwitchStateMaybeShield(MonthraAttackState.SolarSpiral);
-			}
-		}
-
-		// Espalha poucas lanças em espiral, com espaço constante para atravessar a onda.
-		private void RunSolarSpiral(Player player) {
-			Vector2 anchor = player.Center + new Vector2(0f, -330f);
-			SteerTowards(anchor, 17f + Rage * 6f, 0.12f);
-			NPC.velocity *= 0.94f;
-
-			int interval = FinalPhase ? 18 : PhaseTwo ? 21 : 24;
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer >= 32f && StateTimer <= 220f && (int)StateTimer % interval == 0) {
-				int arms = FinalPhase ? 3 : 2;
-				float baseAngle = StateTimer * (0.115f + Rage * 0.035f);
-				for (int i = 0; i < arms; i++) {
-					float angle = baseAngle + MathHelper.TwoPi * i / arms;
-					Vector2 direction = angle.ToRotationVector2();
-					Vector2 origin = NPC.Center + direction * 105f;
-					Vector2 velocity = direction * (18f + Rage * 4f);
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), origin, velocity, ModContent.ProjectileType<MonthraPrismaticLance>(), PhaseTwo ? 205 : 170, 0f, Main.myPlayer, 0.15f, HoverSide * 0.002f);
-				}
-			}
-
-			if (StateTimer >= Duration(255)) {
-				SwitchStateMaybeShield(MonthraAttackState.ButterflySwarm);
-			}
-		}
-
-		// Orbita o jogador sem acumular uma parede de minions e projéteis.
-		private void RunButterflySwarm(Player player) {
-			Vector2 orbit = new Vector2(410f, 0f).RotatedBy(StateTimer * (0.045f + Rage * 0.025f) * HoverSide);
-			SteerTowards(player.Center + orbit, 23f + Rage * 14f, 0.12f);
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer == 20f) {
-				SpawnMothSwarm(FinalPhase ? 8 : PhaseTwo ? 7 : 6);
-			}
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer > 45f && (int)StateTimer % 58 == 0) {
-				FireHomingShot(player, PhaseTwo ? 220 : 180);
-			}
-			if (StateTimer >= Duration(185)) {
-				SwitchStateMaybeShield(MonthraAttackState.PrismRain);
-			}
-		}
-
-		// Faz chover lanças que corrigem a mira apenas no início da queda.
-		private void RunPrismRain(Player player) {
-			Vector2 anchor = player.Center + new Vector2(HoverSide * 260f, -520f);
-			SteerTowards(anchor, 22f + Rage * 8f, 0.11f);
-			int interval = FinalPhase ? 18 : PhaseTwo ? 22 : 26;
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer >= 28f && StateTimer <= 176f && (int)StateTimer % interval == 0) {
-				SpawnPrismRain(player, FinalPhase ? 3 : 2);
-			}
-			if (StateTimer >= Duration(215)) {
-				SwitchStateMaybeShield(MonthraAttackState.ConvergingWings);
-			}
-		}
-
-		// Fecha pares de lanças pelos flancos, deixando uma pausa clara entre ondas.
-		private void RunConvergingWings(Player player) {
-			Vector2 watch = player.Center + new Vector2(-HoverSide * 430f, -280f);
-			SteerTowards(watch, 20f + Rage * 10f, 0.1f);
-			if (Main.netMode != NetmodeID.MultiplayerClient && (StateTimer == 34f || StateTimer == 108f)) {
-				SpawnConvergingWingPair(player);
-			}
-			if (Main.netMode != NetmodeID.MultiplayerClient && (StateTimer == 70f || StateTimer == 144f)) {
-				FirePrismaticLanceVolley(player, PhaseTwo ? 5 : 4, 22f, 14f, PhaseTwo ? 235 : 195, 0.45f);
-			}
-			if (StateTimer >= Duration(190)) {
-				HoverSide *= -1f;
-				SwitchStateMaybeShield(MonthraAttackState.HoverVolley);
-			}
-		}
-
-		// Ataque raro: escudo inferior ativo e um muro de luz que empurra o jogador.
+		// Mantem a boss protegida por baixo enquanto um raio lateral fecha a arena.
 		private void RunShieldSweep(Player player) {
-			Vector2 offset = new(HoverSide * 170f * (float)System.Math.Sin(StateTimer * 0.018f), -360f);
-			SteerTowards(player.Center + offset, 15f + Rage * 7f, 0.075f);
+			Vector2 offset = new(HoverSide * 210f * (float)System.Math.Sin(StateTimer * 0.018f), -385f);
+			SteerTowards(player.Center + offset, 16f + Rage * 8f, 0.08f);
 			NPC.velocity *= 0.96f;
 
 			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer == 48f) {
 				SpawnShieldSweepBeam(player);
 			}
 
-			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer > 210f && StateTimer < ShieldSweepDuration - 120f && (int)StateTimer % 180 == 0) {
-				FirePrismaticLanceVolley(player, PhaseTwo ? 4 : 3, 18f + Rage * 3f, 11f, PhaseTwo ? 210 : 175, 0.5f);
+			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer > 170f && StateTimer < ShieldSweepDuration - 160f && (int)StateTimer % GetNeedleInterval(92) == 0) {
+				SpawnHaloNeedleWave(player, PhaseTwo ? 3 : 2, 0.38f);
 			}
 
 			if (StateTimer >= ShieldSweepDuration) {
 				HoverSide *= -1f;
-				SwitchState(MonthraAttackState.DashChain);
+				SwitchState(MonthraAttackState.HaloNeedleBarrage);
 			}
 		}
 
-		private void SpawnPrismaticFan(Player player) {
-			Vector2 predicted = player.Center + player.velocity * (14f + Rage * 8f);
-			float centerAngle = (predicted - NPC.Center).ToRotation();
-			int count = FinalPhase ? 5 : PhaseTwo ? 4 : 3;
-			float spread = FinalPhase ? 0.56f : 0.42f;
+		// Dispara ondas de agulhas finas a partir do halo inferior da boss.
+		private void RunHaloNeedleBarrage(Player player) {
+			Vector2 orbit = new Vector2(360f + Rage * 140f, -335f).RotatedBy(StateTimer * (0.022f + Rage * 0.012f) * HoverSide);
+			SteerTowards(player.Center + orbit, 22f + Rage * 12f, 0.12f + Rage * 0.035f);
+
+			int interval = GetNeedleInterval(56);
+			if (Main.netMode != NetmodeID.MultiplayerClient && StateTimer >= 38f && StateTimer <= HaloNeedleDuration - 70f && (int)StateTimer % interval == 0) {
+				SpawnHaloNeedleWave(player, FinalPhase ? 7 : PhaseTwo ? 6 : 5, 0.82f);
+			}
+
+			if (StateTimer >= HaloNeedleDuration) {
+				HoverSide *= -1f;
+				SwitchState(MonthraAttackState.ShieldSweep);
+			}
+		}
+
+		private int GetNeedleInterval(int baseInterval) {
+			return System.Math.Max(24, (int)MathHelper.Lerp(baseInterval, baseInterval * 0.56f, Rage));
+		}
+
+		private void SpawnHaloNeedleWave(Player player, int count, float spread) {
+			Vector2 predicted = player.Center + player.velocity * MathHelper.Lerp(16f, 30f, Rage);
+			float start = -spread;
+			float end = spread;
 			for (int i = 0; i < count; i++) {
 				float t = count == 1 ? 0.5f : i / (float)(count - 1);
-				float angle = centerAngle + MathHelper.Lerp(-spread, spread, t);
-				float turn = 0.008f + Rage * 0.004f;
-				Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, new Vector2(turn, 0f), ModContent.ProjectileType<MonthraPrismaticRay>(), PhaseTwo ? 245 : 205, 0f, Main.myPlayer, angle, 2200f, 1f);
+				float arc = MathHelper.Lerp(start, end, t);
+				Vector2 origin = NPC.Center + new Vector2(arc * 360f, 175f + 42f * (float)System.Math.Sin(StateTimer * 0.07f + i));
+				Vector2 aimPoint = predicted + new Vector2((t - 0.5f) * 180f, Main.rand.NextFloat(-80f, 80f));
+				Vector2 velocity = (aimPoint - origin).SafeNormalize(Vector2.UnitY) * MathHelper.Lerp(19f, 27f, Rage);
+				int damage = PhaseTwo ? 245 : 200;
+				float curve = MathHelper.Lerp(-0.0028f, 0.0028f, t) * HoverSide;
+				Projectile.NewProjectile(NPC.GetSource_FromAI(), origin, velocity, ModContent.ProjectileType<MonthraHaloNeedle>(), damage, 0f, Main.myPlayer, player.whoAmI, curve);
 			}
-			SoundEngine.PlaySound(SoundID.Item29 with { Pitch = 0.34f, Volume = 1.05f }, NPC.Center);
-		}
 
-		private void SpawnLightLattice(Player player) {
-			Vector2 safe = player.Center + player.velocity * 12f;
-			const float safeWidth = 420f;
-			const float safeHeight = 320f;
-			for (int side = -1; side <= 1; side += 2) {
-				SpawnLatticeRay(new Vector2(safe.X, safe.Y + side * safeHeight * 0.5f), 0f);
-				SpawnLatticeRay(new Vector2(safe.X + side * safeWidth * 0.5f, safe.Y), MathHelper.PiOver2);
-			}
-			SoundEngine.PlaySound(SoundID.Item162 with { Pitch = 0.12f, Volume = 0.92f }, safe);
-		}
-
-		private void SpawnLatticeRay(Vector2 center, float rotation) {
-			Projectile.NewProjectile(NPC.GetSource_FromAI(), center, Vector2.Zero, ModContent.ProjectileType<MonthraPrismaticRay>(), PhaseTwo ? 260 : 220, 0f, Main.myPlayer, rotation, -1500f, 0f);
-		}
-
-		private void SpawnPrismRain(Player player, int count) {
-			Vector2 predicted = player.Center + player.velocity * 12f;
-			for (int i = 0; i < count; i++) {
-				float lane = count == 1 ? 0f : MathHelper.Lerp(-210f, 210f, i / (float)(count - 1));
-				Vector2 origin = predicted + new Vector2(lane + Main.rand.NextFloat(-45f, 45f), -780f - i * 70f);
-				Vector2 velocity = (predicted + new Vector2(lane * 0.2f, 0f) - origin).SafeNormalize(Vector2.UnitY) * (20f + Rage * 5f);
-				Projectile.NewProjectile(NPC.GetSource_FromAI(), origin, velocity, ModContent.ProjectileType<MonthraPrismaticLance>(), PhaseTwo ? 220 : 185, 0f, Main.myPlayer, 0.8f, HoverSide * 0.0015f);
-			}
-		}
-
-		private void SpawnConvergingWingPair(Player player) {
-			Vector2 predicted = player.Center + player.velocity * (14f + Rage * 6f);
-			for (int side = -1; side <= 1; side += 2) {
-				for (int lane = -1; lane <= 1; lane += 2) {
-					Vector2 origin = predicted + new Vector2(side * 860f, lane * 310f);
-					Vector2 velocity = (predicted + new Vector2(0f, lane * 85f) - origin).SafeNormalize(Vector2.UnitX) * (21f + Rage * 5f);
-					Projectile.NewProjectile(NPC.GetSource_FromAI(), origin, velocity, ModContent.ProjectileType<MonthraPrismaticLance>(), PhaseTwo ? 235 : 195, 0f, Main.myPlayer, 0.25f, -side * lane * 0.0018f);
-				}
-			}
-			SoundEngine.PlaySound(SoundID.Item29 with { Pitch = 0.5f, Volume = 0.85f }, predicted);
-		}
-
-		private void SpawnMothSwarm(int count) {
-			for (int i = 0; i < count; i++) {
-				Vector2 spawn = NPC.Center + Main.rand.NextVector2CircularEdge(210f, 150f);
-				int index = NPC.NewNPC(NPC.GetSource_FromAI(), (int)spawn.X, (int)spawn.Y, ModContent.NPCType<MonthraMothMinion>(), ai0: NPC.whoAmI);
-				if (index >= 0 && index < Main.maxNPCs) {
-					Main.npc[index].netUpdate = true;
-				}
-			}
-		}
-
-		private void FirePrismaticLanceVolley(Player player, int count, float speed, float spreadDegrees, int damage, float homing) {
-			Vector2 direction = (player.Center + player.velocity * 10f - NPC.Center).SafeNormalize(Vector2.UnitY);
-			for (int i = 0; i < count; i++) {
-				float t = count == 1 ? 0.5f : i / (float)(count - 1);
-				Vector2 velocity = direction.RotatedBy(MathHelper.ToRadians(MathHelper.Lerp(-spreadDegrees, spreadDegrees, t))) * speed;
-				float curve = MathHelper.Lerp(-0.0018f, 0.0018f, t);
-				Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, velocity, ModContent.ProjectileType<MonthraPrismaticLance>(), damage, 0f, Main.myPlayer, homing, curve);
-			}
-			SoundEngine.PlaySound(SoundID.Item125 with { Pitch = 0.32f, Volume = 0.82f }, NPC.Center);
-		}
-
-		private void FireHomingShot(Player player, int damage) {
-			Vector2 direction = (player.Center - NPC.Center).SafeNormalize(Vector2.UnitY);
-			Projectile.NewProjectile(NPC.GetSource_FromAI(), NPC.Center, direction * 11f, ModContent.ProjectileType<MonthraFireballHoming>(), damage, 0f, Main.myPlayer);
+			SoundEngine.PlaySound(SoundID.Item29 with { Pitch = 0.48f, Volume = 0.9f }, NPC.Center);
 		}
 
 		private void SpawnShieldSweepBeam(Player player) {
@@ -403,42 +194,8 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			NPC.netUpdate = true;
 		}
 
-		private void SwitchStateMaybeShield(MonthraAttackState next) {
-			if (Main.netMode != NetmodeID.MultiplayerClient && ShouldStartShieldSweep()) {
-				SwitchState(MonthraAttackState.ShieldSweep);
-				return;
-			}
-
-			SwitchState(next);
-		}
-
-		private bool ShouldStartShieldSweep() {
-			if (AnyShieldSweepBeam()) {
-				return false;
-			}
-
-			float chance = MathHelper.Lerp(0.04f, 0.24f, Rage);
-			if (LifeRatio > 0.72f) {
-				chance *= 0.35f;
-			}
-
-			return Main.rand.NextFloat() < chance;
-		}
-
-		private static bool AnyShieldSweepBeam() {
-			int type = ModContent.ProjectileType<MonthraSweepBeam>();
-			for (int i = 0; i < Main.maxProjectiles; i++) {
-				Projectile projectile = Main.projectile[i];
-				if (projectile.active && projectile.type == type) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-
 		private bool IsProtectedByLowerShield(Vector2 source) {
-			if (!ShieldSweepActive || source.Y < NPC.Center.Y - 35f) {
+			if (!LowerShieldActive || source.Y < NPC.Center.Y - 35f) {
 				return false;
 			}
 
@@ -449,7 +206,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 
 		public override void ModifyHitByItem(Player player, Item item, ref NPC.HitModifiers modifiers) {
 			if (IsProtectedByLowerShield(player.Center)) {
-				modifiers.FinalDamage *= 0.35f;
+				modifiers.FinalDamage *= 0.22f;
 			}
 		}
 
@@ -459,7 +216,7 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 			}
 
 			if (IsProtectedByLowerShield(projectile.Center)) {
-				modifiers.FinalDamage *= 0.35f;
+				modifiers.FinalDamage *= 0.22f;
 			}
 		}
 
@@ -500,12 +257,13 @@ namespace ChaoticDimensions.Content.Bosses.Monthra
 		}
 
 		private float GetShieldOpacity() {
-			if ((MonthraAttackState)(int)State != MonthraAttackState.ShieldSweep) {
+			if (!LowerShieldActive) {
 				return 0f;
 			}
 
 			float fadeIn = Utils.GetLerpValue(0f, 70f, StateTimer, true);
-			float fadeOut = 1f - Utils.GetLerpValue(ShieldSweepDuration - 95f, ShieldSweepDuration, StateTimer, true);
+			float duration = (MonthraAttackState)(int)State == MonthraAttackState.ShieldSweep ? ShieldSweepDuration : HaloNeedleDuration;
+			float fadeOut = 1f - Utils.GetLerpValue(duration - 95f, duration, StateTimer, true);
 			return fadeIn * fadeOut;
 		}
 
